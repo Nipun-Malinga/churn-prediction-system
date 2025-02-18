@@ -11,12 +11,19 @@ class Model_Info(db.Model):
     model_id: Mapped[int] = mapped_column(ForeignKey('model.id'), nullable=False)
     updated_date: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.now)
     accuracy: Mapped[float] = mapped_column(nullable=False, default=0)
+
     # Confusion matrix data
     TP:Mapped[int] = mapped_column(nullable= False, default=0)
     TN:Mapped[int] = mapped_column(nullable= False, default=0)
     FP:Mapped[int] = mapped_column(nullable= False, default=0)
     FN:Mapped[int] = mapped_column(nullable= False, default=0)
+
     precision:Mapped[int] = mapped_column(nullable= False, default=0)
     recall:Mapped[int] = mapped_column(nullable= False, default=0)
     f1_score:Mapped[int] = mapped_column(nullable= False, default=0)
+
     model = relationship('model', back_populates='model_info')
+
+    def __repr__(self):
+        return f'Model_Info(model_id = {self.model_id}, updated_date = {self.updated_date}, accuracy = {self.accuracy})'
+                
