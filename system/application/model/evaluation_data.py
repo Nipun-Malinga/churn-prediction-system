@@ -5,7 +5,7 @@ from sqlalchemy.orm import mapped_column, Mapped
 class Evaluation_Data(db.Model):
     __tablename__ = 'evaluation_data'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     education: Mapped[str] = mapped_column(String(50), nullable=False)
     credit_score: Mapped[float] = mapped_column(nullable=False)
     geography: Mapped[str] = mapped_column(String(100), nullable=False)
