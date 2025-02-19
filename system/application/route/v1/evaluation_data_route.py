@@ -22,6 +22,6 @@ def add_data():
         db.session.add(new_entry)
         db.session.commit()
         
-        return jsonify(request_data), 201
+        return schema.dump(new_entry), 201
     except ValidationError as err:
         return jsonify(err.messages), 400
