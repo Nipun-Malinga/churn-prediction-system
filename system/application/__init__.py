@@ -25,7 +25,7 @@ def create_app():
         db.create_all()
 
     from application.route import create_routes
-    from application.errors import register_error_handler
+    from application.error import register_error_handler
 
     create_routes(app)
     register_error_handler(app)

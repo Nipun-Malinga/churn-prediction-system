@@ -176,5 +176,8 @@ cython_debug/
 # Trained models directory
 models
 
+# Model Files
+.pkl
+
 # idea direcrtory
 .idea
