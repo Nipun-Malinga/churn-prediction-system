@@ -16,3 +16,10 @@ def handle_404(error):
         }
     ), 404
 
+def handle_500(error):
+    return jsonify(
+        {
+            "error": "Internal server error",
+            "message": error.description
+        }
+    ), 500
