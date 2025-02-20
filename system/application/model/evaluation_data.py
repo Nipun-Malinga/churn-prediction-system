@@ -1,11 +1,13 @@
+from datetime import datetime
 from application import db
-from sqlalchemy import String
+from sqlalchemy import String, DateTime
 from sqlalchemy.orm import mapped_column, Mapped
 
 class Evaluation_Data(db.Model):
     __tablename__ = 'evaluation_data'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    added_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     education: Mapped[str] = mapped_column(String(50), nullable=False)
     credit_score: Mapped[float] = mapped_column(nullable=False)
     geography: Mapped[str] = mapped_column(String(100), nullable=False)

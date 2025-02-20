@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
-from application import db
 from application.schema import Evaluation_Data_Schema
-from application.model import Evaluation_Data
+from application.service import save_evaluation_data
 from application.response import response_template, error_response_template
 
 data = Blueprint('data_bp', __name__)
@@ -18,11 +17,19 @@ def add_data():
 
     try:
         request_data = schema.load(request.json)
-        new_entry = Evaluation_Data(**request_data)
+        return response_template(
+            'success', 
+            'New data added to the server successfully', 
+            schema.dump(save_evaluation_data(request_data))
+        ), 201
 
-        db.session.add(new_entry)
-        db.session.commit()
-        
-        return response_template('success', 'New data added to the server successfully', schema.dump(new_entry)), 201
     except ValidationError as err:
-        return error_response_template(err.messages), 400
+        return error_response_template(err.messages), 400 
+
+@data.route('/data/csv', methods=['POST'])
+def add_csv_data():
+    return
+
+@data.route('/data/csv/read', methods=['POST'])
+def read_csv_data():
+    return   
