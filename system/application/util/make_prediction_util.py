@@ -6,5 +6,8 @@ def make_prediction(preprocessed_data):
     BASE_DIR = join(ABS_DIR, "trained_models\\")
 
     voting_classifier = joblib.load(join(BASE_DIR, "ml_models\\voting_classifier.pkl"))
-    print(voting_classifier.predict_proba(preprocessed_data).tolist())
-    return [0]
+
+    prediction = voting_classifier.predict(preprocessed_data).tolist()
+    probability = voting_classifier.predict_proba(preprocessed_data).tolist()
+
+    return prediction, probability

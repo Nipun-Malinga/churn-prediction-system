@@ -3,6 +3,7 @@ from marshmallow import ValidationError
 from application import db
 from application.schema import Evaluation_Data_Schema
 from application.model import Evaluation_Data
+from application.response import response_template, error_response_template
 
 data = Blueprint('data_bp', __name__)
 
@@ -22,6 +23,6 @@ def add_data():
         db.session.add(new_entry)
         db.session.commit()
         
-        return schema.dump(new_entry), 201
+        return response_template('success', 'New data added to the server successfully', schema.dump(new_entry)), 201
     except ValidationError as err:
-        return jsonify(err.messages), 400
+        return error_response_template('Failed to add data to the server'), 400

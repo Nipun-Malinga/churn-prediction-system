@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 from application.service import  predict_results
 from application.schema import Prediction_Request_Schema
+from application.response import response_template, error_response_template
 
 predict_result = Blueprint('predict_bp', __name__)
 
@@ -10,6 +11,9 @@ def predict():
     schema = Prediction_Request_Schema()
     try:
         request_data = schema.load(request.json)
-        return jsonify({"prediction": predict_results(request_data)[0]}), 200
+        
+        prediction, probability = predict_results(request_data)
+
+        return response_template('success', 'Model prediction success', {"Prediction": prediction[0], "Probability": probability}), 200
     except ValidationError as err:
-        return jsonify(err.messages), 400
+        return error_response_template('Failed to make prediction'), 400
