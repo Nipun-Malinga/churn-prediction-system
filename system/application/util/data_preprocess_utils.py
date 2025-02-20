@@ -4,7 +4,6 @@ from os.path import join, dirname, realpath, abspath
 
 def json_data_preprocessor(json_data):
     dataframe = pd.json_normalize(json_data)
-    dataframe = dataframe.drop(columns=['exited'])
 
     ABS_DIR = dirname(abspath(__file__))
     BASE_DIR = join(ABS_DIR, "trained_models\\")
