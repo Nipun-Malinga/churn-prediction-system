@@ -173,11 +173,8 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# Trained models directory
-models
-
 # Model Files
-.pkl
+*.pkl
 
 # idea direcrtory
 .idea
