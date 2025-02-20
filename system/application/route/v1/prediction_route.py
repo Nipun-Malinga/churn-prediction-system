@@ -16,4 +16,4 @@ def predict():
 
         return response_template('success', 'Model prediction success', {"Prediction": prediction[0], "Probability": probability}), 200
     except ValidationError as err:
-        return error_response_template('Failed to make prediction'), 400
+        return error_response_template(err.messages), 400

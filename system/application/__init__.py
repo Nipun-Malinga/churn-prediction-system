@@ -19,7 +19,7 @@ def create_app():
     db.init_app(app)
     marshmallow.init_app(app)
 
-    from application.model import Model, Model_Info, Accuracy_Drift, Evaluation_Data
+    from application.model import Model, Model_Info, Accuracy_Drift, Evaluation_Data, User
 
     with app.app_context():
         db.create_all()

@@ -1,12 +1,12 @@
 from flask import jsonify
 
-def handle_415(error):
+def handle_400(error):
     return jsonify(
         {
-            "error": "Unsupported media type",
+            "error": "Resource not found",
             "message": error.description
         }
-    ), 415
+    ), 400
 
 def handle_404(error):
     return jsonify(
@@ -15,6 +15,14 @@ def handle_404(error):
             "message": error.description
         }
     ), 404
+
+def handle_415(error):
+    return jsonify(
+        {
+            "error": "Unsupported media type",
+            "message": error.description
+        }
+    ), 415
 
 def handle_500(error):
     return jsonify(

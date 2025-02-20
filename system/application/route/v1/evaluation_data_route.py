@@ -25,4 +25,4 @@ def add_data():
         
         return response_template('success', 'New data added to the server successfully', schema.dump(new_entry)), 201
     except ValidationError as err:
-        return error_response_template('Failed to add data to the server'), 400
+        return error_response_template(err.messages), 400
