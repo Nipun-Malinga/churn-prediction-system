@@ -3,9 +3,9 @@ from os.path import join, dirname, abspath
 
 def make_prediction(preprocessed_data):
     ABS_DIR = dirname(abspath(__file__))
-    BASE_DIR = join(ABS_DIR, "trained_models\\")
+    BASE_DIR = join(ABS_DIR, "trained_models/")
 
-    voting_classifier = joblib.load(join(BASE_DIR, "ml_models\\voting_classifier.pkl"))
+    voting_classifier = joblib.load(join(BASE_DIR, "ml_models/voting_classifier.pkl"))
 
     prediction = voting_classifier.predict(preprocessed_data).tolist()
     probability = voting_classifier.predict_proba(preprocessed_data).tolist()

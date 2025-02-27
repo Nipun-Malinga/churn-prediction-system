@@ -6,11 +6,12 @@ def json_data_preprocessor(json_data):
     dataframe = pd.json_normalize(json_data)
 
     ABS_DIR = dirname(abspath(__file__))
-    BASE_DIR = join(ABS_DIR, "trained_models\\")
+    print(ABS_DIR)
+    BASE_DIR = join(ABS_DIR, "trained_models/")
 
     def encode_data(data):
         # Onehot encoding
-        oneHotEncoder = joblib.load(join(BASE_DIR, "encoders\\onehot_encoder.pkl"))
+        oneHotEncoder = joblib.load(join(BASE_DIR, "encoders/onehot_encoder.pkl"))
         encoded = oneHotEncoder.transform(data[['geography', 'education', 'card_type']])
         encoded_df = pd.DataFrame(encoded,
                                     columns=oneHotEncoder.get_feature_names_out(
@@ -28,9 +29,9 @@ def json_data_preprocessor(json_data):
         data = data.drop(columns=['geography', 'education', 'card_type'])
 
         # Label encoding
-        genderEncoder = joblib.load(join(BASE_DIR, "encoders\\gender_encoder.pkl"))
-        housingEncoder = joblib.load(join(BASE_DIR, "encoders\\housing_encoder.pkl"))
-        loanEncoder = joblib.load(join(BASE_DIR, "encoders\\loan_encoder.pkl"))
+        genderEncoder = joblib.load(join(BASE_DIR, "encoders/gender_encoder.pkl"))
+        housingEncoder = joblib.load(join(BASE_DIR, "encoders/housing_encoder.pkl"))
+        loanEncoder = joblib.load(join(BASE_DIR, "encoders/loan_encoder.pkl"))
 
         data['gender'] = genderEncoder.transform(data['gender'])
         data['housing'] = housingEncoder.transform(data['housing'])
@@ -41,7 +42,7 @@ def json_data_preprocessor(json_data):
 
     def scale_data(data):
         # Min-Max scaling
-        minmaxScaler = joblib.load(join(BASE_DIR, "scaler\\minMax_scaler.pkl"))
+        minmaxScaler = joblib.load(join(BASE_DIR, "scaler/minMax_scaler.pkl"))
         return minmaxScaler.transform(data)
 
     encoded_data = encode_data(dataframe)
