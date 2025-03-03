@@ -14,12 +14,12 @@ marshmallow = Marshmallow()
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
 
     db.init_app(app)
     marshmallow.init_app(app)
 
-    from application.model import Model, Model_Info, Accuracy_Drift, Evaluation_Data, User
+    from application.model import Model, Model_Info, Accuracy_Drift, Evaluation_Data, User, Model_Hyper_Parameters
 
     with app.app_context():
         db.create_all()
