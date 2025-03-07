@@ -1,20 +1,23 @@
-import joblib
+from datetime import datetime
+
 import warnings
+import joblib
+
 import numpy as np
 import pandas as pd
-from imblearn.over_sampling import SMOTENC
-from sklearn.model_selection import train_test_split
 from pandas.api.types import is_numeric_dtype, is_object_dtype
+
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder, MinMaxScaler
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 
-import lightgbm as lgb
-from sklearn.model_selection import RandomizedSearchCV
+from imblearn.over_sampling import SMOTENC
 from scipy.stats import randint, uniform
-from xgboost import XGBClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import VotingClassifier
 
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
+from lightgbm import LGBMClassifier
+from xgboost import XGBClassifier
+
+from sqlalchemy import text
 
 from scripts import database_engine
 
@@ -145,8 +148,7 @@ def preprocess_dataset():
     with database_engine().connect() as conn:
         dataset = pd.read_sql(
             sql="SELECT * FROM evaluation_data",
-            # con=conn.connection
-            con=conn
+            con=conn.connection
         )
 
     dataset = dataset.drop(columns=['added_date'])
@@ -186,21 +188,11 @@ def preprocess_dataset():
 
     return X_train, X_test, y_train, y_test
 
-def train_model():
-
-    X_train, X_test, y_train, y_test = preprocess_dataset()
+def train_model(X_train, y_train):
 
     def preform_random_search(model, params, n_tier=20, cv=5):
         random_search = RandomizedSearchCV(model, param_distributions=params, n_iter=n_tier, cv=cv, scoring='accuracy', n_jobs=-1, random_state=42)
         return random_search.fit(X_train, y_train)
-    
-    def display_model_accuracy(model, model_name):
-        y_pred = model.predict(X_test)
-
-        print(f"Evaluating: {model_name} Model")
-        print(f"Accuracy Score: {accuracy_score(y_test, y_pred)}")
-        print(f"Classification Report: {classification_report(y_test, y_pred)}")
-        print(f"Confusion Matrix: {confusion_matrix(y_test, y_pred)}")
     
     XGM = XGBClassifier(
         objective="binary:logistic",
@@ -218,32 +210,85 @@ def train_model():
     XGM_random_searched = preform_random_search(XGM, params_XG, 30)
     XGM_random_searched.best_params_
 
-    display_model_accuracy(XGM_random_searched, 'XGBOOST')
+    # LGB = LGBMClassifier()
 
-    LGB = lgb.LGBMClassifier()
+    # params_LGB = {
+    #     'learning_rate': uniform(0.01, 1),
+    #     'max_depth': randint(2, 20),
+    #     'num_leaves': randint(20, 60),
+    #     'n_estimators': randint(100, 600),
+    # }
 
-    params_LGB = {
-        'learning_rate': uniform(0.01, 1),
-        'max_depth': randint(2, 20),
-        'num_leaves': randint(20, 60),
-        'n_estimators': randint(100, 600),
-    }
+    # LGB_random_searched = preform_random_search(LGB, params_LGB, 40, 10)
+    # LGB_random_searched.best_params_
 
-    LGB_random_searched = preform_random_search(LGB, params_LGB, 40, 10)
-    LGB_random_searched.best_params_
+    # RF = RandomForestClassifier()
 
-    display_model_accuracy(LGB_random_searched, 'LIGHTGBM')
+    # params_RF = {
+    #     'max_depth': randint(3, 20),
+    #     'min_samples_split': randint(2, 20),
+    #     'n_estimators': randint(100, 600),
+    # }
 
-    RF = RandomForestClassifier()
+    # RF_random_searched = preform_random_search(RF, params_RF, 30, 10)
+    # RF_random_searched.best_params_
 
-    params_RF = {
-        'max_depth': randint(3, 20),
-        'min_samples_split': randint(2, 20),
-        'n_estimators': randint(100, 600),
-    }
+    # voting_classifier = VotingClassifier(
+    #     estimators=[
+    #         ('xg', XGM_random_searched), 
+    #         ('lgb', LGB_random_searched), 
+    #         ('rf', RF_random_searched)], voting='soft').fit(X_train, y_train)
+    
+    return [
+        {"model":XGM_random_searched, "name":"XGBOOST"}, 
+        # {"model":LGB_random_searched, "name":"LIGHTGBM"}, 
+        # {"model":RF_random_searched, "name":"RANDOM FORSET"}, 
+        # {"model":voting_classifier, "name":"VOTING CLASSIFIER"}
+        ]
 
-    RF_random_searched = preform_random_search(RF, params_RF, 30, 10)
-    RF_random_searched.best_params_
+from sqlalchemy import text
+from datetime import datetime
 
-    display_model_accuracy(RF_random_searched, 'Random Forest')
+def update_database(model_evaluation_list):
+    engine = database_engine()
 
+    with engine.connect() as connection:
+        try:
+            for evaluation in model_evaluation_list:
+                model_id_result = connection.execute(
+                    text("SELECT id FROM model WHERE name = :model_name"), {"model_name": evaluation["model_name"]}
+                ).fetchone()
+
+                if not model_id_result:
+                    model_id_result = connection.execute(
+                        text("INSERT INTO model (name) VALUES (:name) RETURNING id"), {"name": evaluation["model_name"]}
+                    ).fetchone()
+
+                model_id = model_id_result[0] 
+
+                model_info_query = text("""
+                    INSERT INTO model_info 
+                    (model_id, updated_date, accuracy, "TP", "TN", "FP", "FN", precision, recall, f1_score, is_automated_tunning)
+                    VALUES 
+                    (:model_id, :updated_date, :accuracy, :TP, :TN, :FP, :FN, :precision, :recall, :f1_score, :is_automated_tunning)
+                """)
+
+                connection.execute(model_info_query, {
+                    "model_id": model_id,
+                    "updated_date": datetime.now(),
+                    "accuracy": float(evaluation["accuracy"]), 
+                    "TP": int(evaluation["tp"]),
+                    "TN": int(evaluation["tn"]),
+                    "FP": int(evaluation["fp"]),
+                    "FN": int(evaluation["fn"]),
+                    "precision": float(evaluation["precision"]),
+                    "recall": float(evaluation["recall"]),
+                    "f1_score": float(evaluation["f1_score"]),
+                    "is_automated_tunning": True
+                })
+
+
+                print("Database updated successfully!")
+
+        except Exception as ex:
+            print(f"Error updating database: {ex}")
