@@ -12,7 +12,7 @@ default_args = {
 @dag(dag_id='Model_Training_DAG', default_args=default_args, start_date=datetime(2025, 3, 6), schedule_interval="@daily")
 def model_trainer():
     @task(multiple_outputs=True)
-    def preprocess():
+    def data_preprocess():
         X_train, X_test, y_train, y_test = preprocess_dataset()
         return {
             "X_train": X_train, 
@@ -22,25 +22,26 @@ def model_trainer():
         }
     
     @task(multiple_outputs=True)
-    def train(X_train, y_train):
+    def model_training(X_train, y_train):
         model_list = train_model(X_train, y_train)
         return {
             "model_list": model_list
         }
     
     @task(multiple_outputs=True)
-    def evaluate(model_list, x_test, y_test):
+    def model_evaluation(model_list, x_test, y_test):
+        model_evaluation_list = evaluate_model(model_list, x_test, y_test)
         return {
-            "model_evaluation_list": evaluate_model(model_list, x_test, y_test)
+            "model_evaluation_list": model_evaluation_list
         }
 
     @task
-    def update(model_evaluation_list):
+    def database_update(model_evaluation_list):
         update_database(model_evaluation_list)
 
-    preprocessed_data = preprocess()
-    trained_models = train(preprocessed_data["X_train"],preprocessed_data["y_train"])
-    evaluate_models = evaluate(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["y_test"])
-    update(evaluate_models["model_evaluation_list"])
+    preprocessed_data = data_preprocess()
+    trained_models = model_training(preprocessed_data["X_train"],preprocessed_data["y_train"])
+    evaluate_models = model_evaluation(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["y_test"])
+    database_update(evaluate_models["model_evaluation_list"])
 
 training_dag = model_trainer()

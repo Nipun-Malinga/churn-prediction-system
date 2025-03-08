@@ -1,7 +1,8 @@
-from datetime import datetime
 
 import warnings
 import joblib
+
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
@@ -208,46 +209,43 @@ def train_model(X_train, y_train):
     }
 
     XGM_random_searched = preform_random_search(XGM, params_XG, 30)
-    XGM_random_searched.best_params_
+    XGM_random_searched.best_params_["max_depth"]
 
-    # LGB = LGBMClassifier()
+    LGB = LGBMClassifier()
 
-    # params_LGB = {
-    #     'learning_rate': uniform(0.01, 1),
-    #     'max_depth': randint(2, 20),
-    #     'num_leaves': randint(20, 60),
-    #     'n_estimators': randint(100, 600),
-    # }
+    params_LGB = {
+        'learning_rate': uniform(0.01, 1),
+        'max_depth': randint(2, 20),
+        'num_leaves': randint(20, 60),
+        'n_estimators': randint(100, 600),
+    }
 
-    # LGB_random_searched = preform_random_search(LGB, params_LGB, 40, 10)
-    # LGB_random_searched.best_params_
+    LGB_random_searched = preform_random_search(LGB, params_LGB, 40, 10)
+    LGB_random_searched.best_params_
 
-    # RF = RandomForestClassifier()
+    RF = RandomForestClassifier()
 
-    # params_RF = {
-    #     'max_depth': randint(3, 20),
-    #     'min_samples_split': randint(2, 20),
-    #     'n_estimators': randint(100, 600),
-    # }
+    params_RF = {
+        'max_depth': randint(3, 20),
+        'min_samples_split': randint(2, 20),
+        'n_estimators': randint(100, 600),
+    }
 
-    # RF_random_searched = preform_random_search(RF, params_RF, 30, 10)
-    # RF_random_searched.best_params_
+    RF_random_searched = preform_random_search(RF, params_RF, 30, 10)
+    RF_random_searched.best_params_
 
-    # voting_classifier = VotingClassifier(
-    #     estimators=[
-    #         ('xg', XGM_random_searched), 
-    #         ('lgb', LGB_random_searched), 
-    #         ('rf', RF_random_searched)], voting='soft').fit(X_train, y_train)
+    voting_classifier = VotingClassifier(
+        estimators=[
+            ('xg', XGM_random_searched), 
+            ('lgb', LGB_random_searched), 
+            ('rf', RF_random_searched)], voting='soft').fit(X_train, y_train)
     
     return [
         {"model":XGM_random_searched, "name":"XGBOOST"}, 
-        # {"model":LGB_random_searched, "name":"LIGHTGBM"}, 
-        # {"model":RF_random_searched, "name":"RANDOM FORSET"}, 
-        # {"model":voting_classifier, "name":"VOTING CLASSIFIER"}
+        {"model":LGB_random_searched, "name":"LIGHTGBM"}, 
+        {"model":RF_random_searched, "name":"RANDOM FORSET"}, 
+        {"model":voting_classifier, "name":"VOTING CLASSIFIER"}
         ]
-
-from sqlalchemy import text
-from datetime import datetime
 
 def update_database(model_evaluation_list):
     engine = database_engine()
@@ -292,3 +290,6 @@ def update_database(model_evaluation_list):
 
         except Exception as ex:
             print(f"Error updating database: {ex}")
+
+def deploy_model():
+    None
