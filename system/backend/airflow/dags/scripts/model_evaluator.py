@@ -1,3 +1,5 @@
+from sqlalchemy import text
+from scripts import database_engine
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix, precision_score, recall_score, f1_score
 
 def evaluate_model(model_list: list, X_test, y_test):
@@ -18,8 +20,6 @@ def evaluate_model(model_list: list, X_test, y_test):
             "fp": fp,
             "fn": fn 
         })
-
-        return 
 
     for model in model_list:
         display_model_accuracy(model["model"], model["name"],  X_test, y_test)
