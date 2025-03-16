@@ -1,7 +1,7 @@
 from airflow.decorators import dag, task
 from datetime import datetime, timedelta
 from scripts.utils import fetch_training_data
-from scripts.data_preprocessor import preprocess_dataset
+from scripts.data_preprocessor import preprocess_dataset, deploy_preprocessing_models
 from scripts.model_trainer import train_model, update_database, deploy_model
 from scripts.model_evaluator import evaluate_model
 
@@ -22,23 +22,29 @@ def model_trainer():
 
     @task(multiple_outputs=True)
     def preprocessing_data(dataset):
-        X_train, X_test, y_train, y_test = preprocess_dataset(dataset)
+        X_train, X_test, y_train, y_test, encoders, scalers = preprocess_dataset(dataset)
         return {
             "X_train": X_train, 
             "X_test": X_test, 
             "y_train": y_train, 
-            "y_test": y_test
+            "y_test": y_test,
+            "encoders": encoders,
+            "scalers": scalers
         }
     
+    @task
+    def deploying_processing_models(encoders, scalers):
+        deploy_preprocessing_models(encoders, scalers)
+    
     @task(multiple_outputs=True)
-    def model_training(X_train, y_train):
+    def training_ml_model(X_train, y_train):
         model_list = train_model(X_train, y_train)
         return {
             "model_list": model_list
         }
     
     @task(multiple_outputs=True)
-    def model_evaluation(model_list, x_test, y_test):
+    def evaluating_model_performance(model_list, x_test, y_test):
         model_evaluation_list = evaluate_model(model_list, x_test, y_test)
         return {
             "model_evaluation_list": model_evaluation_list
@@ -54,8 +60,9 @@ def model_trainer():
 
     data = fetching_training_data()
     preprocessed_data = preprocessing_data(data["fetched_data"])
-    trained_models = model_training(preprocessed_data["X_train"],preprocessed_data["y_train"])
-    evaluate_models = model_evaluation(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["y_test"])
+    deploying_processing_models(preprocessed_data["encoders"], preprocessed_data["scalers"])
+    trained_models = training_ml_model(preprocessed_data["X_train"],preprocessed_data["y_train"])
+    evaluate_models = evaluating_model_performance(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["y_test"])
     updating_database(evaluate_models["model_evaluation_list"])
     deploying_model(trained_models["model_list"])
 

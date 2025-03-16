@@ -28,7 +28,12 @@ from scripts.utils import upload_to_gcs
 warnings.filterwarnings('ignore')
 
 ABS_DIR = dirname(abspath(__file__))
-BASE_DIR = join(ABS_DIR, "trained_models/ml_models/")
+BASE_DIR = join(ABS_DIR, "trained_models/")
+
+ML_MODEL_PATHS = {
+    "non_versioned": join(BASE_DIR, "ml_models/non_versioned/"),
+    "versioned": join(BASE_DIR, "ml_models/versioned/"),
+}
 
 def train_model(X_train, y_train):
 
@@ -52,8 +57,10 @@ def train_model(X_train, y_train):
     XGM_random_searched = preform_random_search(XGM, params_XG, 30)
     XGM_random_searched.best_params_
 
+    joblib.dump(XGM_random_searched, join(ML_MODEL_PATHS["non_versioned"], "XGBOOST.pkl"))
+
     XGM_version = f"XGBOOST_V{str(uuid.uuid4())[:8]}.pkl"
-    joblib.dump(XGM_random_searched, join(BASE_DIR, XGM_version))
+    joblib.dump(XGM_random_searched, join(ML_MODEL_PATHS["versioned"], XGM_version))
 
     # LGB = LGBMClassifier()
 
@@ -90,6 +97,11 @@ def train_model(X_train, y_train):
         # {"model":RF_random_searched, "name":"RANDOM FORSET"}, 
         # {"model":voting_classifier, "name":"VOTING CLASSIFIER"}
         ]
+
+def deploy_model(model_list: list):
+    for model in model_list:
+        model_version = model["version"]
+        upload_to_gcs("churn_prediction_model_storage", join(ML_MODEL_PATHS["versioned"], model_version), f"ml_models/{model_version}")
 
 def update_database(model_evaluation_list):
     engine = database_engine()
@@ -134,8 +146,3 @@ def update_database(model_evaluation_list):
 
         except Exception as ex:
             print(f"Error updating database: {ex}")
-
-def deploy_model(model_list: list):
-    for model in model_list:
-        model_version = model["version"]
-        # upload_to_gcs("churn_prediction_model_storage", join(BASE_DIR, model_version), f"ml_models/{model_version}")
