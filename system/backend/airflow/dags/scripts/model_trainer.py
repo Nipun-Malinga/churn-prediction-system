@@ -110,9 +110,9 @@ def update_database(model_evaluation_list):
 
                 model_info_query = text("""
                     INSERT INTO model_info 
-                    (model_id, updated_date, accuracy, "TP", "TN", "FP", "FN", precision, recall, f1_score, is_automated_tunning)
+                    (model_id, updated_date, accuracy, "TP", "TN", "FP", "FN", precision, recall, f1_score, is_automated_tunning, version_name)
                     VALUES 
-                    (:model_id, :updated_date, :accuracy, :TP, :TN, :FP, :FN, :precision, :recall, :f1_score, :is_automated_tunning)
+                    (:model_id, :updated_date, :accuracy, :TP, :TN, :FP, :FN, :precision, :recall, :f1_score, :is_automated_tunning, :version_name)
                 """)
 
                 connection.execute(model_info_query, {
@@ -126,7 +126,8 @@ def update_database(model_evaluation_list):
                     "precision": float(evaluation["precision"]),
                     "recall": float(evaluation["recall"]),
                     "f1_score": float(evaluation["f1_score"]),
-                    "is_automated_tunning": True
+                    "is_automated_tunning": True,
+                    "version_name": evaluation["version_name"]
                 })
 
                 print("Database updated successfully!")
@@ -137,4 +138,4 @@ def update_database(model_evaluation_list):
 def deploy_model(model_list: list):
     for model in model_list:
         model_version = model["version"]
-        upload_to_gcs("churn_prediction_model_storage", join(BASE_DIR, model_version), f"ml_models/{model_version}")
+        # upload_to_gcs("churn_prediction_model_storage", join(BASE_DIR, model_version), f"ml_models/{model_version}")

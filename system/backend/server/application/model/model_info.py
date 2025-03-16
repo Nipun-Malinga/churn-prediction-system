@@ -23,7 +23,7 @@ class Model_Info(db.Model):
     f1_score: Mapped[float] = mapped_column(Float, nullable= False, default=0)
 
     is_automated_tunning: Mapped[bool] = mapped_column(Boolean, nullable= False, default=0)
-    file_version_name: Mapped[str] = mapped_column(String)
+    version_name: Mapped[str] = mapped_column(String)
 
     # Relationships
     model: Mapped["Model"] = relationship(back_populates='model_info')
