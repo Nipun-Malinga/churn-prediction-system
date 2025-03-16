@@ -1,7 +1,7 @@
 import datetime
 from application import db
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import Float, Boolean, ForeignKey, DateTime
+from sqlalchemy import String, Float, Boolean, ForeignKey, DateTime
 
 # Stores the model details
 class Model_Info(db.Model):
@@ -23,13 +23,14 @@ class Model_Info(db.Model):
     f1_score: Mapped[float] = mapped_column(Float, nullable= False, default=0)
 
     is_automated_tunning: Mapped[bool] = mapped_column(Boolean, nullable= False, default=0)
+    file_version_name: Mapped[str] = mapped_column(String)
 
     # Relationships
     model: Mapped["Model"] = relationship(back_populates='model_info')
     accuracy_drift: Mapped[list["Accuracy_Drift"]] = relationship(
         back_populates='model_info', 
         cascade="all, delete-orphan"
-    ) 
+    )  
     model_hyper_parameters: Mapped["Model_Hyper_Parameters"] = relationship(back_populates='model_info')
 
     def __repr__(self):

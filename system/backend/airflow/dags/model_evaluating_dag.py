@@ -1,7 +1,7 @@
 from airflow.decorators import dag, task
 from datetime import datetime, timedelta
 
-from scripts.data_fetcher import fetch_evaluation_data
+from scripts.utils import fetch_evaluation_data
 
 default_args = {
     'owner': 'churn-pred_server',

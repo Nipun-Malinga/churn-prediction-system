@@ -1,8 +1,8 @@
 from airflow.decorators import dag, task
 from datetime import datetime, timedelta
-from scripts.data_fetcher import fetch_training_data
-from scripts.preprocess_data import preprocess_dataset
-from scripts.model_trainer import train_model, update_database
+from scripts.utils import fetch_training_data
+from scripts.data_preprocessor import preprocess_dataset
+from scripts.model_trainer import train_model, update_database, deploy_model
 from scripts.model_evaluator import evaluate_model
 
 default_args = {
@@ -48,10 +48,15 @@ def model_trainer():
     def updating_database(model_evaluation_list):
         update_database(model_evaluation_list)
 
+    @task
+    def deploying_model(model_list):
+        deploy_model(model_list)
+
     data = fetching_training_data()
     preprocessed_data = preprocessing_data(data["fetched_data"])
     trained_models = model_training(preprocessed_data["X_train"],preprocessed_data["y_train"])
     evaluate_models = model_evaluation(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["y_test"])
     updating_database(evaluate_models["model_evaluation_list"])
+    deploying_model(trained_models["model_list"])
 
 training_dag = model_trainer()
