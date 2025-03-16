@@ -23,7 +23,7 @@ from os.path import join, dirname, abspath
 
 from google.cloud import storage
 
-from scripts.utils import upload_to_gcs
+from scripts.utils import upload_to_gcs, remove_models
 
 warnings.filterwarnings('ignore')
 
@@ -99,14 +99,27 @@ def train_model(X_train, y_train):
         ]
 
 def deploy_model(model_list: list):
+
+    remove_models(
+        join(ML_MODEL_PATHS["versioned"]),
+        """
+            SELECT 
+                version_name 
+            FROM model_info 
+            WHERE model_id = (SELECT id FROM model WHERE name = 'XGBOOST') 
+            ORDER BY updated_date 
+            DESC 
+            LIMIT 1")
+        """
+    )
+
     for model in model_list:
         model_version = model["version"]
-        upload_to_gcs("churn_prediction_model_storage", join(ML_MODEL_PATHS["versioned"], model_version), f"ml_models/{model_version}")
+        # upload_to_gcs("churn_prediction_model_storage", join(ML_MODEL_PATHS["versioned"], model_version), f"ml_models/{model_version}")
 
 def update_database(model_evaluation_list):
-    engine = database_engine()
 
-    with engine.connect() as connection:
+    with database_engine().connect() as connection:
         try:
             for evaluation in model_evaluation_list:
                 model_id_result = connection.execute(

@@ -262,9 +262,8 @@ def preprocess_evaluation_data(dataset):
 def deploy_preprocessing_models(encoders, scalers):
     for encocder in encoders:
         encoder_version = encocder["version"]
-        print(encocder)
-        upload_to_gcs("churn_prediction_model_storage", join(ENCODER_PATHS["versioned"], encoder_version), f"encoders/{encoder_version}")
+        # upload_to_gcs("churn_prediction_model_storage", join(ENCODER_PATHS["versioned"], encoder_version), f"encoders/{encoder_version}")
 
     for scaler in scalers:
         scaler_version = scaler["version"]
-        upload_to_gcs("churn_prediction_model_storage", join(SCALER_PATHS["versioned"], scaler_version), f"scalers/{scaler_version}")
+        # upload_to_gcs("churn_prediction_model_storage", join(SCALER_PATHS["versioned"], scaler_version), f"scalers/{scaler_version}")

@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 
 from sqlalchemy import text
@@ -40,3 +41,13 @@ def upload_to_gcs(bucket_name, source_file_path, destination):
     blob.upload_from_filename(source_file_path)
 
     print(f"File {source_file_path} uploaded to {destination} in {bucket_name}.")
+
+def remove_models(path, query):
+        with database_engine().connect() as conn:
+            try:
+                version_name_result = conn.execute(text(query)).fetchone()
+
+                os.remove(path, version_name_result[0])
+
+            except Exception as ex:
+                print(f"Error updating database: {ex}")
