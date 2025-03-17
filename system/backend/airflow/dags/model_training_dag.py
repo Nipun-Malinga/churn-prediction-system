@@ -1,8 +1,8 @@
 from airflow.decorators import dag, task
 from datetime import datetime, timedelta
-from scripts.utils import fetch_training_data
+from scripts.utils import fetch_training_data, update_database
 from scripts.data_preprocessor import preprocess_dataset, deploy_preprocessing_models
-from scripts.model_trainer import train_model, update_database, deploy_model
+from scripts.model_trainer import train_model, deploy_model
 from scripts.model_evaluator import evaluate_model
 
 default_args = {
@@ -22,19 +22,18 @@ def model_trainer():
 
     @task(multiple_outputs=True)
     def preprocessing_data(dataset):
-        X_train, X_test, y_train, y_test, encoders, scalers = preprocess_dataset(dataset)
+        X_train, X_test, y_train, y_test, data_transformer_list = preprocess_dataset(dataset)
         return {
             "X_train": X_train, 
             "X_test": X_test, 
             "y_train": y_train, 
             "y_test": y_test,
-            "encoders": encoders,
-            "scalers": scalers
+            "data_transformer_list": data_transformer_list
         }
     
     @task
-    def deploying_processing_models(encoders, scalers):
-        deploy_preprocessing_models(encoders, scalers)
+    def deploying_processing_models(data_transformer_list):
+        deploy_preprocessing_models(data_transformer_list)
     
     @task(multiple_outputs=True)
     def training_ml_model(X_train, y_train):
@@ -51,8 +50,8 @@ def model_trainer():
         }
 
     @task
-    def updating_database(model_evaluation_list):
-        update_database(model_evaluation_list)
+    def updating_database(model_evaluation_list, data_transformer_list):
+        update_database(model_evaluation_list, data_transformer_list)
 
     @task
     def deploying_model(model_list):
@@ -60,10 +59,10 @@ def model_trainer():
 
     data = fetching_training_data()
     preprocessed_data = preprocessing_data(data["fetched_data"])
-    deploying_processing_models(preprocessed_data["encoders"], preprocessed_data["scalers"])
+    deploying_processing_models(preprocessed_data["data_transformer_list"])
     trained_models = training_ml_model(preprocessed_data["X_train"],preprocessed_data["y_train"])
     evaluate_models = evaluating_model_performance(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["y_test"])
-    updating_database(evaluate_models["model_evaluation_list"])
+    updating_database(evaluate_models["model_evaluation_list"], preprocessed_data["data_transformer_list"])
     deploying_model(trained_models["model_list"])
 
 training_dag = model_trainer()

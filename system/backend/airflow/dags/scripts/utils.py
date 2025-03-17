@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from datetime import datetime
 
 from sqlalchemy import text
 from scripts import database_engine
@@ -51,3 +52,84 @@ def remove_models(path, query):
 
             except Exception as ex:
                 print(f"Error updating database: {ex}")
+
+def update_database(model_info_list, data_transformer_list):
+
+    with database_engine().connect() as connection:
+        try:
+            for model_info in model_info_list:
+                model_id_result = connection.execute(
+                    text("SELECT id FROM model WHERE name = :model_name"), {"model_name": model_info["model_name"]}
+                ).fetchone()
+
+                if not model_id_result:
+                    model_id_result = connection.execute(
+                        text("INSERT INTO model (name) VALUES (:name) RETURNING id"), {"name": model_info["model_name"]}
+                    ).fetchone()
+
+                model_id = model_id_result[0] 
+
+                model_info_query = text("""
+                    INSERT INTO model_info 
+                    (model_id, updated_date, accuracy, "TP", "TN", "FP", "FN", precision, recall, f1_score, is_automated_tunning, version_name)
+                    VALUES 
+                    (:model_id, :updated_date, :accuracy, :TP, :TN, :FP, :FN, :precision, :recall, :f1_score, :is_automated_tunning, :version_name)
+                """)
+
+                connection.execute(model_info_query, {
+                    "model_id": model_id,
+                    "updated_date": datetime.now(),
+                    "accuracy": float(model_info["accuracy"]), 
+                    "TP": int(model_info["tp"]),
+                    "TN": int(model_info["tn"]),
+                    "FP": int(model_info["fp"]),
+                    "FN": int(model_info["fn"]),
+                    "precision": float(model_info["precision"]),
+                    "recall": float(model_info["recall"]),
+                    "f1_score": float(model_info["f1_score"]),
+                    "is_automated_tunning": True,
+                    "version_name": model_info["version_name"]
+                })
+
+                print("Machine Learning Model Related Data Updated Successfully!")
+
+        except Exception as ex:
+            print(f"Error adding model info to the database: {ex}")
+            
+        try:
+            for data_transformer in data_transformer_list:
+                data_transformer_id_result = connection.execute(
+                    text("SELECT id FROM data_transformer WHERE name = :name"), 
+                    {
+                        "name": data_transformer["transformer_name"]
+                    }
+                ).fetchone()
+                
+                if not data_transformer_id_result:
+                    data_transformer_id_result = connection.execute(
+                        text("INSERT INTO data_transformer (name) VALUES (:name) RETURNING id"),
+                        {
+                            "name": data_transformer["transformer_name"]
+                        }
+                    ).fetchone()
+                    
+                data_transformer_id = data_transformer_id_result[0]
+          
+                connection.execute(
+                    text(
+                        """
+                        INSERT INTO data_transformer_info (data_transformer_id, updated_date, version_name) 
+                        VALUES (:data_transformer_id, :updated_date, :version_name)
+                        """
+                    ),
+                    {
+                        "data_transformer_id": data_transformer_id,
+                        "updated_date": datetime.now(),
+                        "version_name": data_transformer["version"],
+                    }
+                )
+                
+                print("Data Transformers Related Data Updated Successfully!")
+                    
+        except Exception as ex:
+            print(f"Error adding data_transformer info to the database: {ex}")

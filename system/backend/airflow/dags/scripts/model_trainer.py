@@ -1,10 +1,6 @@
-
-import os
 import uuid
 import warnings
 import joblib
-
-from datetime import datetime
 
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
@@ -116,46 +112,3 @@ def deploy_model(model_list: list):
     for model in model_list:
         model_version = model["version"]
         # upload_to_gcs("churn_prediction_model_storage", join(ML_MODEL_PATHS["versioned"], model_version), f"ml_models/{model_version}")
-
-def update_database(model_evaluation_list):
-
-    with database_engine().connect() as connection:
-        try:
-            for evaluation in model_evaluation_list:
-                model_id_result = connection.execute(
-                    text("SELECT id FROM model WHERE name = :model_name"), {"model_name": evaluation["model_name"]}
-                ).fetchone()
-
-                if not model_id_result:
-                    model_id_result = connection.execute(
-                        text("INSERT INTO model (name) VALUES (:name) RETURNING id"), {"name": evaluation["model_name"]}
-                    ).fetchone()
-
-                model_id = model_id_result[0] 
-
-                model_info_query = text("""
-                    INSERT INTO model_info 
-                    (model_id, updated_date, accuracy, "TP", "TN", "FP", "FN", precision, recall, f1_score, is_automated_tunning, version_name)
-                    VALUES 
-                    (:model_id, :updated_date, :accuracy, :TP, :TN, :FP, :FN, :precision, :recall, :f1_score, :is_automated_tunning, :version_name)
-                """)
-
-                connection.execute(model_info_query, {
-                    "model_id": model_id,
-                    "updated_date": datetime.now(),
-                    "accuracy": float(evaluation["accuracy"]), 
-                    "TP": int(evaluation["tp"]),
-                    "TN": int(evaluation["tn"]),
-                    "FP": int(evaluation["fp"]),
-                    "FN": int(evaluation["fn"]),
-                    "precision": float(evaluation["precision"]),
-                    "recall": float(evaluation["recall"]),
-                    "f1_score": float(evaluation["f1_score"]),
-                    "is_automated_tunning": True,
-                    "version_name": evaluation["version_name"]
-                })
-
-                print("Database updated successfully!")
-
-        except Exception as ex:
-            print(f"Error updating database: {ex}")
