@@ -1,3 +1,4 @@
+from airflow.utils.dates import days_ago
 from airflow.decorators import dag, task
 from datetime import datetime, timedelta
 
@@ -9,7 +10,7 @@ default_args = {
     'retry_delay': timedelta(minutes=10)
 }
 
-@dag(dag_id='Model_Evaluating_DAG', default_args=default_args, start_date=datetime(2025, 3, 14), schedule_interval="@daily")
+@dag(dag_id='Model_Evaluating_DAG', default_args=default_args, start_date=days_ago(1), schedule_interval="@daily")
 def model_evaluator():
     @task(multiple_outputs=True)
     def fetching_evaluation_data():

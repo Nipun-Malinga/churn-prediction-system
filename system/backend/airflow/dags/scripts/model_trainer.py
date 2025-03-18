@@ -94,7 +94,7 @@ def train_model(X_train, y_train):
         # {"model":voting_classifier, "name":"VOTING CLASSIFIER"}
         ]
 
-def deploy_model(model_list: list):
+def deploy_models(model_list: list):
     
     with database_engine().connect() as connection:
         model_id_result = connection.execute(

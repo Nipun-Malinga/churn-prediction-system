@@ -1,9 +1,10 @@
 from airflow.decorators import dag, task
+from airflow.utils.dates import days_ago
 from airflow.exceptions import AirflowFailException
 from datetime import datetime, timedelta
 from scripts.utils import fetch_training_data, update_database
 from scripts.data_preprocessor import preprocess_dataset, deploy_preprocessing_models
-from scripts.model_trainer import train_model, deploy_model
+from scripts.model_trainer import train_model, deploy_models
 from scripts.model_evaluator import evaluate_model
 
 default_args = {
@@ -12,7 +13,7 @@ default_args = {
     'retry_delay': timedelta(minutes=10)
 }
 
-@dag(dag_id='Model_Training_DAG', default_args=default_args, start_date=datetime(2025, 3, 14), schedule_interval="@daily")
+@dag(dag_id='Model_Training_DAG', default_args=default_args, start_date=days_ago(1), schedule_interval="@daily")
 def model_trainer():
     @task(multiple_outputs=True)
     def fetching_training_data():
@@ -59,15 +60,15 @@ def model_trainer():
         update_database(model_evaluation_list, data_transformer_list)
 
     @task
-    def deploying_model(model_list):
-        deploy_model(model_list)
+    def deploying_ml_models(model_list):
+        deploy_models(model_list)
 
-    data = fetching_training_data()
-    preprocessed_data = preprocessing_data(data["fetched_data"])
+    training_data = fetching_training_data()
+    preprocessed_data = preprocessing_data(training_data["fetched_data"])
     deploying_processing_models(preprocessed_data["data_transformer_list"])
     trained_models = training_ml_model(preprocessed_data["X_train"],preprocessed_data["y_train"])
-    evaluate_models = evaluating_model_performance(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["y_test"])
-    updating_database(evaluate_models["model_evaluation_list"], preprocessed_data["data_transformer_list"])
-    deploying_model(trained_models["model_list"])
+    evaluation_data = evaluating_model_performance(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["y_test"])
+    updating_database(evaluation_data["model_evaluation_list"], preprocessed_data["data_transformer_list"])
+    deploying_ml_models(trained_models["model_list"])
 
 training_dag = model_trainer()
