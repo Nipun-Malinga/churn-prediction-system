@@ -7,4 +7,4 @@ def database_engine():
         database_url = f"postgresql://{conn.login}:{conn.password}@{conn.host}:{conn.port}/{conn.schema}"
         return create_engine(database_url)
     except Exception as e:
-        print(f"Error fetching Airflow connection: {e}")
+        print("Failed to connect to the database.")

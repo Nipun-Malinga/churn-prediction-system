@@ -1,4 +1,5 @@
 from airflow.decorators import dag, task
+from airflow.exceptions import AirflowFailException
 from datetime import datetime, timedelta
 from scripts.utils import fetch_training_data, update_database
 from scripts.data_preprocessor import preprocess_dataset, deploy_preprocessing_models
@@ -16,6 +17,10 @@ def model_trainer():
     @task(multiple_outputs=True)
     def fetching_training_data():
         fetched_data = fetch_training_data()
+        
+        if fetched_data.empty:
+            raise AirflowFailException("No data in database. Programme terminated.")
+        
         return {
             "fetched_data": fetched_data
         }

@@ -176,7 +176,7 @@ cython_debug/
 # Model Files
 *.pkl
 
-# idea direcrtory
-.idea
-
 *.json
+
+/logs
+*.pid
