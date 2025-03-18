@@ -6,6 +6,8 @@ from sqlalchemy import text
 from scripts import database_engine
 from google.cloud import storage
 
+from os.path import join
+
 def fetch_training_data():
     with database_engine().connect() as conn:
         dataset = pd.read_sql(
@@ -45,11 +47,10 @@ def upload_to_gcs(bucket_name, source_file_path, destination):
 
 def remove_models(path, query):
         with database_engine().connect() as conn:
-            try:
+            try:            
                 version_name_result = conn.execute(text(query)).fetchone()
-
-                os.remove(path, version_name_result[0])
-
+                os.remove(join(path, version_name_result[0]))
+                
             except Exception as ex:
                 print(f"Error updating database: {ex}")
 

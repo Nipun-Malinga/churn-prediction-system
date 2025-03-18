@@ -11,7 +11,10 @@ from sklearn.preprocessing import OneHotEncoder, LabelEncoder, MinMaxScaler
 
 from imblearn.over_sampling import SMOTENC
 
-from scripts.utils import upload_to_gcs
+from sqlalchemy import text
+
+from scripts import database_engine
+from scripts.utils import upload_to_gcs, remove_models
 
 ABS_DIR = dirname(abspath(__file__))
 BASE_DIR = join(ABS_DIR, "trained_models/")
@@ -265,7 +268,26 @@ def preprocess_evaluation_data(dataset):
     return scaled_X_test, Y_test
 
 def deploy_preprocessing_models(data_transformer_list):
+    
+    with database_engine().connect() as connection:
+        transformer_id_result = connection.execute(
+            text("SELECT id FROM data_transformer")
+        )
+        
+    for id in transformer_id_result: 
+        remove_models(
+            DATA_TRANSFORMER_PATHS["versioned"],
+            f"""
+                SELECT 
+                    version_name 
+                FROM data_transformer_info 
+                WHERE data_transformer_id = {id[0]}
+                ORDER BY updated_date 
+                DESC
+                LIMIT 1
+            """
+        )
+    
     for data_transformer in data_transformer_list:
         encoder_version = data_transformer["version"]
-        print(encoder_version)
         # upload_to_gcs("churn_prediction_model_storage", join(ENCODER_PATHS["versioned"], encoder_version), f"data_transformers/{encoder_version}")

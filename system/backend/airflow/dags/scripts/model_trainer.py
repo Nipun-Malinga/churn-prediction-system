@@ -95,19 +95,30 @@ def train_model(X_train, y_train):
         ]
 
 def deploy_model(model_list: list):
-
-    remove_models(
-        join(ML_MODEL_PATHS["versioned"]),
-        """
-            SELECT 
-                version_name 
-            FROM model_info 
-            WHERE model_id = (SELECT id FROM model WHERE name = 'XGBOOST') 
-            ORDER BY updated_date 
-            DESC 
-            LIMIT 1")
-        """
-    )
+    
+    with database_engine().connect() as connection:
+        model_id_result = connection.execute(
+            text(
+                """
+                SELECT id
+                FROM model
+                """
+            )
+        )
+    
+    for id in model_id_result: 
+        remove_models(
+            ML_MODEL_PATHS["versioned"],
+            f"""
+                SELECT 
+                    version_name 
+                FROM model_info 
+                WHERE model_id = {id[0]}
+                ORDER BY updated_date 
+                DESC
+                LIMIT 1
+            """
+        )
 
     for model in model_list:
         model_version = model["version"]
