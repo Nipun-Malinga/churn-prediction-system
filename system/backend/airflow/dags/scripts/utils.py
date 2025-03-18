@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from datetime import datetime
 
-from sqlalchemy import text
+from sqlalchemy import text, exc
 from scripts import database_engine
 from google.cloud import storage
 
@@ -48,11 +48,14 @@ def upload_to_gcs(bucket_name, source_file_path, destination):
 def remove_models(path, query):
         with database_engine().connect() as conn:
             try:            
-                version_name_result = conn.execute(text(query)).fetchone()
-                os.remove(join(path, version_name_result[0]))
-                
-            except Exception as ex:
+                version_name_result = conn.execute(text(query)).fetchone()      
+            except exc.SQLAlchemyError as ex:
                 print(f"Error updating database: {ex}")
+            
+            try:
+                os.remove(join(path, version_name_result[0]))
+            except FileNotFoundError as ex:
+                print(f"Failed to delete model. File not found: {version_name_result[0]}")
 
 def update_database(model_info_list, data_transformer_list):
 
