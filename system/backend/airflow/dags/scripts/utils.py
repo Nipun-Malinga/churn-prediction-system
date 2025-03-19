@@ -28,7 +28,7 @@ def fetch_evaluation_data() -> pd.DataFrame:
                 return None
             
             evaluation_dataset = pd.read_sql(
-                sql=f"SELECT * FROM evaluation_data WHERE added_date > {fetched_last_updated_date}",
+                sql=f"SELECT * FROM evaluation_data WHERE added_date > '{fetched_last_updated_date}'",
                 con=conn.connection
             )
             
