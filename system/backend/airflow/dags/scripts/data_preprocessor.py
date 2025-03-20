@@ -218,6 +218,7 @@ def preprocess_dataset(dataset):
 
     return X_train, X_test, y_train, y_test, data_transformer_list
 
+# FIXME: Fix the preprocessing faliure due to untrained data
 def preprocess_evaluation_data(dataset):
     dataset = dataset.drop(columns=["added_date"])
 
@@ -247,7 +248,7 @@ def preprocess_evaluation_data(dataset):
 
         # Label encoding
         genderEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "gender_encoder.pkl"))
-        housingEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "ousing_encoder.pkl"))
+        housingEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "housing_encoder.pkl"))
         loanEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "loan_encoder.pkl"))
 
         data["gender"] = genderEncoder.transform(data["gender"])

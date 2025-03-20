@@ -1,12 +1,13 @@
 import os
 import pandas as pd
+import joblib
 from datetime import datetime
 
 from sqlalchemy import text, exc
 from scripts import database_engine
 from google.cloud import storage
 
-from os.path import join
+from os.path import join, dirname, abspath
 
 def fetch_training_data():
     with database_engine().connect() as conn:
@@ -36,6 +37,34 @@ def fetch_evaluation_data() -> pd.DataFrame:
         except Exception as ex:
             print(f"Error fetching evaluation data: {ex}")
 
+def fetch_trained_models():
+    ABS_DIR = dirname(abspath(__file__))
+    BASE_DIR = join(ABS_DIR, "trained_models/")
+
+    ML_MODEL_PATHS = {
+        "versioned": join(BASE_DIR, "ml_models/versioned/"),
+    }
+    
+    with database_engine().connect() as connection:
+        model_list = []
+        
+        model_names_result = connection.execute(text(
+            """
+                SELECT version_name FROM model_info ORDER BY updated_date DESC LIMIT (SELECT COUNT(*) FROM model)
+            """
+        )).fetchall()
+        
+        for model_name in model_names_result:
+            model_list.append(
+                {
+                    "model": joblib.load(join(ML_MODEL_PATHS["versioned"], model_name[0])),
+                    "name": None,
+                    "version": None
+                }
+            )
+    
+    return model_list
+                 
 def upload_to_gcs(bucket_name, source_file_path, destination):
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
