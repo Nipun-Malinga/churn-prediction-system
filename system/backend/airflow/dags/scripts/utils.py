@@ -58,13 +58,13 @@ def fetch_trained_models():
                 LIMIT (SELECT COUNT(*) FROM model)
             """
         )).fetchall()
-        
-        
+          
         for data in model_data_result:
             model_data.append({
                     "model": joblib.load(join(ML_MODEL_PATHS["versioned"], data[3])),
                     "name": data[0],
                     "version": data[3],
+                    "base_model": None
             })
     
     return model_data
@@ -101,7 +101,7 @@ def update_database(model_info_list, data_transformer_list):
 
                 if not model_id_result:
                     model_id_result = connection.execute(
-                        text("INSERT INTO model (name) VALUES (:name) RETURNING id"), {"name": model_info["model_name"]}
+                        text("INSERT INTO model (name, base_model) VALUES (:name, :base_model) RETURNING id"), {"name": model_info["model_name"], "base_model": model_info["base_model"]}
                     ).fetchone()
 
                 model_id = model_id_result[0] 

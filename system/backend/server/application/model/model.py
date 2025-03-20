@@ -1,5 +1,5 @@
 from application import db
-from sqlalchemy import String
+from sqlalchemy import String, Boolean
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 class Model(db.Model):
@@ -7,6 +7,7 @@ class Model(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
+    base_model: Mapped[bool] = mapped_column(Boolean, default=False)
     
     # Relationship
     model_info: Mapped[list["Model_Info"]] = relationship(

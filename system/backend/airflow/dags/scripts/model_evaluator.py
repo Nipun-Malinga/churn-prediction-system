@@ -19,7 +19,8 @@ def evaluate_model(model_list: list, X_test, y_test):
             "tn": tn,
             "fp": fp,
             "fn": fn,
-            "version_name": model["version"]
+            "version_name": model["version"],
+            "base_model": model["base_model"]
         })
 
     return model_evaluation_list

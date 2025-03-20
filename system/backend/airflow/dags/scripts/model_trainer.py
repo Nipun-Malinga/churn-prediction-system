@@ -88,7 +88,7 @@ def train_model(X_train, y_train):
     #         ('rf', RF_random_searched)], voting='soft').fit(X_train, y_train)
     
     return [
-        {"model":XGM_random_searched, "name":"XGBOOST", "version": XGM_version}, 
+        {"model":XGM_random_searched, "name":"XGBOOST", "version": XGM_version, "base_model": True}, 
         # {"model":LGB_random_searched, "name":"LIGHTGBM"}, 
         # {"model":RF_random_searched, "name":"RANDOM FORSET"}, 
         # {"model":voting_classifier, "name":"VOTING CLASSIFIER"}
