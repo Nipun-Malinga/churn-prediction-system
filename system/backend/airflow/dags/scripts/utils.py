@@ -53,6 +53,7 @@ def fetch_trained_models():
                 SELECT name, accuracy, f1_score, version_name 
                 FROM model_info 
                 INNER JOIN model ON model_info.model_id = model.id
+                WHERE base_model IS TRUE
                 ORDER BY updated_date 
                 DESC 
                 LIMIT (SELECT COUNT(*) FROM model)
