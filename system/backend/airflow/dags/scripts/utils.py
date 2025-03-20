@@ -46,24 +46,28 @@ def fetch_trained_models():
     }
     
     with database_engine().connect() as connection:
-        model_list = []
+        model_data = []
         
-        model_names_result = connection.execute(text(
+        model_data_result = connection.execute(text(
             """
-                SELECT version_name FROM model_info ORDER BY updated_date DESC LIMIT (SELECT COUNT(*) FROM model)
+                SELECT name, accuracy, f1_score, version_name 
+                FROM model_info 
+                INNER JOIN model ON model_info.model_id = model.id
+                ORDER BY updated_date 
+                DESC 
+                LIMIT (SELECT COUNT(*) FROM model)
             """
         )).fetchall()
         
-        for model_name in model_names_result:
-            model_list.append(
-                {
-                    "model": joblib.load(join(ML_MODEL_PATHS["versioned"], model_name[0])),
-                    "name": None,
-                    "version": None
-                }
-            )
+        
+        for data in model_data_result:
+            model_data.append({
+                    "model": joblib.load(join(ML_MODEL_PATHS["versioned"], data[3])),
+                    "name": data[0],
+                    "version": data[3],
+            })
     
-    return model_list
+    return model_data
                  
 def upload_to_gcs(bucket_name, source_file_path, destination):
     storage_client = storage.Client()
