@@ -1,6 +1,6 @@
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
-from airflow.exceptions import AirflowFailException
+from airflow.operators.python import ShortCircuitOperator
 from datetime import datetime, timedelta
 from scripts.utils import fetch_training_data, update_database
 from scripts.data_preprocessor import preprocess_dataset, deploy_preprocessing_models
@@ -17,11 +17,7 @@ default_args = {
 def model_trainer():
     @task(multiple_outputs=True)
     def fetching_training_data():
-        fetched_data = fetch_training_data()
-        
-        if fetched_data.empty:
-            raise AirflowFailException("No data in database. Programme terminated.")
-        
+        fetched_data = fetch_training_data()  
         return {
             "fetched_data": fetched_data
         }
@@ -62,13 +58,29 @@ def model_trainer():
     @task
     def deploying_ml_models(model_list):
         deploy_models(model_list)
+        
+    def check_training_data(fetched_data):
+        if fetched_data.empty:
+            return False
+        return True
 
     training_data = fetching_training_data()
+    
+    short_circuit = ShortCircuitOperator(
+        task_id="stop_if_no_training_data",
+        python_callable=check_training_data,
+        op_kwargs={"fetched_data": training_data["fetched_data"]},
+    )
+    
     preprocessed_data = preprocessing_data(training_data["fetched_data"])
-    deploying_processing_models(preprocessed_data["data_transformer_list"])
-    trained_models = training_ml_model(preprocessed_data["X_train"],preprocessed_data["y_train"])
+    trained_models = training_ml_model(preprocessed_data["X_train"], preprocessed_data["y_train"])
     evaluation_data = evaluating_model_performance(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["y_test"])
-    updating_database(evaluation_data["model_evaluation_list"], preprocessed_data["data_transformer_list"])
-    deploying_ml_models(trained_models["model_list"])
+
+    training_data >> short_circuit >> preprocessed_data
+    preprocessed_data >> deploying_processing_models(preprocessed_data["data_transformer_list"])
+    preprocessed_data >> trained_models
+    trained_models >> evaluation_data
+    evaluation_data >> updating_database(evaluation_data["model_evaluation_list"], preprocessed_data["data_transformer_list"])
+    trained_models >> deploying_ml_models(trained_models["model_list"])
 
 training_dag = model_trainer()
