@@ -113,9 +113,9 @@ def update_database(model_info_list, data_transformer_list):
 
                 model_info_query = text("""
                     INSERT INTO model_info 
-                    (model_id, updated_date, accuracy, "TP", "TN", "FP", "FN", precision, recall, f1_score, is_automated_tunning, version_name)
+                    (model_id, updated_date, accuracy, "TP", "TN", "FP", "FN", precision, recall, f1_score, is_automated_tunning, is_downloaded, version_name)
                     VALUES 
-                    (:model_id, :updated_date, :accuracy, :TP, :TN, :FP, :FN, :precision, :recall, :f1_score, :is_automated_tunning, :version_name)
+                    (:model_id, :updated_date, :accuracy, :TP, :TN, :FP, :FN, :precision, :recall, :f1_score, :is_automated_tunning, :is_downloaded, :version_name)
                 """)
 
                 connection.execute(model_info_query, {
@@ -130,6 +130,7 @@ def update_database(model_info_list, data_transformer_list):
                     "recall": float(model_info["recall"]),
                     "f1_score": float(model_info["f1_score"]),
                     "is_automated_tunning": True,
+                    "is_downloaded": False,
                     "version_name": model_info["version_name"]
                 })
 
@@ -160,14 +161,15 @@ def update_database(model_info_list, data_transformer_list):
                 connection.execute(
                     text(
                         """
-                        INSERT INTO data_transformer_info (data_transformer_id, updated_date, version_name) 
-                        VALUES (:data_transformer_id, :updated_date, :version_name)
+                        INSERT INTO data_transformer_info (data_transformer_id, updated_date, version_name, is_downloaded) 
+                        VALUES (:data_transformer_id, :updated_date, :version_name, :is_downloaded)
                         """
                     ),
                     {
                         "data_transformer_id": data_transformer_id,
                         "updated_date": datetime.now(),
                         "version_name": data_transformer["version"],
+                        "is_downloaded": False
                     }
                 )
                 
