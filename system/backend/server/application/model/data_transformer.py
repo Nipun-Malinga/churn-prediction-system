@@ -10,7 +10,7 @@ class Data_Transformer(db.Model):
     
     # Relationship
     data_transformer_info: Mapped[list["Data_Transformer_Info"]] = relationship(
-        back_populates='model', 
+        back_populates='data_transformer', 
         cascade="all, delete-orphan"
     )
 

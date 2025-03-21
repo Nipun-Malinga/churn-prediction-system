@@ -13,8 +13,8 @@ class Data_Transformer_Info(db.Model):
     version_name: Mapped[str] = mapped_column(String, nullable= True)
 
     # Relationships
-    model: Mapped["Data_Transformer"] = relationship(back_populates='data_transformer_info')  
+    data_transformer: Mapped["Data_Transformer"] = relationship(back_populates='data_transformer_info')  
 
     def __repr__(self):
-        return f'Data_Transformer_Info(model_id = {self.model_id}, version_name = {self.version_name})'
+        return f'Data_Transformer_Info(data_transformer_id = {self.data_transformer_id}, version_name = {self.version_name})'
                 
