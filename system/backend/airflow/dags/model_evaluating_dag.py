@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from scripts.utils import fetch_evaluation_data, fetch_trained_models
 from scripts.data_preprocessor import preprocess_evaluation_data
-from scripts.model_evaluator import evaluate_model
+from scripts.model_evaluator import evaluate_model, compare_model_performance
 
 default_args = {
     'owner': 'churn-pred_server',
@@ -45,6 +45,14 @@ def model_evaluator():
             "model_evaluation_list": model_evaluation_list
         }
         
+    @task
+    def comparing_model_performance(base_performance, evaluated_performance):
+        accuracy_loss, retrain_model = compare_model_performance(base_performance, evaluated_performance)
+        return {
+            "accuracy_loss": accuracy_loss,
+            "retrain_model": retrain_model
+        }
+   
     def check_evaluation_data(evaluation_data):
         if not evaluation_data or evaluation_data.empty or evaluation_data.shape[0] < 1000:  
             print("Evaluation data is empty. Stopping DAG.")
@@ -84,11 +92,16 @@ def model_evaluator():
         preprocessed_data["X_test"], 
         preprocessed_data["Y_test"]
     )
+    
+    compared_data = comparing_model_performance(
+        trained_models["model_list"],
+        evaluated_data["model_evaluation_list"]
+    )
 
     dataset >> short_circuit >> branch_task
     trained_models >> branch_task
 
     branch_task >> trigger_retraining_dag
-    branch_task >> preprocessed_data >> evaluated_data
+    branch_task >> preprocessed_data >> evaluated_data >> compared_data
     
 evaluating_dag = model_evaluator()
