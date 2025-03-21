@@ -89,10 +89,11 @@ def remove_models(path, query):
             except exc.SQLAlchemyError as ex:
                 print(f"Error updating database: {ex}")
             
-            try:
-                os.remove(join(path, version_name_result[0]))
-            except FileNotFoundError as ex:
-                print(f"Failed to delete model. File not found: {version_name_result[0]}")
+            if version_name_result:
+                try:
+                    os.remove(join(path, version_name_result[0]))
+                except FileNotFoundError as ex:
+                    print(f"Failed to delete model. File not found: {version_name_result[0]}")
 
 def update_database(model_info_list, data_transformer_list):
 
