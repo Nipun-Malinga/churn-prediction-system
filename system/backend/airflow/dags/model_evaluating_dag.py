@@ -1,6 +1,7 @@
 from airflow.utils.dates import days_ago
 from airflow.decorators import dag, task
-from airflow.exceptions import AirflowFailException
+from airflow.operators.python import BranchPythonOperator, ShortCircuitOperator
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from datetime import datetime, timedelta
 
 from scripts.utils import fetch_evaluation_data, fetch_trained_models
@@ -17,11 +18,7 @@ default_args = {
 def model_evaluator():
     @task(multiple_outputs=True)
     def fetching_evaluation_data():
-        fetched_evaluation_data = fetch_evaluation_data()
-        
-        if fetched_evaluation_data.empty:
-            raise AirflowFailException("No data in database. Programme terminated.")
-        
+        fetched_evaluation_data = fetch_evaluation_data()   
         return {
             "evaluation_data": fetched_evaluation_data
         }
@@ -47,10 +44,51 @@ def model_evaluator():
         return {
             "model_evaluation_list": model_evaluation_list
         }
+        
+    def check_evaluation_data(evaluation_data):
+        if not evaluation_data or evaluation_data.empty or evaluation_data.shape[0] < 1000:  
+            print("Evaluation data is empty. Stopping DAG.")
+            return False
+        return True
     
+    def check_trained_models(trained_models):
+        if not trained_models:
+            return "trigger_retraining_dag"
+        return "preprocessing_data"
+           
     dataset = fetching_evaluation_data()
-    preprocessed_data = preprocessing_data(dataset["evaluation_data"])
     trained_models = fetching_trained_models()
-    evaluated_data = evaluating_model_performance(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["Y_test"])
+
+    short_circuit = ShortCircuitOperator(
+        task_id="stop_if_no_evaluation_data",
+        python_callable=check_evaluation_data,
+        op_kwargs={"evaluation_data": dataset["evaluation_data"]},
+    )
+    
+    branch_task = BranchPythonOperator(
+        task_id="branch_on_trained_models",
+        python_callable=check_trained_models,
+        op_kwargs={"trained_models": trained_models["model_list"]},
+    )
+
+    trigger_retraining_dag = TriggerDagRunOperator(
+        task_id="trigger_retraining_dag",
+        trigger_dag_id="Model_Training_DAG",
+        wait_for_completion=True
+    )
+
+    preprocessed_data = preprocessing_data(dataset["evaluation_data"])
+
+    evaluated_data = evaluating_model_performance(
+        trained_models["model_list"], 
+        preprocessed_data["X_test"], 
+        preprocessed_data["Y_test"]
+    )
+
+    dataset >> short_circuit >> branch_task
+    trained_models >> branch_task
+
+    branch_task >> trigger_retraining_dag
+    branch_task >> preprocessed_data >> evaluated_data
     
 evaluating_dag = model_evaluator()

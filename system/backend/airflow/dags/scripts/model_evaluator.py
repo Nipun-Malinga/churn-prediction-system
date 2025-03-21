@@ -24,3 +24,12 @@ def evaluate_model(model_list: list, X_test, y_test):
         })
 
     return model_evaluation_list
+
+def compare_model_performance(base_performance, evaluated_performance):
+    retrain_model= False 
+    accuracy_loss = (evaluated_performance[0]["accuracy"] - base_performance[0]["accuracy"]) * 100
+    
+    if accuracy_loss < -15 or evaluated_performance[0]["accuracy"] < 0.75:
+        retrain_model = True
+    
+    return accuracy_loss, retrain_model

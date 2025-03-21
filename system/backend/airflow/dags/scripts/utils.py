@@ -50,9 +50,10 @@ def fetch_trained_models():
         
         model_data_result = connection.execute(text(
             """
-                SELECT name, accuracy, f1_score, version_name 
+                SELECT model_info.id, name, accuracy, f1_score, version_name 
                 FROM model_info 
                 INNER JOIN model ON model_info.model_id = model.id
+                WHERE base_model IS TRUE
                 ORDER BY updated_date 
                 DESC 
                 LIMIT (SELECT COUNT(*) FROM model)
@@ -61,9 +62,12 @@ def fetch_trained_models():
           
         for data in model_data_result:
             model_data.append({
-                    "model": joblib.load(join(ML_MODEL_PATHS["versioned"], data[3])),
-                    "name": data[0],
-                    "version": data[3],
+                    "id": data[0],
+                    "model": joblib.load(join(ML_MODEL_PATHS["versioned"], data[4])),
+                    "name": data[1],
+                    "accuracy": data[2],
+                    "f1_score": data[3],
+                    "version": data[4],
                     "base_model": None
             })
     
