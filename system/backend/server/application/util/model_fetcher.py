@@ -5,6 +5,8 @@ from application import db
 from application.util.cloud_storage_utils import download_blob
 from application.model.data_transformer import Data_Transformer
 from application.model.data_transformer_info import Data_Transformer_Info
+from application.model.model import Model
+from application.model.model_info import Model_Info
 
 ABS_DIR = dirname(abspath(__file__))
 BASE_DIR = join(ABS_DIR, "trained_models/")
@@ -25,16 +27,38 @@ def fetch_preprocessing_models():
     
     
     for info in result:
-        print(f"Info: {info}")
         download_blob(
             f"data_transformers/{info[2]}", 
             join(DATA_TRANSFORMER_PATH, f"{info[0]}.pkl")
         )
         transformer_info_result = Data_Transformer_Info.query.get(info[1])
-        print(f"Info_result: {transformer_info_result}")
         transformer_info_result.is_downloaded = True
         db.session.commit()
         
+    db.session.close()
+        
     
 def fetch_ml_models():
-    None
+    result = db.session.query(
+        Model.name,
+        Model_Info.id,
+        Model_Info.version_name
+    ).join(Model_Info).order_by(
+        desc(Model_Info.updated_date)
+    ).where(
+        Model_Info.is_downloaded == False,  Model.base_model == True
+    ).all()
+    
+    print(result)
+    
+    for model in result:
+        download_blob(
+            f"ml_models/{model[2]}",
+            join(ML_MODEL_PATH, f"{model[0]}.pkl")
+        )
+        
+        model_info_result = Model_Info.query.get(model[1])
+        model_info_result.is_downloaded = True
+        db.session.commit()
+        
+    db.session.close()

@@ -23,6 +23,7 @@ class Model_Info(db.Model):
     f1_score: Mapped[float] = mapped_column(Float, nullable= False, default=0)
 
     is_automated_tunning: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_downloaded: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     version_name: Mapped[str] = mapped_column(String)
 
     # Relationships
