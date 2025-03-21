@@ -181,7 +181,7 @@ def preprocess_dataset(dataset):
 
         return X_train_scaled, X_test_scaled
 
-    dataset = dataset.drop(columns=["added_date"])
+    dataset = dataset.drop(columns=["id", "added_date"])
 
     # Removing the white spaces from columns
     dataset.columns = dataset.columns.str.strip()
