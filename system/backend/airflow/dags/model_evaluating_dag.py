@@ -54,7 +54,7 @@ def model_evaluator():
         }
    
     def check_evaluation_data(evaluation_data):
-        if not evaluation_data or evaluation_data.empty or evaluation_data.shape[0] < 1000:  
+        if evaluation_data.empty or evaluation_data.shape[0] < 1000:  
             print("Evaluation data is empty. Stopping DAG.")
             return False
         return True
@@ -74,7 +74,7 @@ def model_evaluator():
     )
     
     branch_task = BranchPythonOperator(
-        task_id="branch_on_trained_models",
+        task_id="check_trained_models",
         python_callable=check_trained_models,
         op_kwargs={"trained_models": trained_models["model_list"]},
     )

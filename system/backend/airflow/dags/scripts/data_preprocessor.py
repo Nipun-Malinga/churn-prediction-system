@@ -220,7 +220,7 @@ def preprocess_dataset(dataset):
 
 # FIXME: Fix the preprocessing faliure due to untrained data
 def preprocess_evaluation_data(dataset):
-    dataset = dataset.drop(columns=["added_date"])
+    dataset = dataset.drop(columns=["id", "added_date"])
 
     def split_dataset_to_X_y(dataset):
         X = dataset.iloc[:, :-1]
