@@ -47,9 +47,7 @@ def fetch_ml_models():
         desc(Model_Info.updated_date)
     ).where(
         Model_Info.is_downloaded == False,  Model.base_model == True
-    ).all()
-    
-    print(result)
+    ).limit(1).all()
     
     for model in result:
         download_blob(
