@@ -95,7 +95,7 @@ def remove_models(path, query):
                 except FileNotFoundError as ex:
                     print(f"Failed to delete model. File not found: {version_name_result[0]}")
 
-def update_database(model_info_list, data_transformer_list):
+def update_model_info(model_info_list, data_transformer_list):
 
     with database_engine().connect() as connection:
         try:

@@ -54,7 +54,7 @@ def model_evaluator():
         }
         
     @task
-    def updating_database(model_info, evaluation_data, acuracy_drift):
+    def update_model_info(model_info, evaluation_data, acuracy_drift):
         update_accuracy_drift(model_info, evaluation_data, acuracy_drift)
    
     def check_evaluation_data(evaluation_data):
@@ -119,7 +119,7 @@ def model_evaluator():
     branch_task_01 >> trigger_retraining_dag
     branch_task_01 >> preprocessed_data >> evaluated_data 
     
-    compared_data >> updating_database(
+    compared_data >> update_model_info(
         trained_models["model_list"],
         evaluated_data["model_evaluation_list"], 
         compared_data["accuracy_loss"]

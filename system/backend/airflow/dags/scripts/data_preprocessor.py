@@ -228,44 +228,64 @@ def preprocess_evaluation_data(dataset):
         return X, y
 
     def encode_data(data):
+        
+        # Loading Data Transformers
+        try:
+            oneHotEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "onehot_encoder.pkl"))
+            genderEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "gender_encoder.pkl"))
+            housingEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "housing_encoder.pkl"))
+            loanEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "loan_encoder.pkl"))
+        except RuntimeError as exp:
+            print(f"Failed to load encoders: {exp}")
+        
         # Onehot encoding
-        oneHotEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "onehot_encoder.pkl"))
-        encoded = oneHotEncoder.transform(data[["geography", "education", "card_type"]])
-        encoded_df = pd.DataFrame(encoded,
-                                    columns=oneHotEncoder.get_feature_names_out(
-                                        ["geography", "education", "card_type"]
-                                    ))
+        try: 
+            encoded = oneHotEncoder.transform(data[["geography", "education", "card_type"]])
+            encoded_df = pd.DataFrame(
+                encoded,
+                columns=oneHotEncoder.get_feature_names_out(["geography", "education", "card_type"])
+            )
 
-        # Reset index before concatenation
-        data= data.reset_index(drop=True)
-        encoded_df = encoded_df.reset_index(drop=True)
+            # Reset index before concatenation
+            data= data.reset_index(drop=True)
+            encoded_df = encoded_df.reset_index(drop=True)
 
-        # Concatenate DataFrames
-        data = pd.concat([data, encoded_df], axis=1)
+            # Concatenate DataFrames
+            data = pd.concat([data, encoded_df], axis=1)
 
-        # Drop original categorical columns
-        data = data.drop(columns=["geography", "education", "card_type"])
+            # Drop original categorical columns
+            data = data.drop(columns=["geography", "education", "card_type"])
 
-        # Label encoding
-        genderEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "gender_encoder.pkl"))
-        housingEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "housing_encoder.pkl"))
-        loanEncoder = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "loan_encoder.pkl"))
-
-        data["gender"] = genderEncoder.transform(data["gender"])
-        data["housing"] = housingEncoder.transform(data["housing"])
-        data["loan"] = loanEncoder.transform(data["loan"])
+            # Label encoding
+            data["gender"] = genderEncoder.transform(data["gender"])
+            data["housing"] = housingEncoder.transform(data["housing"])
+            data["loan"] = loanEncoder.transform(data["loan"])
+        except ValueError as exp:
+            raise ValueError(f"Invalid Value Detected during encoding: {exp}") from exp
 
         data.columns = data.columns.str.strip()
+        
         return data
 
     def scale_data(data):
-        # Min-Max scaling
-        minmaxScaler = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "minMax_scaler.pkl"))
-        return minmaxScaler.transform(data)
+        # Loading Scaler
+        try:
+            minmaxScaler = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "minMax_scaler.pkl"))
+        except RuntimeError as exp:
+            print(f"Failed to load encoders: {exp}")
+            
+        try:
+            scaled_data = minmaxScaler.transform(data)
+        except ValueError as exp:
+            raise ValueError(f"Invalid Value Detected during encoding: {exp}") from exp
+        
+        return scaled_data
+
 
     X_test, Y_test = split_dataset_to_X_y(dataset)
     encoded_X_test = encode_data(X_test)
     scaled_X_test = scale_data(encoded_X_test)
+
     return scaled_X_test, Y_test
 
 def deploy_preprocessing_models(data_transformer_list):

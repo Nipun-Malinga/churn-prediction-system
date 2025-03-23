@@ -2,7 +2,7 @@ from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
 from airflow.operators.python import ShortCircuitOperator
 from datetime import datetime, timedelta
-from scripts.utils import fetch_training_data, update_database
+from scripts.utils import fetch_training_data, update_model_info
 from scripts.data_preprocessor import preprocess_dataset, deploy_preprocessing_models
 from scripts.model_trainer import train_model, deploy_models
 from scripts.model_evaluator import evaluate_model
@@ -53,7 +53,7 @@ def model_trainer():
 
     @task
     def updating_database(model_evaluation_list, data_transformer_list):
-        update_database(model_evaluation_list, data_transformer_list)
+        update_model_info(model_evaluation_list, data_transformer_list)
 
     @task
     def deploying_ml_models(model_list):
@@ -73,14 +73,21 @@ def model_trainer():
     )
     
     preprocessed_data = preprocessing_data(training_data["fetched_data"])
+    
     trained_models = training_ml_model(preprocessed_data["X_train"], preprocessed_data["y_train"])
+    
     evaluation_data = evaluating_model_performance(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["y_test"])
 
     training_data >> short_circuit >> preprocessed_data
+    
     preprocessed_data >> deploying_processing_models(preprocessed_data["data_transformer_list"])
+    
     preprocessed_data >> trained_models
+    
     trained_models >> evaluation_data
+    
     evaluation_data >> updating_database(evaluation_data["model_evaluation_list"], preprocessed_data["data_transformer_list"])
+    
     trained_models >> deploying_ml_models(trained_models["model_list"])
 
 training_dag = model_trainer()
