@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+from typing import Dict, Union
 from airflow.utils.dates import days_ago
 from airflow.decorators import dag, task
 from airflow.operators.python import BranchPythonOperator, ShortCircuitOperator
@@ -16,14 +19,14 @@ default_args = {
 @dag(dag_id='Model_Evaluating_DAG', default_args=default_args, start_date=days_ago(1), schedule_interval="@daily")
 def model_evaluator():
     @task(multiple_outputs=True)
-    def fetching_evaluation_data():
+    def fetching_evaluation_data() -> Dict[str, pd.DataFrame]:
         fetched_evaluation_data = fetch_evaluation_data()   
         return {
             "evaluation_data": fetched_evaluation_data
         }
     
     @task(multiple_outputs=True)
-    def preprocessing_data(evaluation_dataset):
+    def preprocessing_data(evaluation_dataset: pd.DataFrame) -> Dict[str, np.array]:
         X_test, Y_test = preprocess_evaluation_data(evaluation_dataset)
         return {
             "X_test": X_test,
@@ -31,21 +34,21 @@ def model_evaluator():
         }
         
     @task(multiple_outputs=True)
-    def fetching_trained_models():
+    def fetching_trained_models() -> Dict[str, list]:
         trained_models = fetch_trained_models()
         return {
             "model_list": trained_models
         }
         
     @task(multiple_outputs=True)
-    def evaluating_model_performance(model_list, x_test, y_test):
+    def evaluating_model_performance(model_list: list, x_test: np.array, y_test: np.array) -> Dict[str, list]:
         model_evaluation_list = evaluate_model(model_list, x_test, y_test)
         return {
             "model_evaluation_list": model_evaluation_list
         }
         
     @task(multiple_outputs=True)
-    def comparing_model_performance(base_performance, evaluated_performance):
+    def comparing_model_performance(base_performance: list, evaluated_performance: list) -> Dict[str, Union[float, bool]]:
         accuracy_loss, retrain_model = compare_model_performance(base_performance, evaluated_performance)
         return {
             "accuracy_loss": accuracy_loss,
@@ -53,21 +56,21 @@ def model_evaluator():
         }
         
     @task
-    def update_model_info(model_info, evaluation_data, acuracy_drift):
+    def update_model_info(model_info: list, evaluation_data: list, acuracy_drift: float) -> None:
         update_accuracy_drift(model_info, evaluation_data, acuracy_drift)
    
-    def check_evaluation_data(evaluation_data):
+    def check_evaluation_data(evaluation_data: pd.DataFrame) -> bool:
         if evaluation_data is None or evaluation_data.empty or evaluation_data.shape[0] < 1000:  
             print("Evaluation data is empty. Stopping DAG.")
             return False
         return True
     
-    def check_trained_models(trained_models):
+    def check_trained_models(trained_models: list) -> str:
         if not trained_models:
             return "trigger_retraining_dag"
         return "preprocessing_data"
     
-    def decide_approach(retrain_model):
+    def decide_approach(retrain_model: bool) -> str:
         if retrain_model:
             return "trigger_retraining_dag"
         
@@ -82,7 +85,7 @@ def model_evaluator():
     )
     
     branch_task_01 = BranchPythonOperator(
-        task_id="check_trained_models",
+        task_id="stop_if_no_trained_models",
         python_callable=check_trained_models,
         op_kwargs={"trained_models": trained_models["model_list"]},
     )

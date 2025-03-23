@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+from typing import Dict, Union
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
 from airflow.operators.python import ShortCircuitOperator
@@ -16,14 +19,14 @@ default_args = {
 @dag(dag_id='Model_Training_DAG', default_args=default_args, start_date=days_ago(1), schedule_interval="@daily")
 def model_trainer():
     @task(multiple_outputs=True)
-    def fetching_training_data():
+    def fetching_training_data() -> Dict[str, pd.DataFrame]:
         fetched_data = fetch_training_data()  
         return {
             "fetched_data": fetched_data
         }
 
     @task(multiple_outputs=True)
-    def preprocessing_data(dataset):
+    def preprocessing_data(dataset: pd.DataFrame) -> Dict[str, Union[np.array, list]]:
         X_train, X_test, y_train, y_test, data_transformer_list = preprocess_dataset(dataset)
         return {
             "X_train": X_train, 
@@ -34,32 +37,32 @@ def model_trainer():
         }
     
     @task
-    def deploying_processing_models(data_transformer_list):
+    def deploying_processing_models(data_transformer_list: list) -> None:
         deploy_preprocessing_models(data_transformer_list)
     
     @task(multiple_outputs=True)
-    def training_ml_model(X_train, y_train):
+    def training_ml_model(X_train: np.array, y_train: np.array) -> Dict[str, list]:
         model_list = train_model(X_train, y_train)
         return {
             "model_list": model_list
         }
     
     @task(multiple_outputs=True)
-    def evaluating_model_performance(model_list, x_test, y_test):
+    def evaluating_model_performance(model_list: list, x_test: np.array, y_test: np.array) -> Dict[str, list]:
         model_evaluation_list = evaluate_model(model_list, x_test, y_test)
         return {
             "model_evaluation_list": model_evaluation_list
         }
 
     @task
-    def updating_database(model_evaluation_list, data_transformer_list):
+    def updating_database(model_evaluation_list: list, data_transformer_list: list) -> None:
         update_model_info(model_evaluation_list, data_transformer_list)
 
     @task
-    def deploying_ml_models(model_list):
+    def deploying_ml_models(model_list: list) -> None:
         deploy_models(model_list)
         
-    def check_training_data(fetched_data):
+    def check_training_data(fetched_data: pd.DataFrame) -> bool:
         if fetched_data.empty:
             return False
         return True
