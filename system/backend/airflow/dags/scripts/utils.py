@@ -1,11 +1,13 @@
 import os
-import pandas as pd
-import joblib
 from datetime import datetime
-from sqlalchemy import text, exc
-from scripts import database_engine
+from os.path import abspath, dirname, join
+
+import joblib
+import pandas as pd
 from google.cloud import storage
-from os.path import join, dirname, abspath
+from scripts import database_engine
+from sqlalchemy import exc, text
+
 
 def fetch_training_data():
     with database_engine().connect() as conn:
@@ -19,7 +21,15 @@ def fetch_evaluation_data() -> pd.DataFrame:
     with database_engine().connect() as conn:
         try:
             fetched_last_updated_date = conn.execute(
-                text("SELECT updated_date FROM model_info ORDER BY updated_date DESC LIMIT 1")
+                text(
+                    """
+                    SELECT 
+                        updated_date 
+                    FROM model_info 
+                    ORDER BY updated_date 
+                    DESC LIMIT 1
+                    """
+                )
             ).scalar() 
 
             if fetched_last_updated_date is None:
@@ -48,7 +58,11 @@ def fetch_trained_models():
         
         model_data_result = connection.execute(text(
             """
-                SELECT model_info.id, name, accuracy, f1_score, version_name 
+                SELECT 
+                    model_info.id, 
+                    name, accuracy, 
+                    f1_score, 
+                    version_name 
                 FROM model_info 
                 INNER JOIN model ON model_info.model_id = model.id
                 WHERE base_model IS TRUE
@@ -99,22 +113,48 @@ def update_model_info(model_info_list, data_transformer_list):
         try:
             for model_info in model_info_list:
                 model_id_result = connection.execute(
-                    text("SELECT id FROM model WHERE name = :model_name"), {"model_name": model_info["model_name"]}
+                    text(
+                        """
+                        SELECT 
+                            id 
+                        FROM model 
+                        WHERE name = :model_name
+                        """
+                    ), {"model_name": model_info["model_name"]}
                 ).fetchone()
 
                 if not model_id_result:
                     model_id_result = connection.execute(
-                        text("INSERT INTO model (name, base_model) VALUES (:name, :base_model) RETURNING id"), {"name": model_info["model_name"], "base_model": model_info["base_model"]}
+                        text(
+                            """
+                            INSERT INTO model 
+                            (name, base_model) 
+                            VALUES (:name, :base_model) 
+                            RETURNING id
+                            """
+                        ), {"name": model_info["model_name"], "base_model": model_info["base_model"]}
                     ).fetchone()
 
                 model_id = model_id_result[0] 
 
-                model_info_query = text("""
+                model_info_query = text(
+                    """
                     INSERT INTO model_info 
-                    (model_id, updated_date, accuracy, "TP", "TN", "FP", "FN", precision, recall, f1_score, is_automated_tunning, is_downloaded, version_name)
+                    (
+                        model_id, updated_date, accuracy, 
+                        "TP", "TN", "FP", "FN", precision, 
+                        recall, f1_score, is_automated_tunning, 
+                        is_downloaded, version_name
+                    )
                     VALUES 
-                    (:model_id, :updated_date, :accuracy, :TP, :TN, :FP, :FN, :precision, :recall, :f1_score, :is_automated_tunning, :is_downloaded, :version_name)
-                """)
+                    (
+                        :model_id, :updated_date, :accuracy, 
+                        :TP, :TN, :FP, :FN, :precision, :recall, 
+                        :f1_score, :is_automated_tunning, 
+                        :is_downloaded, :version_name
+                    )
+                    """
+                )
 
                 connection.execute(model_info_query, {
                     "model_id": model_id,
@@ -140,7 +180,14 @@ def update_model_info(model_info_list, data_transformer_list):
         try:
             for data_transformer in data_transformer_list:
                 data_transformer_id_result = connection.execute(
-                    text("SELECT id FROM data_transformer WHERE name = :name"), 
+                    text(
+                        """
+                        SELECT 
+                            id 
+                        FROM data_transformer 
+                        WHERE name = :name
+                        """
+                    ), 
                     {
                         "name": data_transformer["transformer_name"]
                     }
@@ -148,7 +195,14 @@ def update_model_info(model_info_list, data_transformer_list):
                 
                 if not data_transformer_id_result:
                     data_transformer_id_result = connection.execute(
-                        text("INSERT INTO data_transformer (name) VALUES (:name) RETURNING id"),
+                        text(
+                            """
+                            INSERT INTO data_transformer 
+                            (name) 
+                            VALUES (:name) 
+                            RETURNING id
+                            """
+                        ),
                         {
                             "name": data_transformer["transformer_name"]
                         }
@@ -159,8 +213,16 @@ def update_model_info(model_info_list, data_transformer_list):
                 connection.execute(
                     text(
                         """
-                        INSERT INTO data_transformer_info (data_transformer_id, updated_date, version_name, is_downloaded) 
-                        VALUES (:data_transformer_id, :updated_date, :version_name, :is_downloaded)
+                        INSERT INTO data_transformer_info 
+                        (
+                            data_transformer_id, updated_date, 
+                            version_name, is_downloaded
+                        ) 
+                        VALUES 
+                        (
+                            :data_transformer_id, :updated_date, 
+                            :version_name, :is_downloaded
+                        )
                         """
                     ),
                     {

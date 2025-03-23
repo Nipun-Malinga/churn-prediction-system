@@ -1,16 +1,17 @@
 import uuid
 import warnings
+from os.path import abspath, dirname, join
+
 import joblib
-from sklearn.model_selection import RandomizedSearchCV
-from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from imblearn.over_sampling import SMOTENC
-from scipy.stats import randint, uniform
 from lightgbm import LGBMClassifier
-from xgboost import XGBClassifier
-from sqlalchemy import text
+from scipy.stats import randint, uniform
 from scripts import database_engine
-from os.path import join, dirname, abspath
-from scripts.utils import upload_to_gcs, remove_models
+from scripts.utils import remove_models, upload_to_gcs
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
+from sklearn.model_selection import RandomizedSearchCV
+from sqlalchemy import text
+from xgboost import XGBClassifier
 
 warnings.filterwarnings('ignore')
 

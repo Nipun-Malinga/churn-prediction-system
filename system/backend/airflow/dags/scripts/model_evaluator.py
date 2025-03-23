@@ -1,7 +1,10 @@
-from sqlalchemy import text
-from scripts import database_engine
 from datetime import datetime
-from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, f1_score
+
+from scripts import database_engine
+from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
+                             precision_score, recall_score)
+from sqlalchemy import text
+
 
 def evaluate_model(model_list: list, X_test, y_test):
     model_evaluation_list = []

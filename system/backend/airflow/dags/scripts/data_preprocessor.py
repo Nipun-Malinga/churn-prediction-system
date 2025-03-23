@@ -1,15 +1,16 @@
 import uuid
+from os.path import abspath, dirname, join
+
 import joblib
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_numeric_dtype, is_object_dtype
-from os.path import join, dirname, abspath
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder, MinMaxScaler
 from imblearn.over_sampling import SMOTENC
-from sqlalchemy import text
+from pandas.api.types import is_numeric_dtype, is_object_dtype
 from scripts import database_engine
-from scripts.utils import upload_to_gcs, remove_models
+from scripts.utils import remove_models, upload_to_gcs
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OneHotEncoder
+from sqlalchemy import text
 
 ABS_DIR = dirname(abspath(__file__))
 BASE_DIR = join(ABS_DIR, "trained_models/")

@@ -1,14 +1,16 @@
+from datetime import timedelta
+from typing import Dict, Union
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Union
-from airflow.utils.dates import days_ago
 from airflow.decorators import dag, task
 from airflow.operators.python import BranchPythonOperator, ShortCircuitOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
-from datetime import timedelta
-from scripts.utils import fetch_evaluation_data, fetch_trained_models
+from airflow.utils.dates import days_ago
 from scripts.data_preprocessor import preprocess_evaluation_data
-from scripts.model_evaluator import evaluate_model, compare_model_performance, update_accuracy_drift
+from scripts.model_evaluator import (compare_model_performance, evaluate_model,
+                                     update_accuracy_drift)
+from scripts.utils import fetch_evaluation_data, fetch_trained_models
 
 default_args = {
     'owner': 'churn-pred_server',
