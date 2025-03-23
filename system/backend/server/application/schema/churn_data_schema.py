@@ -1,6 +1,7 @@
 from marshmallow import Schema, fields
 
-class Prediction_Request_Schema(Schema):
+# TODO: Add custom validations
+class Base_Schema(Schema):
     education = fields.String(required=True)
     credit_score = fields.Integer(required=True)
     geography = fields.String(required=True)
@@ -15,3 +16,9 @@ class Prediction_Request_Schema(Schema):
     estimated_salary = fields.Float(required=True)
     housing = fields.String(required=True)
     loan = fields.String(required=True)
+    
+class Prediction_Request_Schema(Base_Schema):
+    pass
+
+class Evaluation_Data_Schema(Base_Schema):
+    exited = fields.Integer(required=True)

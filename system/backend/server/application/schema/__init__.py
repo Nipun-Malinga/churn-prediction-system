@@ -1,2 +1,2 @@
-from .evaluation_data_schema import Evaluation_Data_Schema
-from .prediction_request_schema import Prediction_Request_Schema
+from .churn_data_schema import Evaluation_Data_Schema, Prediction_Request_Schema
+from .user_schema import User_Register_Schema, User_Login_Schema
