@@ -1,7 +1,7 @@
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
 from airflow.operators.python import ShortCircuitOperator
-from datetime import datetime, timedelta
+from datetime import timedelta
 from scripts.utils import fetch_training_data, update_model_info
 from scripts.data_preprocessor import preprocess_dataset, deploy_preprocessing_models
 from scripts.model_trainer import train_model, deploy_models

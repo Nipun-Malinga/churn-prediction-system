@@ -1,18 +1,13 @@
 import uuid
 import joblib
-
 import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_object_dtype
-
-from os.path import join, dirname, realpath, abspath
+from os.path import join, dirname, abspath
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder, MinMaxScaler
-
 from imblearn.over_sampling import SMOTENC
-
 from sqlalchemy import text
-
 from scripts import database_engine
 from scripts.utils import upload_to_gcs, remove_models
 

@@ -2,11 +2,9 @@ import os
 import pandas as pd
 import joblib
 from datetime import datetime
-
 from sqlalchemy import text, exc
 from scripts import database_engine
 from google.cloud import storage
-
 from os.path import join, dirname, abspath
 
 def fetch_training_data():

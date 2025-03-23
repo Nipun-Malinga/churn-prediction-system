@@ -2,8 +2,7 @@ from airflow.utils.dates import days_ago
 from airflow.decorators import dag, task
 from airflow.operators.python import BranchPythonOperator, ShortCircuitOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
-from datetime import datetime, timedelta
-
+from datetime import timedelta
 from scripts.utils import fetch_evaluation_data, fetch_trained_models
 from scripts.data_preprocessor import preprocess_evaluation_data
 from scripts.model_evaluator import evaluate_model, compare_model_performance, update_accuracy_drift
