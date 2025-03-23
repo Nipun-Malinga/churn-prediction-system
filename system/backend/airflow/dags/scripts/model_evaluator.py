@@ -1,5 +1,6 @@
 from sqlalchemy import text
 from scripts import database_engine
+from datetime import datetime
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix, precision_score, recall_score, f1_score
 
 def evaluate_model(model_list: list, X_test, y_test):
@@ -33,3 +34,24 @@ def compare_model_performance(base_performance, evaluated_performance):
         retrain_model = True
     
     return accuracy_loss, retrain_model
+
+def update_accuracy_drift(model_info, evaluation_data, accuracy_drift):
+    print(model_info)
+    with database_engine().connect() as connection:
+        connection.execute(
+            text(
+                """
+                INSERT INTO 
+                accuracy_drift  
+                (model_info_id, date, accuracy, drift)
+                VALUES 
+                (:model_info_id, :date, :accuracy, :drift)
+                """
+            ),
+            {
+                "model_info_id": model_info[0]["id"],
+                "date": datetime.now(),
+                "accuracy": evaluation_data[0]["accuracy"],
+                "drift": accuracy_drift
+            }
+        )

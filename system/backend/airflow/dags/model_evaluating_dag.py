@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from scripts.utils import fetch_evaluation_data, fetch_trained_models
 from scripts.data_preprocessor import preprocess_evaluation_data
-from scripts.model_evaluator import evaluate_model, compare_model_performance
+from scripts.model_evaluator import evaluate_model, compare_model_performance, update_accuracy_drift
 
 default_args = {
     'owner': 'churn-pred_server',
@@ -45,16 +45,20 @@ def model_evaluator():
             "model_evaluation_list": model_evaluation_list
         }
         
-    @task
+    @task(multiple_outputs=True)
     def comparing_model_performance(base_performance, evaluated_performance):
         accuracy_loss, retrain_model = compare_model_performance(base_performance, evaluated_performance)
         return {
             "accuracy_loss": accuracy_loss,
             "retrain_model": retrain_model
         }
+        
+    @task
+    def updating_database(model_info, evaluation_data, acuracy_drift):
+        update_accuracy_drift(model_info, evaluation_data, acuracy_drift)
    
     def check_evaluation_data(evaluation_data):
-        if evaluation_data.empty or evaluation_data.shape[0] < 1000:  
+        if evaluation_data is None or evaluation_data.empty or evaluation_data.shape[0] < 1000:  
             print("Evaluation data is empty. Stopping DAG.")
             return False
         return True
@@ -63,6 +67,11 @@ def model_evaluator():
         if not trained_models:
             return "trigger_retraining_dag"
         return "preprocessing_data"
+    
+    def decide_approach(retrain_model):
+        if retrain_model:
+            return "trigger_retraining_dag"
+        
            
     dataset = fetching_evaluation_data()
     trained_models = fetching_trained_models()
@@ -73,7 +82,7 @@ def model_evaluator():
         op_kwargs={"evaluation_data": dataset["evaluation_data"]},
     )
     
-    branch_task = BranchPythonOperator(
+    branch_task_01 = BranchPythonOperator(
         task_id="check_trained_models",
         python_callable=check_trained_models,
         op_kwargs={"trained_models": trained_models["model_list"]},
@@ -97,11 +106,25 @@ def model_evaluator():
         trained_models["model_list"],
         evaluated_data["model_evaluation_list"]
     )
+    
+    branch_task_02 = BranchPythonOperator(
+        task_id="deciding_approach",
+        python_callable=decide_approach,
+        op_kwargs={"retrain_model": compared_data["retrain_model"]}
+    )
 
-    dataset >> short_circuit >> branch_task
-    trained_models >> branch_task
+    dataset >> short_circuit >> branch_task_01
+    trained_models >> branch_task_01
 
-    branch_task >> trigger_retraining_dag
-    branch_task >> preprocessed_data >> evaluated_data >> compared_data
+    branch_task_01 >> trigger_retraining_dag
+    branch_task_01 >> preprocessed_data >> evaluated_data 
+    
+    compared_data >> updating_database(
+        trained_models["model_list"],
+        evaluated_data["model_evaluation_list"], 
+        compared_data["accuracy_loss"]
+    )
+    
+    compared_data >> branch_task_02 >> trigger_retraining_dag
     
 evaluating_dag = model_evaluator()
