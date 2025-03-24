@@ -2,6 +2,8 @@ import os
 from flask import Flask
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,6 +12,10 @@ DB_NAME = "database.db"
 
 db = SQLAlchemy()
 marshmallow = Marshmallow()
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
 
 def create_app():
     app = Flask(__name__)
@@ -18,6 +24,7 @@ def create_app():
 
     db.init_app(app)
     marshmallow.init_app(app)
+    limiter.init_app(app)
 
     from application.model import Model, Model_Info, Accuracy_Drift, Evaluation_Data, User, Model_Hyperparameters, Data_Transformer, Data_Transformer_Info
 
