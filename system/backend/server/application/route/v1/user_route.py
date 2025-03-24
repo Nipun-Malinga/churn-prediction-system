@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from application.schema import User_Register_Schema, User_Login_Schema
 from application.response import response_template, error_response_template
-from application.service.user_service import save_user, validate_user
+from application.service import save_user, validate_user
 
 user = Blueprint("user_bp", __name__)
 
