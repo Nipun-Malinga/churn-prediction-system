@@ -6,7 +6,7 @@ class User_Base_Schema(Schema):
     password = fields.String(required=True)
 
 class User_Register_Schema(User_Base_Schema):
-    password = fields.String(required=True)
+    username = fields.String(required=True)
     
 class User_Login_Schema(User_Base_Schema):
     pass
