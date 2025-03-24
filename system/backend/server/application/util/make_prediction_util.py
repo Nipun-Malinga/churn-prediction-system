@@ -13,6 +13,9 @@ def make_prediction(preprocessed_data):
     model_name_result = db.session.query(
         Model.name
     ).all()
+         
+    if not model_name_result:
+        raise FileNotFoundError("Currently there are no trained encoders available.")
     
     for name in model_name_result:
         voting_classifier = joblib.load(join(ML_MODEL_PATH, f"{name[0]}.pkl"))

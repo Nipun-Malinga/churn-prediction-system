@@ -16,6 +16,10 @@ def json_data_preprocessor(json_data):
     ).all()
     
     def encode_data(data):
+        
+        if not result:
+            raise FileNotFoundError("Currently there are no trained encoders available.")
+        
         # Onehot encoding
         oneHotEncoder = joblib.load(join(DATA_TRANSFORMER_PATH, f"{result[0][0]}.pkl"))
         encoded = oneHotEncoder.transform(data[['geography', 'education', 'card_type']])

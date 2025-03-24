@@ -17,3 +17,7 @@ def predict():
         return response_template('success', 'Model prediction success', {"Prediction": prediction[0], "Probability": probability}), 200
     except ValidationError as err:
         return error_response_template(err.messages), 400
+    except FileNotFoundError as err:
+        return error_response_template(
+            "Sorry there ara no trained models currently available."
+        ), 503
