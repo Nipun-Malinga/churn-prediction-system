@@ -32,7 +32,7 @@ class Model_Info(db.Model):
         back_populates='model_info', 
         cascade="all, delete-orphan"
     )  
-    model_hyper_parameters: Mapped["Model_Hyperparameters"] = relationship(back_populates='model_info')
+    model_hyperparameters: Mapped[list["Model_Hyperparameters"]] = relationship(back_populates='model_info')
 
     def __repr__(self):
         return f'Model_Info(model_id = {self.model_id}, updated_date = {self.updated_date}, accuracy = {self.accuracy})'
