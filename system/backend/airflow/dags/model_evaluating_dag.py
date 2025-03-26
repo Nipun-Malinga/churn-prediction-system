@@ -90,6 +90,7 @@ def model_evaluator():
     def check_untrained_data(retrain_model: bool) -> str:
         if retrain_model:
             return "trigger_retraining_dag_02"
+        return "evaluating_model_performance"
     
     def decide_approach(retrain_model: bool) -> str:
         if retrain_model:
@@ -158,9 +159,7 @@ def model_evaluator():
     
     preprocessed_data >> branch_task_02
     
-    branch_task_02 >> trigger_retraining_dag_02
-    
-    preprocessed_data >> evaluated_data
+    branch_task_02 >> [trigger_retraining_dag_02, evaluated_data]
     
     compared_data >> update_model_info(
         trained_models["model_list"],
