@@ -7,6 +7,7 @@ from airflow.decorators import dag, task
 from airflow.operators.python import BranchPythonOperator, ShortCircuitOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.utils.dates import days_ago
+from airflow.operators.dummy import DummyOperator
 from scripts.data_preprocessor import preprocess_evaluation_data
 from scripts.model_evaluator import (compare_model_performance, evaluate_model,
                                      update_accuracy_drift)
@@ -20,6 +21,7 @@ default_args = {
 
 @dag(dag_id='Model_Evaluating_DAG', default_args=default_args, start_date=days_ago(1), schedule_interval="@daily")
 def model_evaluator():
+    
     @task(multiple_outputs=True)
     def fetching_evaluation_data() -> Dict[str, pd.DataFrame]:
         fetched_evaluation_data = fetch_evaluation_data()   
@@ -28,12 +30,22 @@ def model_evaluator():
         }
     
     @task(multiple_outputs=True)
-    def preprocessing_data(evaluation_dataset: pd.DataFrame) -> Dict[str, np.array]:
-        X_test, Y_test = preprocess_evaluation_data(evaluation_dataset)
-        return {
-            "X_test": X_test,
-            "Y_test": Y_test
-        }
+    def preprocessing_data(evaluation_dataset: pd.DataFrame) -> Dict[str, Union[np.array, bool]]:
+        try:
+            X_test, Y_test = preprocess_evaluation_data(evaluation_dataset)
+            return {
+                "X_test": X_test,
+                "Y_test": Y_test,
+                "retrain_model": False
+            }
+        except ValueError as exp:
+            print("Untrained Value Detected. Triggering retraining.")
+            return {
+                "X_test": [],
+                "Y_test": [],
+                "retrain_model": True
+            }
+
         
     @task(multiple_outputs=True)
     def fetching_trained_models() -> Dict[str, list]:
@@ -60,6 +72,9 @@ def model_evaluator():
     @task
     def update_model_info(model_info: list, evaluation_data: list, acuracy_drift: float) -> None:
         update_accuracy_drift(model_info, evaluation_data, acuracy_drift)
+        
+        
+        
    
     def check_evaluation_data(evaluation_data: pd.DataFrame) -> bool:
         if evaluation_data is None or evaluation_data.empty or evaluation_data.shape[0] < 1000:  
@@ -72,18 +87,23 @@ def model_evaluator():
             return "trigger_retraining_dag"
         return "preprocessing_data"
     
+    def check_untrained_data(retrain_model: bool) -> str:
+        if retrain_model:
+            return "trigger_retraining_dag_02"
+    
     def decide_approach(retrain_model: bool) -> str:
         if retrain_model:
-            return "trigger_retraining_dag"
+            return "trigger_retraining_dag_01"
         
-           
-    dataset = fetching_evaluation_data()
+    
+    fetched_data = fetching_evaluation_data()
+    
     trained_models = fetching_trained_models()
 
     short_circuit = ShortCircuitOperator(
         task_id="stop_if_no_evaluation_data",
         python_callable=check_evaluation_data,
-        op_kwargs={"evaluation_data": dataset["evaluation_data"]},
+        op_kwargs={"evaluation_data": fetched_data["evaluation_data"]},
     )
     
     branch_task_01 = BranchPythonOperator(
@@ -93,12 +113,24 @@ def model_evaluator():
     )
 
     trigger_retraining_dag = TriggerDagRunOperator(
-        task_id="trigger_retraining_dag",
+        task_id="trigger_retraining_dag_01",
         trigger_dag_id="Model_Training_DAG",
         wait_for_completion=True
     )
-
-    preprocessed_data = preprocessing_data(dataset["evaluation_data"])
+    
+    trigger_retraining_dag_02 = TriggerDagRunOperator(
+        task_id="trigger_retraining_dag_02",
+        trigger_dag_id="Model_Training_DAG",
+        wait_for_completion=True
+    )
+    
+    preprocessed_data = preprocessing_data(fetched_data["evaluation_data"])
+    
+    branch_task_02 = BranchPythonOperator(
+        task_id="check_for_untrained_data",
+        python_callable=check_untrained_data,
+        op_kwargs={"retrain_model": preprocessed_data["retrain_model"]}
+    )
 
     evaluated_data = evaluating_model_performance(
         trained_models["model_list"], 
@@ -111,17 +143,24 @@ def model_evaluator():
         evaluated_data["model_evaluation_list"]
     )
     
-    branch_task_02 = BranchPythonOperator(
+    branch_task_03 = BranchPythonOperator(
         task_id="deciding_approach",
         python_callable=decide_approach,
         op_kwargs={"retrain_model": compared_data["retrain_model"]}
     )
 
-    dataset >> short_circuit >> branch_task_01
+    # Dependencies
+    fetched_data >> short_circuit >> branch_task_01
+    
     trained_models >> branch_task_01
 
-    branch_task_01 >> trigger_retraining_dag
-    branch_task_01 >> preprocessed_data >> evaluated_data 
+    branch_task_01 >> [trigger_retraining_dag, preprocessed_data]
+    
+    preprocessed_data >> branch_task_02
+    
+    branch_task_02 >> trigger_retraining_dag_02
+    
+    preprocessed_data >> evaluated_data
     
     compared_data >> update_model_info(
         trained_models["model_list"],
@@ -129,6 +168,6 @@ def model_evaluator():
         compared_data["accuracy_loss"]
     )
     
-    compared_data >> branch_task_02 >> trigger_retraining_dag
+    compared_data >> branch_task_03 >> trigger_retraining_dag
     
 evaluating_dag = model_evaluator()

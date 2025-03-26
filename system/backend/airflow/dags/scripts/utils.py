@@ -81,7 +81,8 @@ def fetch_trained_models():
                     "accuracy": data[2],
                     "f1_score": data[3],
                     "version": data[4],
-                    "base_model": None
+                    "base_model": None,
+                    "best_params": None
             })
     
     return model_data
