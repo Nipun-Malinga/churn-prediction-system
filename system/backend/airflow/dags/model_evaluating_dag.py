@@ -7,11 +7,10 @@ from airflow.decorators import dag, task
 from airflow.operators.python import BranchPythonOperator, ShortCircuitOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.utils.dates import days_ago
-from airflow.operators.dummy import DummyOperator
 from scripts.data_preprocessor import preprocess_evaluation_data
 from scripts.model_evaluator import (compare_model_performance, evaluate_model,
                                      update_accuracy_drift)
-from scripts.utils import fetch_evaluation_data, fetch_trained_models
+from scripts.utils import fetch_evaluation_data, fetch_trained_model_data
 
 default_args = {
     'owner': 'churn-pred_server',
@@ -49,7 +48,7 @@ def model_evaluator():
         
     @task(multiple_outputs=True)
     def fetching_trained_models() -> Dict[str, list]:
-        trained_models = fetch_trained_models()
+        trained_models = fetch_trained_model_data()
         return {
             "model_list": trained_models
         }
