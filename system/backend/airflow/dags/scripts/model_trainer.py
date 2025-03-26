@@ -43,7 +43,7 @@ def train_model(X_train, y_train):
     }
 
     XGM_random_searched = preform_random_search(XGM, params_XG, 30)
-    XGM_random_searched.best_params_
+    XGM_best_params = XGM_random_searched.best_params_
 
     joblib.dump(XGM_random_searched, join(ML_MODEL_PATHS["non_versioned"], "XGBOOST.pkl"))
 
@@ -79,8 +79,16 @@ def train_model(X_train, y_train):
     #         ('lgb', LGB_random_searched), 
     #         ('rf', RF_random_searched)], voting='soft').fit(X_train, y_train)
     
+    
+    #TODO: Create a output template
     return [
-        {"model":XGM_random_searched, "name":"XGBOOST", "version": XGM_version, "base_model": True}, 
+        {
+            "model":XGM_random_searched, 
+            "name":"XGBOOST", 
+            "version": XGM_version, 
+            "base_model": True,
+            "best_params": XGM_best_params
+        }, 
         # {"model":LGB_random_searched, "name":"LIGHTGBM"}, 
         # {"model":RF_random_searched, "name":"RANDOM FORSET"}, 
         # {"model":voting_classifier, "name":"VOTING CLASSIFIER"}

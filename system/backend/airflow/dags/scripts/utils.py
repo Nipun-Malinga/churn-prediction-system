@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import datetime
 from os.path import abspath, dirname, join
 
@@ -153,10 +154,11 @@ def update_model_info(model_info_list, data_transformer_list):
                         :f1_score, :is_automated_tunning, 
                         :is_downloaded, :version_name
                     )
+                    RETURNING id
                     """
                 )
 
-                connection.execute(model_info_query, {
+                model_info_id_result = connection.execute(model_info_query, {
                     "model_id": model_id,
                     "updated_date": datetime.now(),
                     "accuracy": float(model_info["accuracy"]), 
@@ -170,7 +172,24 @@ def update_model_info(model_info_list, data_transformer_list):
                     "is_automated_tunning": True,
                     "is_downloaded": False,
                     "version_name": model_info["version_name"]
-                })
+                }).fetchone()
+                
+                model_info_id = model_info_id_result[0]
+                
+                connection.execute(
+                    text(
+                        """
+                        INSERT INTO model_hyperparameters
+                        (model_info_id, json_hyperparameters)
+                        VALUES
+                        (:model_info_id, :json_hyperparameters)
+                        """
+                    ),
+                    {
+                       "model_info_id": model_info_id, 
+                       "json_hyperparameters": json.dumps(model_info["best_params"])
+                    }
+                )
 
                 print("Machine Learning Model Related Data Updated Successfully!")
 

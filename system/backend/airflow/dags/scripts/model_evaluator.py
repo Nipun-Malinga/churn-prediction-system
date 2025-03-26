@@ -24,7 +24,8 @@ def evaluate_model(model_list: list, X_test, y_test):
             "fp": fp,
             "fn": fn,
             "version_name": model["version"],
-            "base_model": model["base_model"]
+            "base_model": model["base_model"],
+            "best_params": model["best_params"]
         })
 
     return model_evaluation_list
