@@ -7,7 +7,7 @@ from application.service import save_user, validate_user
 
 user = Blueprint("user_bp", __name__)
 
-@user.route("users/register", methods=["POST"])
+@user.route("/register", methods=["POST"])
 @limiter.limit("5 per minute")
 def register():
     schema = User_Register_Schema()
@@ -23,7 +23,7 @@ def register():
     except ValidationError as err:
         return error_response_template(err.messages), 400
     
-@user.route("users/login", methods=["POST"])
+@user.route("/login", methods=["POST"])
 @limiter.limit("5 per minute")
 def login():
     schema = User_Login_Schema()

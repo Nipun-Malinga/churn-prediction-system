@@ -1,10 +1,10 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask
-from flask_marshmallow import Marshmallow
-from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from dotenv import load_dotenv
+from flask_marshmallow import Marshmallow
+from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 
@@ -26,13 +26,16 @@ def create_app():
     marshmallow.init_app(app)
     limiter.init_app(app)
 
-    from application.model import Model, Model_Info, Accuracy_Drift, Evaluation_Data, User, Model_Hyperparameters, Data_Transformer, Data_Transformer_Info
+    from application.model import (Accuracy_Drift, Data_Transformer,
+                                   Data_Transformer_Info, Evaluation_Data,
+                                   Model, Model_Hyperparameters, Model_Info,
+                                   User)
 
     with app.app_context():
         db.create_all()
 
-    from application.route import create_routes
     from application.error import register_error_handler
+    from application.route import create_routes
 
     create_routes(app)
     register_error_handler(app)
