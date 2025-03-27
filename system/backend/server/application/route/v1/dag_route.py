@@ -6,8 +6,8 @@ dag = Blueprint("dag_bp", __name__)
 
 @dag.route("/dags", methods=["GET"])
 def fetch_all():
-    return response_template(
-        "success",
-        "Dag data fetched successfully",
-        fetch_all_dags()
-    )
+    try:
+        dags = fetch_all_dags()
+        return response_template("success", "DAG data fetched successfully", dags), 200
+    except Exception as ex:
+        return error_response_template(str(ex)), 500

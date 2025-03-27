@@ -6,7 +6,7 @@ from application.service import save_user, validate_user
 
 user = Blueprint("user_bp", __name__)
 
-@user.route("/register", methods=["POST"])
+@user.route("users/register", methods=["POST"])
 def register():
     schema = User_Register_Schema()
     
@@ -21,7 +21,7 @@ def register():
     except ValidationError as err:
         return error_response_template(err.messages), 400
     
-@user.route("/login", methods=["POST"])
+@user.route("users/login", methods=["POST"])
 def login():
     schema = User_Login_Schema()
     
