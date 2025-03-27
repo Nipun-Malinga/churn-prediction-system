@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
+from application import limiter
 from application.schema import User_Register_Schema, User_Login_Schema
 from application.response import response_template, error_response_template
 from application.service import save_user, validate_user
@@ -7,6 +8,7 @@ from application.service import save_user, validate_user
 user = Blueprint("user_bp", __name__)
 
 @user.route("users/register", methods=["POST"])
+@limiter.limit("5 per minute")
 def register():
     schema = User_Register_Schema()
     
@@ -22,6 +24,7 @@ def register():
         return error_response_template(err.messages), 400
     
 @user.route("users/login", methods=["POST"])
+@limiter.limit("5 per minute")
 def login():
     schema = User_Login_Schema()
     

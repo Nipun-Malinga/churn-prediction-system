@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify
+from application import limiter
 from application.service import fetch_all_dags
 from application.response import response_template, error_response_template
 
 dag = Blueprint("dag_bp", __name__)
 
 @dag.route("/dags", methods=["GET"])
+@limiter.limit("5 per minute")
 def fetch_all():
     try:
         dags = fetch_all_dags()

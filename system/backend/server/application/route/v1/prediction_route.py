@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
+from application import limiter
 from application.service import  predict_results
 from application.schema import Prediction_Request_Schema
 from application.response import response_template, error_response_template
@@ -7,6 +8,7 @@ from application.response import response_template, error_response_template
 predict_result = Blueprint('predict_bp', __name__)
 
 @predict_result.route('/predict', methods=['POST'])
+@limiter.limit("5 per minute")
 def predict():
     schema = Prediction_Request_Schema()
     try:

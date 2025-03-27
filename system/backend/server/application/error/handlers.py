@@ -23,6 +23,15 @@ def handle_415(error):
             "message": error.description
         }
     ), 415
+    
+def handle_429(error):
+    return jsonify(
+        {
+            "error": "Too Many Requests",
+            "message": error.description
+        }
+    ), 415
+
 
 def handle_500(error):
     return jsonify(
