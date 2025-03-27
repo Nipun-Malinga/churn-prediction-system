@@ -16,6 +16,14 @@ def handle_404(error):
         }
     ), 404
 
+def handle_405(error):
+    return jsonify(
+        {
+            "error": "Method not allowed",
+            "message": error.description
+        }
+    ), 405
+
 def handle_415(error):
     return jsonify(
         {
@@ -30,7 +38,7 @@ def handle_429(error):
             "error": "Too Many Requests",
             "message": error.description
         }
-    ), 415
+    ), 429
 
 
 def handle_500(error):
