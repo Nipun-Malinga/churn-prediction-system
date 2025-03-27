@@ -71,9 +71,27 @@ def model_evaluator():
     @task
     def update_model_info(model_info: list, evaluation_data: list, acuracy_drift: float) -> None:
         update_accuracy_drift(model_info, evaluation_data, acuracy_drift)
-        
-        
-        
+     
+    """ Task Calls """  
+    
+    fetched_data = fetching_evaluation_data()
+    
+    trained_models = fetching_trained_models()
+   
+    preprocessed_data = preprocessing_data(fetched_data["evaluation_data"])
+    
+    evaluated_data = evaluating_model_performance(
+        trained_models["model_list"], 
+        preprocessed_data["X_test"], 
+        preprocessed_data["Y_test"]
+    )
+    
+    compared_data = comparing_model_performance(
+        trained_models["model_list"],
+        evaluated_data["model_evaluation_list"]
+    )
+    
+    """ Conditional Switchs """    
    
     def check_evaluation_data(evaluation_data: pd.DataFrame) -> bool:
         if evaluation_data is None or evaluation_data.empty or evaluation_data.shape[0] < 1000:  
@@ -94,25 +112,16 @@ def model_evaluator():
     def decide_approach(retrain_model: bool) -> str:
         if retrain_model:
             return "trigger_retraining_dag_01"
-        
     
-    fetched_data = fetching_evaluation_data()
+    """Conditional Tasks"""
     
-    trained_models = fetching_trained_models()
-
     short_circuit = ShortCircuitOperator(
         task_id="stop_if_no_evaluation_data",
         python_callable=check_evaluation_data,
         op_kwargs={"evaluation_data": fetched_data["evaluation_data"]},
     )
     
-    branch_task_01 = BranchPythonOperator(
-        task_id="stop_if_no_trained_models",
-        python_callable=check_trained_models,
-        op_kwargs={"trained_models": trained_models["model_list"]},
-    )
-
-    trigger_retraining_dag = TriggerDagRunOperator(
+    trigger_retraining_dag_01 = TriggerDagRunOperator(
         task_id="trigger_retraining_dag_01",
         trigger_dag_id="Model_Training_DAG",
         wait_for_completion=True
@@ -124,23 +133,16 @@ def model_evaluator():
         wait_for_completion=True
     )
     
-    preprocessed_data = preprocessing_data(fetched_data["evaluation_data"])
+    branch_task_01 = BranchPythonOperator(
+        task_id="stop_if_no_trained_models",
+        python_callable=check_trained_models,
+        op_kwargs={"trained_models": trained_models["model_list"]},
+    )
     
     branch_task_02 = BranchPythonOperator(
         task_id="check_for_untrained_data",
         python_callable=check_untrained_data,
         op_kwargs={"retrain_model": preprocessed_data["retrain_model"]}
-    )
-
-    evaluated_data = evaluating_model_performance(
-        trained_models["model_list"], 
-        preprocessed_data["X_test"], 
-        preprocessed_data["Y_test"]
-    )
-    
-    compared_data = comparing_model_performance(
-        trained_models["model_list"],
-        evaluated_data["model_evaluation_list"]
     )
     
     branch_task_03 = BranchPythonOperator(
@@ -148,13 +150,14 @@ def model_evaluator():
         python_callable=decide_approach,
         op_kwargs={"retrain_model": compared_data["retrain_model"]}
     )
-
-    # Dependencies
+    
+    """ Dependencies """
+    
     fetched_data >> short_circuit >> branch_task_01
     
     trained_models >> branch_task_01
 
-    branch_task_01 >> [trigger_retraining_dag, preprocessed_data]
+    branch_task_01 >> [trigger_retraining_dag_01, preprocessed_data]
     
     preprocessed_data >> branch_task_02
     
@@ -166,6 +169,6 @@ def model_evaluator():
         compared_data["accuracy_loss"]
     )
     
-    compared_data >> branch_task_03 >> trigger_retraining_dag
+    compared_data >> branch_task_03 >> trigger_retraining_dag_01
     
 evaluating_dag = model_evaluator()

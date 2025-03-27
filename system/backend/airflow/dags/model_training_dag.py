@@ -63,13 +63,32 @@ def model_trainer():
     @task
     def deploying_ml_models(model_list: list) -> None:
         deploy_models(model_list)
-        
+    
+    """ Task Calls """
+
+    training_data = fetching_training_data()
+    
+    preprocessed_data = preprocessing_data(training_data["fetched_data"])
+    
+    trained_models = training_ml_model(
+        preprocessed_data["X_train"], 
+        preprocessed_data["y_train"]
+    )
+    
+    evaluation_data = evaluating_model_performance(
+        trained_models["model_list"], 
+        preprocessed_data["X_test"], 
+        preprocessed_data["y_test"]
+    )
+    
+    """ Conditional Switchs """ 
+    
     def check_training_data(fetched_data: pd.DataFrame) -> bool:
         if fetched_data.empty:
             return False
         return True
-
-    training_data = fetching_training_data()
+    
+    """Conditional Tasks"""
     
     short_circuit = ShortCircuitOperator(
         task_id="stop_if_no_training_data",
@@ -77,11 +96,7 @@ def model_trainer():
         op_kwargs={"fetched_data": training_data["fetched_data"]},
     )
     
-    preprocessed_data = preprocessing_data(training_data["fetched_data"])
-    
-    trained_models = training_ml_model(preprocessed_data["X_train"], preprocessed_data["y_train"])
-    
-    evaluation_data = evaluating_model_performance(trained_models["model_list"], preprocessed_data["X_test"], preprocessed_data["y_test"])
+    """ Dependencies """
 
     training_data >> short_circuit >> preprocessed_data
     
@@ -91,7 +106,10 @@ def model_trainer():
     
     trained_models >> evaluation_data
     
-    evaluation_data >> updating_database(evaluation_data["model_evaluation_list"], preprocessed_data["data_transformer_list"])
+    evaluation_data >> updating_database(
+        evaluation_data["model_evaluation_list"], 
+        preprocessed_data["data_transformer_list"]
+    )
     
     trained_models >> deploying_ml_models(trained_models["model_list"])
 
