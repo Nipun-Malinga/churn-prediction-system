@@ -1,6 +1,8 @@
 import os
+
 from dotenv import load_dotenv
 from flask import Flask
+from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_marshmallow import Marshmallow
@@ -21,6 +23,8 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
+
+    CORS(app)
 
     db.init_app(app)
     marshmallow.init_app(app)
