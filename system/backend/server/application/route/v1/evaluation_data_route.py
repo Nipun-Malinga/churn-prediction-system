@@ -2,10 +2,12 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from application import limiter
 from application.schema import Evaluation_Data_Schema
-from application.service import save_evaluation_data
+from application.service import Evaluation_Data_Service
 from application.response import response_template, error_response_template
 
 data = Blueprint("data_bp", __name__)
+
+service = Evaluation_Data_Service()
 
 @data.route("/", methods=["GET"])
 @limiter.limit("5 per minute")
@@ -23,7 +25,7 @@ def add_data():
         return response_template(
             "success", 
             "New data added to the server successfully", 
-            schema.dump(save_evaluation_data(request_data))
+            schema.dump(service.save_evaluation_data(request_data))
         ), 201
 
     except ValidationError as err:
@@ -36,7 +38,7 @@ def add_data_list():
 
     try:
         request_data = schema.load(request.json) 
-        saved_entries = [save_evaluation_data(entry) for entry in request_data]
+        saved_entries = [service.save_evaluation_data(entry) for entry in request_data]
         
         return response_template(
             "success", 

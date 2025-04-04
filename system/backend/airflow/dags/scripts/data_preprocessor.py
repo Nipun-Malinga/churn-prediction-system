@@ -307,4 +307,4 @@ def deploy_preprocessing_models(data_transformer_list):
     
     for data_transformer in data_transformer_list:
         encoder_version = data_transformer["version"]
-        # upload_to_gcs("churn_prediction_model_storage", join(ENCODER_PATHS["versioned"], encoder_version), f"data_transformers/{encoder_version}")
+        upload_to_gcs("churn_prediction_model_storage", join(DATA_TRANSFORMER_PATHS["versioned"], encoder_version), f"data_transformers/{encoder_version}")

@@ -122,4 +122,4 @@ def deploy_models(model_list: list):
 
     for model in model_list:
         model_version = model["version"]
-        # upload_to_gcs("churn_prediction_model_storage", join(ML_MODEL_PATHS["versioned"], model_version), f"ml_models/{model_version}")
+        upload_to_gcs("churn_prediction_model_storage", join(ML_MODEL_PATHS["versioned"], model_version), f"ml_models/{model_version}")
