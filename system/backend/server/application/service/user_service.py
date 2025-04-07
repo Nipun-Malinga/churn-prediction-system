@@ -1,10 +1,12 @@
 import json
+
 from application import db
 from application.model import User
 from application.schema import User_Login_Schema
 from application.util import validate_password
 from flask_jwt_extended import create_access_token
 from sqlalchemy.exc import IntegrityError
+
 
 class User_Service:
 
@@ -15,7 +17,7 @@ class User_Service:
             db.session.add(user)
             db.session.commit()
             return create_access_token(
-                identity={"user_id:": user.id}, 
+                identity=json.dumps({"user_id:": user.id}), 
                 additional_claims={"email": user.email}
             )
         except IntegrityError as exp:
@@ -39,6 +41,6 @@ class User_Service:
             raise ValueError("User validation failed due to password error") from exp
         
         return create_access_token(
-                identity={"user_id:": fetched_user[0]},
+                identity=json.dumps({"user_id:": fetched_user[0]}), 
                 additional_claims={"email": fetched_user[2]}
         )
