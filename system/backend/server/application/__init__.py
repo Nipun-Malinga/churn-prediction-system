@@ -1,13 +1,14 @@
 import os
+from datetime import timedelta
 
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
 
 load_dotenv()
 
@@ -25,6 +26,7 @@ def create_app():
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
     app.config['JWT_TOKEN_LOCATION'] = ['headers']
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=60)
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
 
     CORS(app)

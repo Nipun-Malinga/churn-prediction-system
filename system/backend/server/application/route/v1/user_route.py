@@ -26,6 +26,10 @@ def register():
         
     except ValidationError as exp:
         return error_response_template(exp.messages), 400
+    except ValueError as exp:
+        return error_response_template(
+            "User could not be saved. Possible duplicate or constraint violation."
+        ), 409
     
 @user.route("/login", methods=["POST"])
 @limiter.limit("5 per minute")
