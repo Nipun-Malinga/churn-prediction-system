@@ -7,6 +7,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager
 
 load_dotenv()
 
@@ -21,11 +22,14 @@ limiter = Limiter(
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+    app.config['JWT_TOKEN_LOCATION'] = ['headers']
+    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
 
     CORS(app)
-
+    JWTManager(app)
+    
     db.init_app(app)
     marshmallow.init_app(app)
     limiter.init_app(app)

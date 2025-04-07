@@ -15,15 +15,17 @@ def register():
     schema = User_Register_Schema()
     
     try:
-        requset_data = schema.load(request.json)
+        auth_token = service.save_user(schema.load(request.json))   
         return response_template(
             "success",
             "User registered successfully",
-            schema.dump(service.save_user(requset_data))
+            {
+                "auth_token": auth_token
+            }
         ), 201
         
-    except ValidationError as err:
-        return error_response_template(err.messages), 400
+    except ValidationError as exp:
+        return error_response_template(exp.messages), 400
     
 @user.route("/login", methods=["POST"])
 @limiter.limit("5 per minute")
@@ -31,11 +33,19 @@ def login():
     schema = User_Login_Schema()
     
     try:
-        request_data = schema.load(request.json)
+        auth_token = service.validate_user(schema.load(request.json))
         
-        if service.validate_user(request_data): 
-            return response_template("success", "User verified successfully", None), 200
+        if auth_token: 
+            return response_template(
+                "success", 
+                "User verified successfully", 
+                {
+                    "auth_token": auth_token
+                }
+            ), 200
         return error_response_template("Invalid Credentials"), 401
 
-    except ValidationError as err:
-        return error_response_template(err.messages), 400
+    except ValidationError as exp:
+        return error_response_template(exp.messages), 400
+    except ValueError as exp:
+        return error_response_template("Failed to authenticate user"), 500
