@@ -14,6 +14,13 @@ class Model(db.Model):
         back_populates='model', 
         cascade="all, delete-orphan"
     )
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "base_model": self.base_model
+        }
 
     def __repr__(self):
         return f'Model(name = {self.name})'

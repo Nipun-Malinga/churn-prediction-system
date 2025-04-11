@@ -34,6 +34,22 @@ class Model_Info(db.Model):
     )  
     model_hyperparameters: Mapped[list["Model_Hyperparameters"]] = relationship(back_populates='model_info')
 
+    def to_dict(self): 
+        return {
+            "id": self.id,
+            "model_id": self.model_id,
+            "updated_date": self.updated_date,
+            "accuracy": self.accuracy,
+            "TP": self.TP,
+            "TN": self.TN,
+            "FP": self.FP,
+            "FN": self.FN,
+            "precision": self.precision,
+            "recall": self.recall,
+            "f1_score": self.f1_score,
+            "is_automated_tuning": self.is_automated_tunning
+        }
+
     def __repr__(self):
         return f'Model_Info(model_id = {self.model_id}, updated_date = {self.updated_date}, accuracy = {self.accuracy})'
                 
