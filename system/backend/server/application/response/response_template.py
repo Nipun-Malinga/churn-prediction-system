@@ -1,5 +1,6 @@
 from flask import jsonify
 
+
 def response_template(status, message, data):
     return jsonify(
         {

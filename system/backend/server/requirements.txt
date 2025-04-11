@@ -4,13 +4,15 @@ SQLAlchemy==2.0.38
 PyMySQL==1.1.1
 python-dotenv==1.0.1
 marshmallow==3.26.1
-numpy==2.2.3
-pandas==2.2.3
-scikit-learn==1.5.2
-xgboost==2.1.3
-lightgbm==4.5.0
 flask-marshmallow==1.3.0
 google-cloud-storage==3.1.0
 bcrypt==4.3.0
 Flask-Limiter==3.12
 flask-cors==5.0.1
+
+# ML Related libraries
+numpy==2.2.3
+pandas==2.2.3
+scikit-learn==1.5.2
+xgboost==2.1.3
+lightgbm==4.5.0

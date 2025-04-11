@@ -1,6 +1,7 @@
 from application import db
-from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import Integer, Float, JSON, ForeignKey
+from sqlalchemy import JSON, Float, ForeignKey, Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 class Model_Hyperparameters(db.Model):
     __tablename__ = 'model_hyperparameters'

@@ -1,6 +1,8 @@
 import re
+
 import requests
 from requests.exceptions import ConnectionError, HTTPError, RequestException
+
 
 def get_csrf_token(url):
     """Get the CSRF token from the login page response."""

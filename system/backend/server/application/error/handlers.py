@@ -1,5 +1,6 @@
 from flask import jsonify
 
+
 def handle_400(error):
     return jsonify(
         {

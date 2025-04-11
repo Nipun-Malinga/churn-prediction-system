@@ -1,8 +1,9 @@
+from os.path import abspath, dirname, join, realpath
+
 import joblib
 import pandas as pd
 from application import db
 from application.model import Data_Transformer
-from os.path import join, dirname, realpath, abspath
 
 ABS_DIR = dirname(abspath(__file__))
 BASE_DIR = join(ABS_DIR, "trained_models/")

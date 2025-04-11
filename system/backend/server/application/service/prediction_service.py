@@ -1,5 +1,7 @@
 import joblib
-from application.util import json_data_preprocessor, make_prediction, fetch_preprocessing_models, fetch_ml_models
+from application.util import (fetch_ml_models, fetch_preprocessing_models,
+                              json_data_preprocessor, make_prediction)
+
 
 class Prediction_Service:
 

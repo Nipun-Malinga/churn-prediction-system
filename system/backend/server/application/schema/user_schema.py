@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields
 
+
 # TODO: Add custom validations
 class User_Base_Schema(Schema):
     email = fields.Email(required=True)

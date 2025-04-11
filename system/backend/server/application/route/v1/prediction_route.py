@@ -1,10 +1,10 @@
-from flask import Blueprint, jsonify, request
-from marshmallow import ValidationError
-from application.service import Prediction_Service
-from application.schema import Prediction_Request_Schema
-from application.response import response_template, error_response_template
-from flask_jwt_extended import jwt_required
 from application import limiter
+from application.response import error_response_template, response_template
+from application.schema import Prediction_Request_Schema
+from application.service import Prediction_Service
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
+from marshmallow import ValidationError
 
 predict_result = Blueprint("predict_bp", __name__)
 

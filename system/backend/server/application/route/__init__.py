@@ -1,4 +1,5 @@
-from .v1 import data, predict_result, user, dag, model
+from .v1 import dag, data, model, predict_result, user
+
 
 def create_routes(app):
     app.register_blueprint(data, url_prefix="/api/v1/data")

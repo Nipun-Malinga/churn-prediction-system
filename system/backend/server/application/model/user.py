@@ -1,7 +1,8 @@
 from application import db
-from sqlalchemy import String
-from sqlalchemy.orm import mapped_column, Mapped
 from application.util import encrypt_password
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
+
 
 class User(db.Model):
     __tablename__ = 'user'

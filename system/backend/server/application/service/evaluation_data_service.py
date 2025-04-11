@@ -1,6 +1,7 @@
 from application import db
 from application.model import Evaluation_Data
 
+
 class Evaluation_Data_Service:
 
     @classmethod

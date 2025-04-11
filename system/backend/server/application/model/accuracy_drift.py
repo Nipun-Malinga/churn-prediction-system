@@ -1,7 +1,9 @@
 import datetime
+
 from application import db
-from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import Float, ForeignKey, DateTime
+from sqlalchemy import DateTime, Float, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 class Accuracy_Drift(db.Model):
     __tablename__ = 'accuracy_drift'

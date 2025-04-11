@@ -1,9 +1,9 @@
-from flask import Blueprint, request, jsonify
-from marshmallow import ValidationError
 from application import limiter
-from application.schema import User_Register_Schema, User_Login_Schema
-from application.response import response_template, error_response_template
+from application.response import error_response_template, response_template
+from application.schema import User_Login_Schema, User_Register_Schema
 from application.service import User_Service
+from flask import Blueprint, jsonify, request
+from marshmallow import ValidationError
 
 user = Blueprint("user_bp", __name__)
 

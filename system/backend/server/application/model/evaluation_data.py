@@ -1,7 +1,9 @@
 from datetime import datetime
+
 from application import db
-from sqlalchemy import String, DateTime
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy import DateTime, String
+from sqlalchemy.orm import Mapped, mapped_column
+
 
 class Evaluation_Data(db.Model):
     __tablename__ = 'evaluation_data'

@@ -1,12 +1,13 @@
-from sqlalchemy import desc
-from sqlalchemy.orm import joinedload
-from os.path import join, dirname, abspath
+from os.path import abspath, dirname, join
+
 from application import db
-from application.util.cloud_storage_utils import download_blob
 from application.model.data_transformer import Data_Transformer
 from application.model.data_transformer_info import Data_Transformer_Info
 from application.model.model import Model
 from application.model.model_info import Model_Info
+from application.util.cloud_storage_utils import download_blob
+from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
 
 ABS_DIR = dirname(abspath(__file__))
 BASE_DIR = join(ABS_DIR, "trained_models/")

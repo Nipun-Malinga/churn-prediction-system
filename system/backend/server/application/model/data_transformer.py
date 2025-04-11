@@ -1,6 +1,7 @@
 from application import db
 from sqlalchemy import String
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 class Data_Transformer(db.Model):
     __tablename__ = 'data_transformer'

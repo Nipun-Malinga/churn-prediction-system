@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields
 
+
 # TODO: Add custom validations
 class Base_Schema(Schema):
     education = fields.String(required=True)

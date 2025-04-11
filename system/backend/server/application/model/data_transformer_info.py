@@ -1,7 +1,9 @@
 import datetime
+
 from application import db
-from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import String, Boolean, ForeignKey, DateTime
+from sqlalchemy import Boolean, DateTime, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 # Stores the model details
 class Data_Transformer_Info(db.Model):

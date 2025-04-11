@@ -1,11 +1,11 @@
 from enum import Enum, auto
 
-from flask import Blueprint, request, jsonify
-from application.service import Model_Info_Service
-from application.response import response_template, error_response_template
-from sqlalchemy.exc import NoResultFound
-from flask_jwt_extended import jwt_required
 from application import limiter
+from application.response import error_response_template, response_template
+from application.service import Model_Info_Service
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
+from sqlalchemy.exc import NoResultFound
 
 model = Blueprint("model_bp", __name__)
 

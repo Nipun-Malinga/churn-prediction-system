@@ -1,5 +1,6 @@
+from os.path import abspath, dirname, join
+
 import joblib
-from os.path import join, dirname, abspath
 from application import db
 from application.model import Model
 

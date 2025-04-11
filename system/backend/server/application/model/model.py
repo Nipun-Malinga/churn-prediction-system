@@ -1,6 +1,7 @@
 from application import db
-from sqlalchemy import String, Boolean
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy import Boolean, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 class Model(db.Model):
     __tablename__ = 'model'
