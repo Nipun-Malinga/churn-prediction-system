@@ -4,6 +4,7 @@ from application import limiter
 from application.schema import Evaluation_Data_Schema
 from application.service import Evaluation_Data_Service
 from application.response import response_template, error_response_template
+from flask_jwt_extended import jwt_required
 
 data = Blueprint("data_bp", __name__)
 
@@ -11,12 +12,14 @@ service = Evaluation_Data_Service()
 
 @data.route("/", methods=["GET"])
 @limiter.limit("5 per minute")
+@jwt_required()
 # TODO: Complete
 def get_data():
     return [], 200
 
 @data.route("/", methods=["POST"])
 @limiter.limit("5 per minute")
+@jwt_required()
 def add_data():
     schema = Evaluation_Data_Schema()
 
@@ -33,6 +36,7 @@ def add_data():
     
 @data.route("/list", methods=["POST"])
 @limiter.limit("5 per minute")
+@jwt_required()
 def add_data_list():
     schema = Evaluation_Data_Schema(many=True)
 
@@ -51,10 +55,12 @@ def add_data_list():
 
 @data.route("/csv", methods=["POST"])
 @limiter.limit("5 per minute")
+@jwt_required()
 def add_csv_data():
     return
 
 @data.route("/csv/read", methods=["POST"])
 @limiter.limit("5 per minute")
+@jwt_required()
 def read_csv_data():
     return   

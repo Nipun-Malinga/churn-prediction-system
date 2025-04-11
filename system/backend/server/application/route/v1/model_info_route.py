@@ -4,6 +4,8 @@ from flask import Blueprint, request, jsonify
 from application.service import Model_Info_Service
 from application.response import response_template, error_response_template
 from sqlalchemy.exc import NoResultFound
+from flask_jwt_extended import jwt_required
+from application import limiter
 
 model = Blueprint("model_bp", __name__)
 
@@ -19,6 +21,8 @@ class Type(Enum):
     F1_SCORE = "f1_score"
     
 @model.route("/", methods=["GET"])
+@limiter.limit("5 per minute")
+@jwt_required()
 def get_all_models():
     
     try:
@@ -31,6 +35,8 @@ def get_all_models():
         return error_response_template("Failed to Fetch Models"), 500
     
 @model.route("/info/basic", methods=["GET"])    
+@limiter.limit("5 per minute")
+@jwt_required()
 def get_basic_model_info_by_id():
     
     model_id = request.args.get("model_id") 
@@ -45,7 +51,9 @@ def get_basic_model_info_by_id():
     except Exception as ex:
         return error_response_template("Failed to fetch Model Information"), 500
     
-@model.route("/info/advanced", methods=["GET"])    
+@model.route("/info/advanced", methods=["GET"])   
+@limiter.limit("5 per minute")
+@jwt_required() 
 def get_advanced_model_info_by_id():
     
     model_id = request.args.get("model_id")
@@ -60,7 +68,9 @@ def get_advanced_model_info_by_id():
     except Exception as ex:
         return error_response_template("Failed to fetch Model Information"), 500
 
-@model.route("/charts", methods=["GET"])   
+@model.route("/charts", methods=["GET"])
+@limiter.limit("5 per minute")
+@jwt_required()
 def model_history_chart_data():
     try:
         model_id = request.args.get("model_id")

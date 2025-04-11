@@ -26,7 +26,7 @@ def create_app():
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
     app.config['JWT_TOKEN_LOCATION'] = ['headers']
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=60)
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
 
     CORS(app)
