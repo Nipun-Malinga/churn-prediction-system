@@ -14,10 +14,12 @@ def make_prediction(preprocessed_data):
     try:
         result = db.session.query(
             Model.name
+        ).where(
+            Model.base_model == True
         ).one()
-        
+   
         if not result:
-            raise FileNotFoundError("Currently there are no trained encoders available.")
+            raise FileNotFoundError("Currently there are no trained models available.")
 
         voting_classifier = joblib.load(join(ML_MODEL_PATH, f"{result[0]}.pkl"))
 

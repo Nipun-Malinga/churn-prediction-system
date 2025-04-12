@@ -25,10 +25,27 @@ ML_MODEL_PATHS = {
 
 def train_model(X_train, y_train):
 
-    def preform_random_search(model, params, n_tier=20, cv=5):
+    def perform_random_search(model, params, n_tier=20, cv=5):
         random_search = RandomizedSearchCV(model, param_distributions=params, n_iter=n_tier, cv=cv, scoring='accuracy', n_jobs=-1, random_state=42)
         return random_search.fit(X_train, y_train)
     
+    def save_model_file(model_name, model):
+        joblib.dump(
+            model,
+            join(
+                ML_MODEL_PATHS["non_versioned"], 
+                f"{model_name}.pkl"
+            )
+        )
+        
+        model_version = f"{model_name}_V{str(uuid.uuid4())[:8]}.pkl"
+        joblib.dump(model, join(ML_MODEL_PATHS["versioned"], model_version))
+        
+        return model_version
+    
+    """
+    XGBOOST
+    """
     XGM = XGBClassifier(
         objective="binary:logistic",
         eval_metric="logloss",
@@ -42,43 +59,57 @@ def train_model(X_train, y_train):
         'n_estimators': randint(100, 600),
     }
 
-    XGM_random_searched = preform_random_search(XGM, params_XG, 30)
+    XGM_random_searched = perform_random_search(XGM, params_XG, 30)
     XGM_best_params = XGM_random_searched.best_params_
 
-    joblib.dump(XGM_random_searched, join(ML_MODEL_PATHS["non_versioned"], "XGBOOST.pkl"))
+    XGM_version = save_model_file("XGBOOST", XGM_random_searched)
 
-    XGM_version = f"XGBOOST_V{str(uuid.uuid4())[:8]}.pkl"
-    joblib.dump(XGM_random_searched, join(ML_MODEL_PATHS["versioned"], XGM_version))
 
-    # LGB = LGBMClassifier()
+    """
+    LIGHTGBM
+    """
+    LGB = LGBMClassifier()
 
-    # params_LGB = {
-    #     'learning_rate': uniform(0.01, 1),
-    #     'max_depth': randint(2, 20),
-    #     'num_leaves': randint(20, 60),
-    #     'n_estimators': randint(100, 600),
-    # }
+    params_LGB = {
+        'learning_rate': uniform(0.01, 1),
+        'max_depth': randint(2, 20),
+        'num_leaves': randint(20, 60),
+        'n_estimators': randint(100, 600),
+    }
 
-    # LGB_random_searched = preform_random_search(LGB, params_LGB, 40, 10)
-    # LGB_random_searched.best_params_
-
-    # RF = RandomForestClassifier()
-
-    # params_RF = {
-    #     'max_depth': randint(3, 20),
-    #     'min_samples_split': randint(2, 20),
-    #     'n_estimators': randint(100, 600),
-    # }
-
-    # RF_random_searched = preform_random_search(RF, params_RF, 30, 10)
-    # RF_random_searched.best_params_
-
-    # voting_classifier = VotingClassifier(
-    #     estimators=[
-    #         ('xg', XGM_random_searched), 
-    #         ('lgb', LGB_random_searched), 
-    #         ('rf', RF_random_searched)], voting='soft').fit(X_train, y_train)
+    LGBM_random_searched = perform_random_search(LGB, params_LGB, 40, 10)
+    LGBM_best_params = LGBM_random_searched.best_params_
     
+    LGBM_version = save_model_file("LIGHTGBM", LGBM_random_searched)
+    
+    
+    """
+    RANDOM FOREST
+    """
+    RF = RandomForestClassifier()
+
+    params_RF = {
+        'max_depth': randint(3, 20),
+        'min_samples_split': randint(2, 20),
+        'n_estimators': randint(100, 600),
+    }
+
+    RF_random_searched = perform_random_search(RF, params_RF, 30, 10)
+    RF_best_params = RF_random_searched.best_params_
+    
+    RF_version = save_model_file("RF", RF_random_searched)
+    
+    
+    """
+    VOTING CLASSIFIER
+    """
+    voting_classifier = VotingClassifier(
+        estimators=[
+            ('xg', XGM_random_searched), 
+            ('lgb', LGBM_random_searched), 
+            ('rf', RF_random_searched)], voting='soft').fit(X_train, y_train)
+    
+    voting_classifier_version = save_model_file("VOTING_Classifier", voting_classifier)
     
     #TODO: Create a output template
     return [
@@ -86,12 +117,30 @@ def train_model(X_train, y_train):
             "model":XGM_random_searched, 
             "name":"XGBOOST", 
             "version": XGM_version, 
-            "base_model": True,
+            "base_model": False,
             "best_params": XGM_best_params
         }, 
-        # {"model":LGB_random_searched, "name":"LIGHTGBM"}, 
-        # {"model":RF_random_searched, "name":"RANDOM FORSET"}, 
-        # {"model":voting_classifier, "name":"VOTING CLASSIFIER"}
+        {
+            "model":LGBM_random_searched,
+            "name":"LIGHTGBM",
+            "version": LGBM_version, 
+            "base_model": False,
+            "best_params": LGBM_best_params
+        }, 
+        {
+            "model":RF_random_searched, 
+            "name":"RANDOM_FOREST",
+            "version": RF_version, 
+            "base_model": False,
+            "best_params": RF_best_params
+        }, 
+        {
+            "model":voting_classifier, 
+            "name":"VOTING_CLASSIFIER",
+            "version": voting_classifier_version, 
+            "base_model": True,
+            "best_params": {}
+        }
         ]
 
 def deploy_models(model_list: list):

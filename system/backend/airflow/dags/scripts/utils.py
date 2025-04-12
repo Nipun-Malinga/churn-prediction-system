@@ -98,7 +98,7 @@ def upload_to_gcs(bucket_name, source_file_path, destination) -> None:
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination)
 
-    blob.upload_from_filename(source_file_path)
+    blob.upload_from_filename(source_file_path, timeout=10000)
 
     print(f"File {source_file_path} uploaded to {destination} in {bucket_name}.")
 

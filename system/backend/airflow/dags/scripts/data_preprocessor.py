@@ -168,7 +168,7 @@ def preprocess_dataset(dataset):
         # Versioning the scaler
         minmax_scaler_version = f"minMax_scaler_V{str(uuid.uuid4())[:8]}.pkl"
 
-        # Expoting versioned scaler
+        # Exporting versioned scaler
         joblib.dump(scaler, join(DATA_TRANSFORMER_PATHS["versioned"], minmax_scaler_version))
         
         data_transformer_list.append(
@@ -182,7 +182,7 @@ def preprocess_dataset(dataset):
     # Removing the white spaces from columns
     dataset.columns = dataset.columns.str.strip()
 
-    # Removing whitespaces from dara
+    # Removing whitespaces from data
     dataset = dataset.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
     # Handling null values
@@ -214,7 +214,7 @@ def preprocess_dataset(dataset):
 
     return X_train, X_test, y_train, y_test, data_transformer_list
 
-# FIXME: Fix the preprocessing faliure due to untrained data
+# FIXME: Fix the preprocessing failure due to untrained data
 def preprocess_evaluation_data(dataset):
     dataset = dataset.drop(columns=["id", "added_date"])
 

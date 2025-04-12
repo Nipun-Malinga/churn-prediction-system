@@ -18,7 +18,7 @@ default_args = {
     'retry_delay': timedelta(minutes=10)
 }
 
-@dag(dag_id='Model_Evaluating_DAG', default_args=default_args, start_date=days_ago(1), schedule_interval="@daily")
+@dag(dag_id='Model_Evaluating_DAG', default_args=default_args, start_date=days_ago(1), schedule_interval="@weekly")
 def model_evaluator():
     
     @task(multiple_outputs=True)
@@ -69,8 +69,8 @@ def model_evaluator():
         }
         
     @task
-    def update_model_info(model_info: list, evaluation_data: list, acuracy_drift: float) -> None:
-        update_accuracy_drift(model_info, evaluation_data, acuracy_drift)
+    def update_model_info(model_info: list, evaluation_data: list, accuracy_drift: float) -> None:
+        update_accuracy_drift(model_info, evaluation_data, accuracy_drift)
      
     """ Task Calls """  
     
@@ -91,7 +91,7 @@ def model_evaluator():
         evaluated_data["model_evaluation_list"]
     )
     
-    """ Conditional Switchs """    
+    """ Conditional Switch """    
    
     def check_evaluation_data(evaluation_data: pd.DataFrame) -> bool:
         if evaluation_data is None or evaluation_data.empty or evaluation_data.shape[0] < 1000:  

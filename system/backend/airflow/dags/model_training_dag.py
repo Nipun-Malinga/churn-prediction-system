@@ -18,7 +18,7 @@ default_args = {
     'retry_delay': timedelta(minutes=10)
 }
 
-@dag(dag_id='Model_Training_DAG', default_args=default_args, start_date=days_ago(1), schedule_interval="@daily")
+@dag(dag_id='Model_Training_DAG', default_args=default_args, start_date=days_ago(1), schedule_interval="@once")
 def model_trainer():
     @task(multiple_outputs=True)
     def fetching_training_data() -> Dict[str, pd.DataFrame]:
@@ -81,7 +81,7 @@ def model_trainer():
         preprocessed_data["y_test"]
     )
     
-    """ Conditional Switchs """ 
+    """ Conditional Switch """ 
     
     def check_training_data(fetched_data: pd.DataFrame) -> bool:
         if fetched_data.empty:
