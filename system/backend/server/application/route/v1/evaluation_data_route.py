@@ -1,3 +1,7 @@
+import json
+
+import magic
+import pandas as pd
 from application import limiter
 from application.response import error_response_template, response_template
 from application.schema import Evaluation_Data_Schema
@@ -56,11 +60,31 @@ def add_data_list():
 @data.route("/csv", methods=["POST"])
 @limiter.limit("5 per minute")
 @jwt_required()
-def add_csv_data():
-    return
-
-@data.route("/csv/read", methods=["POST"])
-@limiter.limit("5 per minute")
-@jwt_required()
 def read_csv_data():
-    return   
+    data_source = request.files.get("data_source")
+    
+    if not data_source:
+        return error_response_template(
+            "No Data Source Uploaded"
+        ), 400
+        
+    file_content_type = data_source.content_type
+    
+    if file_content_type in ["text/csv"]:
+        
+        try:
+            return response_template(
+            "success",
+            "CSV Data Source Read Successfully",
+            service.preprocess_csv_data(data_source)
+            ), 200
+        except ValueError as ex:
+            return error_response_template(
+                f"{ex}"
+            ), 400
+            
+        
+    else:
+        return error_response_template(
+            f"Invalid File type detected: {file_content_type}"
+        )
