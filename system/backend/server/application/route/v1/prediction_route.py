@@ -17,13 +17,27 @@ def predict():
     schema = Prediction_Request_Schema()
     try:
         request_data = schema.load(request.json)
-        
+         
         prediction, probability = service.predict_results(request_data)
 
-        return response_template("success", "Model prediction success", {"Prediction": prediction[0], "Probability": probability}), 200
-    except ValidationError as err:
-        return error_response_template(err.messages), 400
-    except FileNotFoundError as err:
+        return response_template(
+            "success", 
+            "Model prediction success", 
+            {
+                "Prediction": prediction[0], 
+                "Probability": probability
+            }
+        ), 200
+        
+    except ValidationError as ex:
+        return error_response_template(
+            ex.messages
+        ), 400
+    except FileNotFoundError as ex:
         return error_response_template(
             "Sorry there ara no trained models currently available."
         ), 503
+    except ValueError as ex:
+        return error_response_template (
+            "Sorry the system cannot make predictions for untrained values."
+        ), 400

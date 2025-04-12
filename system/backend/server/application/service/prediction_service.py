@@ -11,7 +11,8 @@ class Prediction_Service:
         fetch_ml_models()
         try:
             preprocessed_data = json_data_preprocessor(json_data)
-            prediction = make_prediction(preprocessed_data)
-        except FileNotFoundError as err:
-            raise FileNotFoundError(f"File not found: {err}") from err
-        return prediction
+            return  make_prediction(preprocessed_data)                  
+        except FileNotFoundError as ex:
+            raise FileNotFoundError(f"File not found: {ex}") from ex
+        except ValueError as ex:
+            raise ValueError from ex
