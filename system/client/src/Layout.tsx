@@ -1,12 +1,31 @@
-import { Box } from '@chakra-ui/react';
+import Sidebar from '@/components/Sidebar';
+import { Grid, GridItem, Show, useBreakpointValue } from '@chakra-ui/react';
 import { Outlet } from 'react-router-dom';
 
 const Layout = () => {
+  const isDesktop = useBreakpointValue({ base: false, lg: true });
+
   return (
     <>
-      <Box padding={5}>
-        <Outlet />
-      </Box>
+      <Grid
+        templateAreas={{
+          base: `"main"`,
+          lg: `"aside main"`,
+        }}
+        templateColumns={{
+          base: '1fr',
+          lg: '250px 1fr',
+        }}
+      >
+        <Show when={isDesktop}>
+          <GridItem area={'aside'}>
+            <Sidebar />
+          </GridItem>
+        </Show>
+        <GridItem area={'main'}>
+          <Outlet />
+        </GridItem>
+      </Grid>
     </>
   );
 };
