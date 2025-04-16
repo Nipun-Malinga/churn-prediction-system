@@ -1,10 +1,16 @@
 import usePerformanceHistory from '@/hooks/usePerformanceHistory';
-import { Box, HStack, NativeSelect, Text, VStack } from '@chakra-ui/react';
+import { HStack, NativeSelect, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import PerformanceChart from '../PerformanceChart';
+import { useParams } from 'react-router-dom';
 
-const ChartContainer = () => {
+interface Props {
+  isBaseModel: boolean;
+}
+
+const ChartContainer = ({ isBaseModel }: Props) => {
   const [selectedChart, setSelectedChart] = useState('accuracy');
+  const params = useParams();
 
   /*
     TODO: 
@@ -12,9 +18,10 @@ const ChartContainer = () => {
       * Implement Loading Skeleton and Error Massage Components
 
   */
-  const { data, isFetching, error } = usePerformanceHistory(4, selectedChart);
 
-  console.log(data);
+  const { data, isFetching, error } = isBaseModel
+    ? usePerformanceHistory(4, selectedChart)
+    : usePerformanceHistory(Number(params?.id!), selectedChart);
 
   return (
     <VStack
@@ -43,7 +50,7 @@ const ChartContainer = () => {
             lg: '1.5rem',
           }}
         >
-          Performance Details
+          Performance History
         </Text>
         <NativeSelect.Root
           width={{

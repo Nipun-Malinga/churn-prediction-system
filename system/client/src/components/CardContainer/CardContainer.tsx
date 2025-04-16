@@ -1,15 +1,11 @@
 import { SimpleGrid } from '@chakra-ui/react';
-import DetailCard from '../DetailCard';
-import { Model } from '@/models';
+import { ReactNode } from 'react';
 
-const modelInfo: Model[] = [
-  { id: 1, name: 'VOTING CLASSIFIER', base_model: true },
-  { id: 2, name: 'XGBOOST', base_model: false },
-  { id: 3, name: 'LIGHTGBM', base_model: false },
-  { id: 4, name: 'RANDOM FOREST', base_model: false },
-];
+interface Props {
+  children: ReactNode;
+}
 
-const CardContainer = () => {
+const CardContainer = ({ children }: Props) => {
   return (
     <SimpleGrid
       columns={{
@@ -20,9 +16,7 @@ const CardContainer = () => {
       gap={2}
       width={'100%'}
     >
-      {modelInfo.map((info, id) => (
-        <DetailCard key={id} children={info} />
-      ))}
+      {children}
     </SimpleGrid>
   );
 };
