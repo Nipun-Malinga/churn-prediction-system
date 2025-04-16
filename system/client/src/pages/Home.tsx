@@ -1,4 +1,5 @@
 import CardContainer from '@/components/CardContainer';
+import ChartContainer from '@/components/ChartContainer';
 import { Text, VStack } from '@chakra-ui/react';
 
 const Home = () => {
@@ -14,6 +15,7 @@ const Home = () => {
         Dashboard
       </Text>
       <CardContainer />
+      <ChartContainer />
     </VStack>
   );
 };

@@ -69,8 +69,6 @@ def get_advanced_model_info_by_id():
         return error_response_template("Failed to fetch Model Information"), 500
 
 @model.route("/charts", methods=["GET"])
-@limiter.limit("5 per minute")
-@jwt_required()
 def model_history_chart_data():
     try:
         model_id = request.args.get("model_id")
