@@ -22,7 +22,7 @@ const Layout = () => {
             <Sidebar />
           </GridItem>
         </Show>
-        <GridItem area={'main'}>
+        <GridItem area={'main'} background='#F5F6FA'>
           <Outlet />
         </GridItem>
       </Grid>
