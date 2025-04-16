@@ -1,5 +1,5 @@
+import PerformanceDataPoint from '@/models/ModelPerformance';
 import APIClient from '@/services/apiClient';
-import { PerformanceDataPoint } from '@/models';
 import { useQuery } from '@tanstack/react-query';
 
 const usePerformanceHistory = (model_id: number, filter_type: string) => {

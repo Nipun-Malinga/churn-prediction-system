@@ -1,4 +1,4 @@
-import { Model } from '@/models';
+import { Model } from '@/models/ModelDetails';
 import { Card, HStack, Span, Text } from '@chakra-ui/react';
 import { format } from 'date-fns';
 import { FaLongArrowAltRight } from 'react-icons/fa';
@@ -40,9 +40,7 @@ const DetailCard = ({ children }: Props) => {
             lg: '1.5rem',
           }}
         >
-
           {/*TODO: Implement logic to change the font color base on the accuracy*/}
-
           Accuracy: {91}%
         </Text>
         <HStack>

@@ -1,4 +1,4 @@
-import { PerformanceDataPoint } from '@/models';
+import PerformanceDataPoint from '@/models/ModelPerformance';
 import {
   Area,
   CartesianGrid,

@@ -1,7 +1,7 @@
 import CardContainer from '@/components/CardContainer';
 import ChartContainer from '@/components/ChartContainer';
 import DetailCard from '@/components/DetailCard';
-import { Model } from '@/models';
+import { Model } from '@/models/ModelDetails';
 import { Text, VStack } from '@chakra-ui/react';
 
 const Home = () => {

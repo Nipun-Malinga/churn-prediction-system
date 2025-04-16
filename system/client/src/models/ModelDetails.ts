@@ -9,6 +9,19 @@ interface BasicModelInfo {
   updatedDate: string;
 }
 
-interface AdvancedModelInfo {}
+interface AdvancedModelInfo {
+  FN: number;
+  FP: number;
+  TN: number;
+  TP: number;
+  accuracy: number;
+  f1_score: number;
+  id: number;
+  is_automated_tuning: boolean;
+  model_id: number;
+  precision: number;
+  recall: number;
+  updated_date: string;
+}
 
-export type { Model, BasicModelInfo, AdvancedModelInfo };
+export type { AdvancedModelInfo, BasicModelInfo, Model };
