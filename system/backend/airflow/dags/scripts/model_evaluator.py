@@ -40,7 +40,7 @@ def compare_model_performance(base_performance, evaluated_performance):
     return accuracy_loss, retrain_model
 
 def update_accuracy_drift(model_info, evaluation_data, accuracy_drift):
-    print(model_info)
+
     with database_engine().connect() as connection:
         connection.execute(
             text(

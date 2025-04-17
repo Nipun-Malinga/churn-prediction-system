@@ -129,14 +129,14 @@ def train_model(X_train, y_train):
         }, 
         {
             "model":RF_random_searched, 
-            "name":"RANDOM_FOREST",
+            "name":"RANDOM FOREST",
             "version": RF_version, 
             "base_model": False,
             "best_params": RF_best_params
         }, 
         {
             "model":voting_classifier, 
-            "name":"VOTING_CLASSIFIER",
+            "name":"VOTING CLASSIFIER",
             "version": voting_classifier_version, 
             "base_model": True,
             "best_params": {}
