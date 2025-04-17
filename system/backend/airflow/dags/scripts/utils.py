@@ -73,7 +73,7 @@ def fetch_trained_model_data() -> list:
                     WHERE base_model IS TRUE
                     ORDER BY updated_date 
                     DESC 
-                    LIMIT (SELECT COUNT(*) FROM model)
+                    LIMIT (1)
                 """
             )
         ).fetchall()
