@@ -1,7 +1,14 @@
-interface FetchResponse<T> {
+interface BaseResponse {
   status: string;
   message: string;
+}
+
+interface FetchListResponse<T> extends BaseResponse {
   data: T[];
 }
 
-export default FetchResponse;
+interface FetchResponse<T> extends BaseResponse {
+  data: T;
+}
+
+export type { FetchListResponse, FetchResponse };

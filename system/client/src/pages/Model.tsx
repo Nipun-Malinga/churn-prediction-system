@@ -15,19 +15,19 @@ const Model = () => {
       {data && (
         <CardContainer>
           <PerformanceCard
-            value={data.data?.accuracy.toFixed(3) * 100}
+            value={parseFloat(data.data.accuracy.toFixed(3)) * 100}
             title='Accuracy'
           ></PerformanceCard>
           <PerformanceCard
-            value={data.data?.precision.toFixed(3) * 100}
+            value={parseFloat(data.data?.precision.toFixed(3)) * 100}
             title='Precision'
           ></PerformanceCard>
           <PerformanceCard
-            value={data.data?.recall.toFixed(3) * 100}
+            value={parseFloat(data.data?.recall.toFixed(3)) * 100}
             title='Recall'
           ></PerformanceCard>
           <PerformanceCard
-            value={data.data?.f1_score.toFixed(3) * 100}
+            value={parseFloat(data.data?.f1_score.toFixed(3)) * 100}
             title='F1 Score'
           ></PerformanceCard>
         </CardContainer>

@@ -11,11 +11,11 @@ const isoDate = '2025-04-13T05:32:50.435610';
 const formattedDate = format(new Date(isoDate), 'yyyy-MM-dd HH:mm:ss');
 
 interface Props {
-  children: Model;
+  model: Model;
 }
 
-const DetailCard = ({ children }: Props) => {
-  const mainColor = children.base_model ? '#FEC53D' : '#5893FF';
+const DetailCard = ({ model }: Props) => {
+  const mainColor = model.base_model ? '#FEC53D' : '#5893FF';
 
   return (
     <Card.Root width={'100%'} borderRadius={'1rem'} color={'#fff'} background={mainColor}>
@@ -28,7 +28,7 @@ const DetailCard = ({ children }: Props) => {
             }}
             fontWeight={'medium'}
           >
-            {children.name}
+            {model.name}
           </Text>
           <Span background={'#fff'} padding={1} borderRadius={'5px'}>
             <LuBrainCircuit size={35} color={mainColor} />
@@ -48,7 +48,7 @@ const DetailCard = ({ children }: Props) => {
           <Text fontWeight={'medium'}>Last Updated: {formattedDate}</Text>
         </HStack>
         <HStack justifyContent={'flex-end'}>
-          <Link to={`/model/${children.id}`}>
+          <Link to={`/model/${model.id}`}>
             <HStack gap={'1'}>
               <Text>More Information</Text>
               <FaLongArrowAltRight />

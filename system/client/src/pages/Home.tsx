@@ -1,17 +1,13 @@
 import CardContainer from '@/components/CardContainer';
 import ChartContainer from '@/components/ChartContainer';
 import DetailCard from '@/components/DetailCard';
-import { Model } from '@/models/ModelDetails';
+import useModel from '@/hooks/useModel';
 import { Text, VStack } from '@chakra-ui/react';
 
 const Home = () => {
   /* TODO: Fetch Model Info From the Server*/
-  const modelInfo: Model[] = [
-    { id: 1, name: 'VOTING CLASSIFIER', base_model: true },
-    { id: 2, name: 'XGBOOST', base_model: false },
-    { id: 3, name: 'LIGHTGBM', base_model: false },
-    { id: 4, name: 'RANDOM FOREST', base_model: false },
-  ];
+
+  const { data, isLoading, error } = useModel();
 
   return (
     <VStack alignItems='flex-start' padding={5}>
@@ -25,9 +21,7 @@ const Home = () => {
         Dashboard
       </Text>
       <CardContainer>
-        {modelInfo.map((info, id) => (
-          <DetailCard key={id} children={info} />
-        ))}
+        {data && data.data.map((model, id) => <DetailCard key={id} model={model} />)}
       </CardContainer>
       <ChartContainer isBaseModel={true} />
     </VStack>
