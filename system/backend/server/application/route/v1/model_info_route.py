@@ -19,35 +19,17 @@ class Type(Enum):
     PRECISION = "precision"
     RECALL = "recall"
     F1_SCORE = "f1_score"
-    
-@model.route("/", methods=["GET"])
+ 
+@model.route("/info", methods=["GET"])    
 @limiter.limit("5 per minute")
 @jwt_required()
-def get_all_models():
-    
-    try:
-        return response_template(
-            "success",
-            "Models Fetched Successfully",
-            service.get_all_models()
-        ), 200
-    except Exception as ex:
-        return error_response_template("Failed to Fetch Models"), 500
-    
-@model.route("/info/basic", methods=["GET"])    
-@limiter.limit("5 per minute")
-@jwt_required()
-def get_basic_model_info_by_id():
-    
-    model_id = request.args.get("model_id") 
+def get_basic_model():
     try:
         return response_template(
             "success",
             "Model Information Fetched Successfully",
-            service.get_basic_model_info(request.args.get("model_id"))
+            service.get_basic_model_info()
         ), 200
-    except NoResultFound as ex:
-        return error_response_template(f"No model info found for model_id: {model_id}"), 404
     except Exception as ex:
         return error_response_template("Failed to fetch Model Information"), 500
     

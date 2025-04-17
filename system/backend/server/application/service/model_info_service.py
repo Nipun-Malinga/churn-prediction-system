@@ -3,7 +3,8 @@ from application.model import Model, Model_Info
 from flask import abort
 from sqlalchemy import desc
 from sqlalchemy.exc import NoResultFound
-
+from sqlalchemy.orm import aliased
+from sqlalchemy.sql import desc, func
 
 class Model_Info_Service:
     
@@ -29,29 +30,46 @@ class Model_Info_Service:
     
     from sqlalchemy import desc
 
+    from sqlalchemy.orm import aliased
+
     @classmethod
-    def get_basic_model_info(cls, model_id):
-        try:
-            result = db.session.query(
-                Model_Info.id,
-                Model_Info.accuracy,
-                Model_Info.updated_date
-            ).filter(
-                Model_Info.model_id == model_id
-            ).order_by(
-                desc(Model_Info.updated_date)
-            ).limit(1).one()
+    def get_basic_model_info(cls):
+        latest_info_subq = db.session.query(
+            Model_Info.model_id,
+            func.max(Model_Info.updated_date).label('latest_date')
+        ).group_by(
+            Model_Info.model_id
+        ).subquery()
 
-            model_info_id, accuracy, updated_date = result
+        LatestModelInfo = aliased(Model_Info)
 
-            return {
-                "model_info_id": model_info_id,
+        results = db.session.query(
+            Model.id,
+            Model.name,
+            Model.base_model,
+            LatestModelInfo.accuracy,
+            LatestModelInfo.updated_date
+        ).join(
+            LatestModelInfo, Model.id == LatestModelInfo.model_id
+        ).join(
+            latest_info_subq,
+            (LatestModelInfo.model_id == latest_info_subq.c.model_id) &
+            (LatestModelInfo.updated_date == latest_info_subq.c.latest_date)
+        ).all()
+
+        model_info = []
+        for result in results:
+            id, name, base_model, accuracy, updated_date = result
+            model_info.append({
+                "id": id,
+                "name": name,
+                "base_model": base_model,
                 "accuracy": accuracy,
-                "updated_date": updated_date.isoformat() if updated_date else {}
-            } 
-        except NoResultFound as ex:
-            raise NoResultFound from ex
-        
+                "updated_date": updated_date.isoformat() if updated_date else None
+            })
+
+        return model_info
+  
     def get_advanced_model_info(cls, model_id):
         try:
             result = db.session.query(
