@@ -1,4 +1,5 @@
 import PerformanceDataPoint from '@/models/ModelPerformance';
+import { format } from 'date-fns';
 import {
   Area,
   CartesianGrid,
@@ -19,7 +20,10 @@ const PerformanceChart = ({ performanceHistory }: Props) => {
     <ResponsiveContainer width='100%' height={400}>
       <ComposedChart data={performanceHistory}>
         <CartesianGrid strokeDasharray='3 3' />
-        <XAxis dataKey='updated_date' />
+        <XAxis
+          dataKey='updated_date'
+          tickFormatter={(v) => `${format(new Date(v), 'yyyy-MM-dd')}`}
+        />
         <YAxis tickFormatter={(v) => `${v}%`} />
         <Tooltip formatter={(v: number) => `${v}%`} />
 

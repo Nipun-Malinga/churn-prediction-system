@@ -1,8 +1,9 @@
 import CardContainer from '@/components/CardContainer';
 import ChartContainer from '@/components/ChartContainer';
+import ConfusionMatrix from '@/components/ConfusionMatrix';
 import PerformanceCard from '@/components/PerformanceCard';
 import { useAdvancedModelInfo } from '@/hooks/useModelInfo';
-import { VStack } from '@chakra-ui/react';
+import { GridItem, SimpleGrid, VStack } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 
 const Model = () => {
@@ -10,8 +11,28 @@ const Model = () => {
   const { data } = useAdvancedModelInfo(Number(params?.id!));
 
   return (
-    <VStack alignItems='flex-start' padding={5}>
-      <ChartContainer isBaseModel={false}></ChartContainer>
+    <VStack alignItems='flex-start' padding={5} gap={5}>
+      <SimpleGrid
+        width={'100%'}
+        columns={{
+          base: 1,
+          md: 3,
+        }}
+        gap={'1rem'}
+      >
+        <GridItem width={'100%'}>
+          <ConfusionMatrix
+            tp={data?.data.TP ? data?.data.TP : 0}
+            tn={data?.data.TN ? data?.data.TN : 0}
+            fp={data?.data.FP ? data?.data.FP : 0}
+            fn={data?.data.FN ? data?.data.FN : 0}
+          />
+        </GridItem>
+        <GridItem colSpan={{ md: 2 }} width={'100%'}>
+          <ChartContainer isBaseModel={false}></ChartContainer>
+        </GridItem>
+      </SimpleGrid>
+
       {data && (
         <CardContainer>
           <PerformanceCard
