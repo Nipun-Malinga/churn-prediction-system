@@ -30,10 +30,8 @@ const ChartContainer = ({ isBaseModel }: Props) => {
       background={'#ffffff'}
       borderRadius={'1rem'}
       padding={{
-        base: 0,
-        md: 5,
+        base: 5,
       }}
-      marginY={'1rem'}
     >
       <HStack
         width={'100%'}
