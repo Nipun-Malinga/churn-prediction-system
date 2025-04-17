@@ -1,13 +1,13 @@
 import CardContainer from '@/components/CardContainer';
 import ChartContainer from '@/components/ChartContainer';
 import DetailCard from '@/components/DetailCard';
-import useModel from '@/hooks/useModel';
+import { useBasicModelInfo } from '@/hooks/useModelInfo';
 import { Text, VStack } from '@chakra-ui/react';
 
 const Home = () => {
   /* TODO: Fetch Model Info From the Server*/
 
-  const { data, isLoading, error } = useModel();
+  const { data, isLoading, error } = useBasicModelInfo();
 
   return (
     <VStack alignItems='flex-start' padding={5}>

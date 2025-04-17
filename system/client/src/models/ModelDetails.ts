@@ -1,12 +1,9 @@
-interface Model {
-  id: number;
-  name: string;
-  base_model: boolean;
-}
-
 interface BasicModelInfo {
+  id: number;
+  base_model: number;
+  name: number;
   accuracy: number;
-  updatedDate: string;
+  updated_date: string;
 }
 
 interface AdvancedModelInfo {
@@ -24,4 +21,4 @@ interface AdvancedModelInfo {
   updated_date: string;
 }
 
-export type { AdvancedModelInfo, BasicModelInfo, Model };
+export type { AdvancedModelInfo, BasicModelInfo };

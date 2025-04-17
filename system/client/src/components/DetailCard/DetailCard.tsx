@@ -1,17 +1,12 @@
-import { Model } from '@/models/ModelDetails';
+import { BasicModelInfo } from '@/models/ModelDetails';
 import { Card, HStack, Span, Text } from '@chakra-ui/react';
-import { format } from 'date-fns';
 import { FaLongArrowAltRight } from 'react-icons/fa';
 import { LuBrainCircuit } from 'react-icons/lu';
 import { RxUpdate } from 'react-icons/rx';
 import { Link } from 'react-router-dom';
-
-/*TODO: Use Real Data From Server */
-const isoDate = '2025-04-13T05:32:50.435610';
-const formattedDate = format(new Date(isoDate), 'yyyy-MM-dd HH:mm:ss');
-
+import { format } from 'date-fns';
 interface Props {
-  model: Model;
+  model: BasicModelInfo;
 }
 
 const DetailCard = ({ model }: Props) => {
@@ -41,11 +36,13 @@ const DetailCard = ({ model }: Props) => {
           }}
         >
           {/*TODO: Implement logic to change the font color base on the accuracy*/}
-          Accuracy: {91}%
+          Accuracy: {Number((model.accuracy * 100).toFixed(2))}%
         </Text>
         <HStack>
           <RxUpdate size={20} />
-          <Text fontWeight={'medium'}>Last Updated: {formattedDate}</Text>
+          <Text fontWeight={'medium'}>
+            Last Updated: {format(new Date(model.updated_date), 'yyyy-MM-dd')}
+          </Text>
         </HStack>
         <HStack justifyContent={'flex-end'}>
           <Link to={`/model/${model.id}`}>
