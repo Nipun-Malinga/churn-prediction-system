@@ -1,15 +1,22 @@
 import CardContainer from '@/components/CardContainer';
 import ChartContainer from '@/components/ChartContainer';
 import DetailCard from '@/components/DetailCard';
+import PerformanceChart from '@/components/PerformanceChart';
 import SystemOption from '@/components/SystemOption';
 import SystemOptionContainer from '@/components/SystemOptionContainer';
 import { useBasicModelInfo } from '@/hooks/useModelInfo';
+import usePerformanceHistory from '@/hooks/usePerformanceHistory';
+import useSelectedModeStore from '@/store/useSelectedModeStore';
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { IoDownloadOutline } from 'react-icons/io5';
 import { TbRefresh } from 'react-icons/tb';
 
+// TODO: Build a separate hook to fetch base model information
 const Home = () => {
-  const { data, isLoading, error } = useBasicModelInfo();
+  const { selectedMode } = useSelectedModeStore();
+
+  const { data: basicModelData } = useBasicModelInfo();
+  const { data: performanceHistoryData } = usePerformanceHistory(4, selectedMode);
 
   return (
     <VStack alignItems='flex-start' padding={5} rowGap={5}>
@@ -23,7 +30,8 @@ const Home = () => {
         Dashboard
       </Text>
       <CardContainer>
-        {data && data.data.map((model, id) => <DetailCard key={id} model={model} />)}
+        {basicModelData &&
+          basicModelData.data.map((model, id) => <DetailCard key={id} model={model} />)}
       </CardContainer>
       <Box
         alignSelf={{
@@ -45,7 +53,11 @@ const Home = () => {
           ></SystemOption>
         </SystemOptionContainer>
       </Box>
-      <ChartContainer isBaseModel={true} />
+      <ChartContainer>
+        {performanceHistoryData?.data && (
+          <PerformanceChart performanceHistory={performanceHistoryData?.data} />
+        )}
+      </ChartContainer>
     </VStack>
   );
 };

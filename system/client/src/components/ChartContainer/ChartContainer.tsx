@@ -1,27 +1,19 @@
-import usePerformanceHistory from '@/hooks/usePerformanceHistory';
+import useSelectedModeStore from '@/store/useSelectedModeStore';
 import { HStack, NativeSelect, Text, VStack } from '@chakra-ui/react';
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import PerformanceChart from '../PerformanceChart';
+import { ReactNode } from 'react';
 
 interface Props {
-  isBaseModel: boolean;
+  children: ReactNode;
+  title?: string;
 }
 
-const ChartContainer = ({ isBaseModel }: Props) => {
-  const [selectedChart, setSelectedChart] = useState('accuracy');
-  const params = useParams();
-
+const ChartContainer = ({ children, title }: Props) => {
   /*
     TODO: 
-      * Develop a Separate API Endpoint for Base Model 
       * Implement Loading Skeleton and Error Massage Components
-
   */
 
-  const { data, isFetching, error } = isBaseModel
-    ? usePerformanceHistory(4, selectedChart)
-    : usePerformanceHistory(Number(params?.id!), selectedChart);
+  const { setSelectedMode } = useSelectedModeStore();
 
   return (
     <VStack
@@ -40,7 +32,7 @@ const ChartContainer = ({ isBaseModel }: Props) => {
             lg: '1.25rem',
           }}
         >
-          Performance History
+          {title ? title : 'Performance History'}
         </Text>
         <NativeSelect.Root
           width={{
@@ -48,7 +40,7 @@ const ChartContainer = ({ isBaseModel }: Props) => {
             lg: '10rem',
           }}
         >
-          <NativeSelect.Field onChange={(e) => setSelectedChart(e.target.value)}>
+          <NativeSelect.Field onChange={(e) => setSelectedMode(e.target.value)}>
             <option value='accuracy'>Accuracy</option>
             <option value='precision'>Precision</option>
             <option value='recall'>Recall</option>
@@ -57,7 +49,7 @@ const ChartContainer = ({ isBaseModel }: Props) => {
           <NativeSelect.Indicator />
         </NativeSelect.Root>
       </HStack>
-      {data?.data ? <PerformanceChart performanceHistory={data?.data} /> : <></>}
+      {children}
     </VStack>
   );
 };

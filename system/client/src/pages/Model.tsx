@@ -2,17 +2,22 @@ import CardContainer from '@/components/CardContainer';
 import ChartContainer from '@/components/ChartContainer';
 import ConfusionMatrix from '@/components/ConfusionMatrix';
 import PerformanceCard from '@/components/PerformanceCard';
+import PerformanceChart from '@/components/PerformanceChart';
 import { useAdvancedModelInfo } from '@/hooks/useModelInfo';
-import { GridItem, SimpleGrid, VStack, Text } from '@chakra-ui/react';
+import usePerformanceHistory from '@/hooks/usePerformanceHistory';
+import useSelectedModeStore from '@/store/useSelectedModeStore';
+import { GridItem, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 
 const Model = () => {
   const params = useParams();
-
-  const modelId = params?.id!;
+  const modelId = Number(params?.id!);
   const modelName = params?.model!;
 
-  const { data } = useAdvancedModelInfo(Number(modelId));
+  const { selectedMode } = useSelectedModeStore();
+  
+  const { data } = useAdvancedModelInfo(modelId);
+  const { data: performanceHistoryData } = usePerformanceHistory(4, selectedMode);
 
   return (
     <VStack alignItems='flex-start' padding={5} gap={5}>
@@ -41,7 +46,11 @@ const Model = () => {
           />
         </GridItem>
         <GridItem colSpan={{ md: 2 }} width={'100%'}>
-          <ChartContainer isBaseModel={false}></ChartContainer>
+          <ChartContainer>
+            {performanceHistoryData?.data && (
+              <PerformanceChart performanceHistory={performanceHistoryData?.data} />
+            )}
+          </ChartContainer>
         </GridItem>
       </SimpleGrid>
 
