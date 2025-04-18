@@ -22,7 +22,7 @@ const Home = () => {
   const { data: performanceDriftHistoryData } = usePerformanceDriftHistory();
 
   return (
-    <VStack alignItems='flex-start' padding={5} rowGap={5}>
+    <>
       <Text
         fontSize={{
           base: '1rem',
@@ -76,7 +76,7 @@ const Home = () => {
           )}
         </ChartContainer>
       </SimpleGrid>
-    </VStack>
+    </>
   );
 };
 

@@ -20,7 +20,7 @@ const Model = () => {
   const { data: performanceHistoryData } = usePerformanceHistory(4, selectedMode);
 
   return (
-    <VStack alignItems='flex-start' padding={5} gap={5}>
+    <>
       <Text
         fontWeight={'bold'}
         fontSize={{
@@ -74,7 +74,7 @@ const Model = () => {
           ></PerformanceCard>
         </CardContainer>
       )}
-    </VStack>
+    </>
   );
 };
 

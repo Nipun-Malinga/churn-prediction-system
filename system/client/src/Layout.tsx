@@ -1,5 +1,5 @@
 import Sidebar from '@/components/Sidebar';
-import { Grid, GridItem, Show, useBreakpointValue } from '@chakra-ui/react';
+import { Grid, GridItem, Show, useBreakpointValue, VStack } from '@chakra-ui/react';
 import { Outlet } from 'react-router-dom';
 
 const Layout = () => {
@@ -23,7 +23,9 @@ const Layout = () => {
           </GridItem>
         </Show>
         <GridItem area={'main'} background='#F5F6FA'>
-          <Outlet />
+          <VStack alignItems='flex-start' padding={5} rowGap={5}>
+            <Outlet />
+          </VStack>
         </GridItem>
       </Grid>
     </>
