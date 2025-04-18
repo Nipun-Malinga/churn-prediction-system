@@ -5,10 +5,11 @@ import { IconType } from 'react-icons';
 interface Props {
   icon?: IconType;
   description: string;
+  disable?: boolean;
   onClick: () => void;
 }
 
-const SystemOption = ({ icon, description, onClick }: Props) => {
+const SystemOption = ({ icon, description, disable, onClick }: Props) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -30,6 +31,7 @@ const SystemOption = ({ icon, description, onClick }: Props) => {
             background: '#4880FF',
             color: '#fff',
           }}
+          disabled={disable}
         >
           <VStack>
             <Span padding={2}>{icon && React.createElement(icon)}</Span>

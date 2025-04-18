@@ -28,8 +28,8 @@ class APIClient<T> {
     return resp.data;
   };
 
-  post = async (data: T) => {
-    const resp = await axiosInstance.post<FetchResponse<T>>(this.endpoint, data);
+  post = async (requestConfig?: AxiosRequestConfig, data?: T) => {
+    const resp = await axiosInstance.post<FetchResponse<T>>(this.endpoint, data, requestConfig);
     return resp.data;
   };
 }
