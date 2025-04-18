@@ -1,6 +1,7 @@
 import { AdvancedModelInfo, BasicModelInfo } from '@/models/ModelDetails';
 import APIClient from '@/services/apiClient';
 import { useQuery } from '@tanstack/react-query';
+import ms from 'ms';
 
 const useBasicModelInfo = () => {
   const apiClient = new APIClient<BasicModelInfo>('/v1/models/info');
@@ -9,6 +10,7 @@ const useBasicModelInfo = () => {
   return useQuery({
     queryKey: ['basicModelInfo'],
     queryFn: fetchData,
+    staleTime: ms('5 Minutes'),
   });
 };
 
@@ -22,6 +24,7 @@ const useAdvancedModelInfo = (model_id: number) => {
   return useQuery({
     queryKey: ['advancedModelInfo', model_id],
     queryFn: fetchData,
+    staleTime: ms('5 Minutes'),
   });
 };
 
