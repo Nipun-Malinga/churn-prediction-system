@@ -47,9 +47,9 @@ const ConfusionMatrix = ({ tp, tn, fp, fn }: Props) => {
       }}
     >
       <Text
-        fontWeight={'medium'}
+        fontWeight={'bold'}
         fontSize={{
-          lg: '1.5rem',
+          lg: '1.25rem',
         }}
       >
         Confusion Matrix

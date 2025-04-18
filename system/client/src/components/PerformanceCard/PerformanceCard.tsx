@@ -11,11 +11,10 @@ const PerformanceCard = ({ value, title }: Props) => {
     <Card.Root width={'100%'} borderRadius={'1rem'}>
       <Card.Body gap={5}>
         <Text
-          fontSize={{
-            base: '2rem',
-            lg: '1rem',
-          }}
           fontWeight={'medium'}
+          fontSize={{
+            lg: '1.25rem',
+          }}
         >
           {title}
         </Text>

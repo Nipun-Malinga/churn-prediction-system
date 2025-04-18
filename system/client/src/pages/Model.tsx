@@ -3,15 +3,27 @@ import ChartContainer from '@/components/ChartContainer';
 import ConfusionMatrix from '@/components/ConfusionMatrix';
 import PerformanceCard from '@/components/PerformanceCard';
 import { useAdvancedModelInfo } from '@/hooks/useModelInfo';
-import { GridItem, SimpleGrid, VStack } from '@chakra-ui/react';
+import { GridItem, SimpleGrid, VStack, Text } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 
 const Model = () => {
   const params = useParams();
-  const { data } = useAdvancedModelInfo(Number(params?.id!));
+
+  const modelId = params?.id!;
+  const modelName = params?.model!;
+
+  const { data } = useAdvancedModelInfo(Number(modelId));
 
   return (
     <VStack alignItems='flex-start' padding={5} gap={5}>
+      <Text
+        fontWeight={'bold'}
+        fontSize={{
+          lg: '1.5rem',
+        }}
+      >
+        {modelName}
+      </Text>
       <SimpleGrid
         width={'100%'}
         columns={{

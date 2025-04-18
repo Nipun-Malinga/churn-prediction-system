@@ -35,10 +35,9 @@ const ChartContainer = ({ isBaseModel }: Props) => {
     >
       <HStack width={'100%'} justifyContent={'space-between'}>
         <Text
-          fontWeight={'medium'}
+          fontWeight={'bold'}
           fontSize={{
-            base: '',
-            lg: '1.5rem',
+            lg: '1.25rem',
           }}
         >
           Performance History

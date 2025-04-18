@@ -45,7 +45,7 @@ const DetailCard = ({ model }: Props) => {
           </Text>
         </HStack>
         <HStack justifyContent={'flex-end'}>
-          <Link to={`/model/${model.id}`}>
+          <Link to={`/model/${model.name}/${model.id}`}>
             <HStack gap={'1'}>
               <Text>More Information</Text>
               <FaLongArrowAltRight />
