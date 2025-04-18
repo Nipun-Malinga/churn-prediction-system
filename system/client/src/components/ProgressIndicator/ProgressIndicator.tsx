@@ -10,7 +10,7 @@ const ProgressIndicator = ({ value }: Props) => {
     {
       name: 'progress',
       value: value,
-      fill: '#00C49F',
+      fill: '#4AD991',
     },
   ];
 

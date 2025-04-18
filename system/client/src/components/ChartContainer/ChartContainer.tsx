@@ -1,8 +1,8 @@
 import usePerformanceHistory from '@/hooks/usePerformanceHistory';
 import { HStack, NativeSelect, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
-import PerformanceChart from '../PerformanceChart';
 import { useParams } from 'react-router-dom';
+import PerformanceChart from '../PerformanceChart';
 
 interface Props {
   isBaseModel: boolean;
@@ -33,14 +33,7 @@ const ChartContainer = ({ isBaseModel }: Props) => {
         base: 5,
       }}
     >
-      <HStack
-        width={'100%'}
-        justifyContent={'space-between'}
-        paddingX={{
-          base: 0,
-          md: 5,
-        }}
-      >
+      <HStack width={'100%'} justifyContent={'space-between'}>
         <Text
           fontWeight={'medium'}
           fontSize={{
