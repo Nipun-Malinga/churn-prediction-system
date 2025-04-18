@@ -62,6 +62,7 @@ def fetch_ml_models():
             desc(Model_Info.updated_date)
         ).where(
             Model_Info.is_downloaded == False,  
+            Model_Info.is_production_model == True,
             Model.base_model == True
         ).limit(1)
 

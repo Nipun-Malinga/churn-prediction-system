@@ -2,7 +2,7 @@ from os.path import abspath, dirname, join
 
 import joblib
 from application import db
-from application.model import Model
+from application.model import Model, Model_Info
 
 ABS_DIR = dirname(abspath(__file__))
 BASE_DIR = join(ABS_DIR, "trained_models/")
@@ -14,10 +14,13 @@ def make_prediction(preprocessed_data):
     try:
         result = db.session.query(
             Model.name
+        ).join(
+            Model_Info, Model.id == Model_Info.model_id
         ).where(
-            Model.base_model == True
-        ).one()
-   
+            Model.base_model == True,
+            Model_Info.is_production_model == True
+        ).one_or_none()
+        
         if not result:
             raise FileNotFoundError("Currently there are no trained models available.")
 

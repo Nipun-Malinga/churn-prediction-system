@@ -215,15 +215,17 @@ def update_model_info(model_info_list: list, data_transformer_list: list) -> Non
                         (
                             model_id, updated_date, accuracy, 
                             "TP", "TN", "FP", "FN", precision, 
-                            recall, f1_score, is_automated_tunning, 
-                            is_downloaded, version_name
+                            recall, f1_score, is_automated_tunning,
+                            is_production_model, is_downloaded, 
+                            version_name
                         )
                         VALUES 
                         (
                             :model_id, :updated_date, :accuracy, 
                             :TP, :TN, :FP, :FN, :precision, :recall, 
                             :f1_score, :is_automated_tunning, 
-                            :is_downloaded, :version_name
+                            :is_production_model, :is_downloaded, 
+                            :version_name
                         )
                         RETURNING id
                         """
@@ -240,6 +242,7 @@ def update_model_info(model_info_list: list, data_transformer_list: list) -> Non
                         "recall": float(model_info["recall"]),
                         "f1_score": float(model_info["f1_score"]),
                         "is_automated_tunning": True,
+                        "is_production_model": False,
                         "is_downloaded": False,
                         "version_name": model_info["version_name"]
                     }
