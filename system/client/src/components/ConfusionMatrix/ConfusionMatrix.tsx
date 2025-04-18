@@ -16,12 +16,12 @@ const boxStyles = (threshold: number) => {
     /* Implement logic to change color based on the confusion matrix data */
     background:
       threshold >= 0 && threshold <= 20
-        ? 'green.100'
+        ? 'blue.100'
         : threshold >= 21 && threshold <= 60
-        ? 'green.200'
+        ? 'blue.200'
         : threshold >= 61 && threshold <= 90
-        ? 'green.300'
-        : 'green.500',
+        ? 'blue.300'
+        : 'blue.500',
   };
 
   return styles;

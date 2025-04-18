@@ -15,7 +15,7 @@ const Model = () => {
   const modelName = params?.model!;
 
   const { selectedMode } = useSelectedModeStore();
-  
+
   const { data } = useAdvancedModelInfo(modelId);
   const { data: performanceHistoryData } = usePerformanceHistory(4, selectedMode);
 
@@ -46,7 +46,7 @@ const Model = () => {
           />
         </GridItem>
         <GridItem colSpan={{ md: 2 }} width={'100%'}>
-          <ChartContainer>
+          <ChartContainer modeSelectorVisible={true}>
             {performanceHistoryData?.data && (
               <PerformanceChart performanceHistory={performanceHistoryData?.data} />
             )}

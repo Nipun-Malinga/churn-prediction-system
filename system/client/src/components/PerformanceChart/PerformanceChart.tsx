@@ -1,4 +1,4 @@
-import PerformanceDataPoint from '@/models/ModelPerformance';
+import { PerformanceDataPoint } from '@/models/ModelPerformance';
 import { format } from 'date-fns';
 import {
   Area,

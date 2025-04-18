@@ -2,12 +2,14 @@ import CardContainer from '@/components/CardContainer';
 import ChartContainer from '@/components/ChartContainer';
 import DetailCard from '@/components/DetailCard';
 import PerformanceChart from '@/components/PerformanceChart';
+import PerformanceDriftChart from '@/components/PerformanceDriftChart';
 import SystemOption from '@/components/SystemOption';
 import SystemOptionContainer from '@/components/SystemOptionContainer';
 import { useBasicModelInfo } from '@/hooks/useModelInfo';
+import usePerformanceDriftHistory from '@/hooks/usePerformanceDriftHistory';
 import usePerformanceHistory from '@/hooks/usePerformanceHistory';
 import useSelectedModeStore from '@/store/useSelectedModeStore';
-import { Box, Text, VStack } from '@chakra-ui/react';
+import { Box, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { IoDownloadOutline } from 'react-icons/io5';
 import { TbRefresh } from 'react-icons/tb';
 
@@ -17,6 +19,7 @@ const Home = () => {
 
   const { data: basicModelData } = useBasicModelInfo();
   const { data: performanceHistoryData } = usePerformanceHistory(4, selectedMode);
+  const { data: performanceDriftHistoryData } = usePerformanceDriftHistory();
 
   return (
     <VStack alignItems='flex-start' padding={5} rowGap={5}>
@@ -53,11 +56,26 @@ const Home = () => {
           ></SystemOption>
         </SystemOptionContainer>
       </Box>
-      <ChartContainer>
-        {performanceHistoryData?.data && (
-          <PerformanceChart performanceHistory={performanceHistoryData?.data} />
-        )}
-      </ChartContainer>
+
+      <SimpleGrid
+        columns={{
+          base: 1,
+          md: 2,
+        }}
+        gap={'1rem'}
+        width={'100%'}
+      >
+        <ChartContainer title='Performance Drift History' modeSelectorVisible={false}>
+          {performanceDriftHistoryData?.data && (
+            <PerformanceDriftChart performanceDriftHistory={performanceDriftHistoryData?.data} />
+          )}
+        </ChartContainer>
+        <ChartContainer modeSelectorVisible={true}>
+          {performanceHistoryData?.data && (
+            <PerformanceChart performanceHistory={performanceHistoryData?.data} />
+          )}
+        </ChartContainer>
+      </SimpleGrid>
     </VStack>
   );
 };

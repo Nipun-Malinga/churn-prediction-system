@@ -1,4 +1,4 @@
-import PerformanceDataPoint from '@/models/ModelPerformance';
+import { PerformanceDataPoint } from '@/models/ModelPerformance';
 import APIClient from '@/services/apiClient';
 import { useQuery } from '@tanstack/react-query';
 import ms from 'ms';
