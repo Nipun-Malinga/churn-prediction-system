@@ -1,5 +1,5 @@
 from application import db
-from application.model import Model, Model_Info
+from application.model import Model, Model_Info, Accuracy_Drift
 from flask import abort
 from sqlalchemy import desc
 from sqlalchemy.exc import NoResultFound
@@ -116,3 +116,11 @@ class Model_Info_Service:
             }
             for result in results
         ]
+        
+    @classmethod
+    def model_drift_history(cls):
+        results = db.session.query(
+            Accuracy_Drift
+        ).all()
+        
+        return [r.to_dict() for r in results] if results else []

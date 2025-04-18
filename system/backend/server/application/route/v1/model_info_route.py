@@ -51,6 +51,8 @@ def get_advanced_model_info_by_id():
         return error_response_template("Failed to fetch Model Information"), 500
 
 @model.route("/charts", methods=["GET"])
+@limiter.limit("5 per minute")
+@jwt_required() 
 def model_history_chart_data():
     try:
         model_id = request.args.get("model_id")
@@ -74,3 +76,17 @@ def model_history_chart_data():
         
     except Exception as ex:
         return error_response_template("Failed to fetch chart history"), 500
+    
+    
+@model.route("/drift", methods=["GET"])
+@limiter.limit("5 per minute")
+@jwt_required() 
+def get_model_performance_drift(): 
+    try:
+        return response_template(
+            "success", 
+            "Drift History Fetched Successfully", 
+            service.model_drift_history()
+        ), 200
+    except Exception as ex:
+        return error_response_template("Failed to fetch drift history"), 500

@@ -30,32 +30,76 @@ def evaluate_model(model_list: list, X_test, y_test):
 
     return model_evaluation_list
 
+def fetch_drift_thresholds_from_db():
+    """
+    Placeholder function to simulate fetching thresholds from the database.
+    """
+    return {
+        "accuracy": -15,
+        "precision": -10,
+        "recall": -10,
+        "f1_score": -10,
+    }
+
 def compare_model_performance(base_performance, evaluated_performance):
-    retrain_model= False 
-    accuracy_loss = (evaluated_performance[0]["accuracy"] - base_performance[0]["accuracy"]) * 100
+    """
+    Compares current model performance against a baseline and decides whether retraining is needed.
+    """
+    drift_thresholds = fetch_drift_thresholds_from_db()
     
-    if accuracy_loss < -15 or evaluated_performance[0]["accuracy"] < 0.75:
-        retrain_model = True
-    
-    return accuracy_loss, retrain_model
+    metrics = ["accuracy", "precision", "recall", "f1_score"]
+    drift = {}
+    retrain_model = False
 
-def update_accuracy_drift(model_info, evaluation_data, accuracy_drift):
+    for metric in metrics:
+        base_value = base_performance[0][metric]
+        new_value = evaluated_performance[0][metric]
+        loss = (new_value - base_value) * 100
+        drift[metric] = loss
 
+        if loss < drift_thresholds[metric]:
+            retrain_model = True
+
+        if metric == "accuracy" and new_value < 0.75:
+            retrain_model = True
+
+    return drift, retrain_model
+
+
+def update_accuracy_drift(model_info, performance_drift):
+
+    print(type(performance_drift["precision"]))
     with database_engine().connect() as connection:
         connection.execute(
             text(
                 """
                 INSERT INTO 
-                accuracy_drift  
-                (model_info_id, date, accuracy, drift)
+                    accuracy_drift
+                (
+                    model_info_id, 
+                    date, 
+                    accuracy_drift, 
+                    precision_drift,
+                    recall_drift,
+                    f1_score_drift
+                )
                 VALUES 
-                (:model_info_id, :date, :accuracy, :drift)
+                (
+                    :model_info_id, 
+                    :date, 
+                    :accuracy, 
+                    :precision,
+                    :recall,
+                    :f1_score
+                )
                 """
             ),
             {
                 "model_info_id": model_info[0]["id"],
                 "date": datetime.now(),
-                "accuracy": evaluation_data[0]["accuracy"],
-                "drift": accuracy_drift
+                "accuracy": float(performance_drift["accuracy"]),
+                "precision": float(performance_drift["precision"]),
+                "recall": float(performance_drift["recall"]),
+                "f1_score": float(performance_drift["f1_score"])
             }
         )

@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Dict, Union
+from typing import Dict, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -61,16 +61,16 @@ def model_evaluator():
         }
         
     @task(multiple_outputs=True)
-    def comparing_model_performance(base_performance: list, evaluated_performance: list) -> Dict[str, Union[float, bool]]:
-        accuracy_loss, retrain_model = compare_model_performance(base_performance, evaluated_performance)
+    def comparing_model_performance(base_performance: list, evaluated_performance: list) -> Tuple[Dict[str, float], bool]:
+        drift_loss, retrain_model = compare_model_performance(base_performance, evaluated_performance)
         return {
-            "accuracy_loss": accuracy_loss,
+            "drift_loss": drift_loss,
             "retrain_model": retrain_model
         }
         
     @task
-    def update_model_info(model_info: list, evaluation_data: list, accuracy_drift: float) -> None:
-        update_accuracy_drift(model_info, evaluation_data, accuracy_drift)
+    def update_model_info(model_info: list, accuracy_drift: float) -> None:
+        update_accuracy_drift(model_info, accuracy_drift)
      
     """ Task Calls """  
     
@@ -124,13 +124,11 @@ def model_evaluator():
     trigger_retraining_dag_01 = TriggerDagRunOperator(
         task_id="trigger_retraining_dag_01",
         trigger_dag_id="Model_Training_DAG",
-        wait_for_completion=True
     )
     
     trigger_retraining_dag_02 = TriggerDagRunOperator(
         task_id="trigger_retraining_dag_02",
         trigger_dag_id="Model_Training_DAG",
-        wait_for_completion=True
     )
     
     branch_task_01 = BranchPythonOperator(
@@ -165,8 +163,7 @@ def model_evaluator():
     
     compared_data >> update_model_info(
         trained_models["model_list"],
-        evaluated_data["model_evaluation_list"], 
-        compared_data["accuracy_loss"]
+        compared_data["drift_loss"]
     )
     
     compared_data >> branch_task_03 >> trigger_retraining_dag_01

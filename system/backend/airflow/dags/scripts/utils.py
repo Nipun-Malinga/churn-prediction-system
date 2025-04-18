@@ -65,7 +65,10 @@ def fetch_trained_model_data() -> list:
                 """
                     SELECT 
                         model_info.id, 
-                        name, accuracy, 
+                        name, 
+                        accuracy,
+                        precision,
+                        recall, 
                         f1_score, 
                         version_name 
                     FROM model_info 
@@ -81,11 +84,13 @@ def fetch_trained_model_data() -> list:
         for data in model_data_result:
             model_data.append({
                     "id": data[0],
-                    "model": joblib.load(join(ML_MODEL_PATHS["versioned"], data[4])),
+                    "model": joblib.load(join(ML_MODEL_PATHS["versioned"], data[6])),
                     "name": data[1],
                     "accuracy": data[2],
-                    "f1_score": data[3],
-                    "version": data[4],
+                    "precision": data[3],
+                    "recall": data[4],
+                    "f1_score": data[5],
+                    "version": data[6],
                     "base_model": None,
                     "best_params": None
             })

@@ -4,18 +4,42 @@ from application import db
 from sqlalchemy import DateTime, Float, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-
+"""
+    TODO: Modify the model architecture for other matrices
+    
+    Architecture
+    id model_info_id date type(type of the measurement) performance drift
+"""
 class Accuracy_Drift(db.Model):
     __tablename__ = 'accuracy_drift'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     model_info_id: Mapped[int] = mapped_column(ForeignKey('model_info.id'), nullable=False)
     date: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.now)
-    accuracy: Mapped[float] = mapped_column(Float, nullable=False, default=0)
-    drift: Mapped[float] = mapped_column(Float, nullable=False, default=0)
+    accuracy_drift: Mapped[float] = mapped_column(Float, nullable=False, default=0)
+    precision_drift: Mapped[float] = mapped_column(Float, nullable=False, default=0)
+    recall_drift: Mapped[float] = mapped_column(Float, nullable=False, default=0)
+    f1_score_drift: Mapped[float] = mapped_column(Float, nullable=False, default=0)
 
     # Relationship
     model_info: Mapped["Model_Info"] = relationship(back_populates='accuracy_drift')
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "model_info_id": self.model_info_id,
+            "date": self.date, 
+            "accuracy_drift": self.accuracy_drift,
+            "precision_drift": self.precision_drift,
+            "recall_drift": self.recall_drift,
+            "f1_score_drift": self.f1_score_drift
+        }
 
     def __repr__(self):
-        return f'Accuracy_Drift(model_info_id = {self.model_info_id}, date = {self.date}, accuracy = {self.accuracy}, drift = {self.drift})'
+        return (f"AccuracyDrift("
+                f"model_info_id={self.model_info_id}, "
+                f"date={self.date}, "
+                f"accuracy_drift={self.accuracy_drift}, "
+                f"precision_drift={self.precision_drift}, "
+                f"recall_drift={self.recall_drift}, "
+                f"f1_score_drift={self.f1_score_drift})")
