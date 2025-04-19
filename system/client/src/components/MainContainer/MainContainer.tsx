@@ -8,7 +8,7 @@ interface Props {
   modeSelectorVisible: boolean;
 }
 
-const ChartContainer = ({ children, title, modeSelectorVisible }: Props) => {
+const MainContainer = ({ children, title, modeSelectorVisible }: Props) => {
   /*
     TODO: 
       * Implement Loading Skeleton and Error Massage Components
@@ -57,4 +57,4 @@ const ChartContainer = ({ children, title, modeSelectorVisible }: Props) => {
   );
 };
 
-export default ChartContainer;
+export default MainContainer;

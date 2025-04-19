@@ -1,6 +1,6 @@
 import CardContainer from '@/components/CardContainer';
-import ChartContainer from '@/components/ChartContainer';
 import DetailCard from '@/components/DetailCard';
+import MainContainer from '@/components/MainContainer';
 import PerformanceChart from '@/components/PerformanceChart';
 import PerformanceDriftChart from '@/components/PerformanceDriftChart';
 import SystemOption from '@/components/SystemOption';
@@ -65,16 +65,16 @@ const Home = () => {
         gap={'1rem'}
         width={'100%'}
       >
-        <ChartContainer title='Performance Drift History' modeSelectorVisible={false}>
+        <MainContainer title='Performance Drift History' modeSelectorVisible={false}>
           {performanceDriftHistoryData?.data && (
             <PerformanceDriftChart performanceDriftHistory={performanceDriftHistoryData?.data} />
           )}
-        </ChartContainer>
-        <ChartContainer modeSelectorVisible={true}>
+        </MainContainer>
+        <MainContainer modeSelectorVisible={true}>
           {performanceHistoryData?.data && (
             <PerformanceChart performanceHistory={performanceHistoryData?.data} />
           )}
-        </ChartContainer>
+        </MainContainer>
       </SimpleGrid>
     </>
   );

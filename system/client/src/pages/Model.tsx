@@ -1,12 +1,12 @@
 import CardContainer from '@/components/CardContainer';
-import ChartContainer from '@/components/ChartContainer';
 import ConfusionMatrix from '@/components/ConfusionMatrix';
+import MainContainer from '@/components/MainContainer';
 import PerformanceCard from '@/components/PerformanceCard';
 import PerformanceChart from '@/components/PerformanceChart';
 import { useAdvancedModelInfo } from '@/hooks/useModelInfo';
 import usePerformanceHistory from '@/hooks/usePerformanceHistory';
 import useSelectedModeStore from '@/store/useSelectedModeStore';
-import { GridItem, SimpleGrid, Text, VStack } from '@chakra-ui/react';
+import { GridItem, SimpleGrid, Text } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 
 const Model = () => {
@@ -46,11 +46,11 @@ const Model = () => {
           />
         </GridItem>
         <GridItem colSpan={{ md: 2 }} width={'100%'}>
-          <ChartContainer modeSelectorVisible={true}>
+          <MainContainer modeSelectorVisible={true}>
             {performanceHistoryData?.data && (
               <PerformanceChart performanceHistory={performanceHistoryData?.data} />
             )}
-          </ChartContainer>
+          </MainContainer>
         </GridItem>
       </SimpleGrid>
 
