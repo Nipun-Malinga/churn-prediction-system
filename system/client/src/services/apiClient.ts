@@ -32,6 +32,13 @@ class APIClient<T> {
     const resp = await axiosInstance.post<FetchResponse<T>>(this.endpoint, data, requestConfig);
     return resp.data;
   };
+
+  patch = async (requestConfig?: AxiosRequestConfig, data?: T) => {
+    const resp = await axiosInstance.patch<FetchResponse<T>>(this.endpoint, data, {
+      ...requestConfig,
+    });
+    return resp.data;
+  };
 }
 
 export default APIClient;
