@@ -86,6 +86,24 @@ class Model_Info_Service:
         except NoResultFound as ex:
             raise NoResultFound from ex
         
+    @classmethod
+    def get_base_model_performance(cls):
+        try:
+            result = db.session.query(
+                Model_Info
+            ).join(
+                Model, Model.id == Model_Info.model_id
+            ).filter(
+              Model.base_model == True, 
+            ).order_by(
+                desc(Model_Info.updated_date)
+            ).limit(1).one()     
+
+            return result.to_dict() if result else {}
+        except NoResultFound as ex:
+            raise NoResultFound from ex
+
+        
     """
         Chart Data Services
     """    

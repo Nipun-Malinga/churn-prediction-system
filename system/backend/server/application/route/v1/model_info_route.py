@@ -49,6 +49,19 @@ def get_advanced_model_info_by_id():
         return error_response_template(f"No model info found for model_id: {model_id}"), 404
     except Exception as ex:
         return error_response_template("Failed to fetch Model Information"), 500
+    
+@model.route("/base", methods=["GET"])
+@limiter.limit("5 per minute")
+@jwt_required() 
+def get_base_model_performance(): 
+    try:
+        return response_template(
+            "success", 
+            "Base Model Data Successfully", 
+            service.get_base_model_performance()
+        ), 200
+    except Exception as ex:
+        return error_response_template("Failed to fetch model information"), 500
 
 @model.route("/charts", methods=["GET"])
 @limiter.limit("5 per minute")
