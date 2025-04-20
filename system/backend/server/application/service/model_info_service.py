@@ -5,7 +5,7 @@ from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import desc, func
 
-
+#TODO: Build DTO class for necessary endpoints
 class Model_Info_Service:
     
     @classmethod
@@ -166,3 +166,37 @@ class Model_Info_Service:
             raise SQLAlchemyError(
                 "An error occurred while retrieving model drift history."
             ) from ex
+            
+    @classmethod
+    def new_trained_models(cls):
+        try:
+            results = db.session.query(
+                Model, 
+                Model_Info           
+            ).join(
+                Model_Info,
+                Model.id == Model_Info.model_id
+            ).filter(
+                Model.base_model == True,
+                Model_Info.is_production_model == False,
+            ).order_by(
+                desc(Model_Info.updated_date)
+            ).limit(1).one()
+             
+            model, info = results
+                
+            return {
+                "model_name": model.name,
+                "version_name": info.version_name,
+                "accuracy": info.accuracy,
+                "precision": info.precision,
+                "recall": info.recall,
+                "f1_score": info.f1_score,
+                "is_production_model": info.is_production_model,
+                "trained_date": info.updated_date
+            }
+                    
+        except SQLAlchemyError as ex:
+            raise SQLAlchemyError(
+                "An error occurred while retrieving new trained models."
+            )

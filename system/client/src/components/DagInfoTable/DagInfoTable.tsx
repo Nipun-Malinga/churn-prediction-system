@@ -33,7 +33,7 @@ const DagInfoTable = () => {
             <Table.ColumnHeader>Last Triggered Time</Table.ColumnHeader>
             <Table.ColumnHeader>Next Dag Run</Table.ColumnHeader>
             <Table.ColumnHeader>Scheduled Interval</Table.ColumnHeader>
-            <Table.ColumnHeader textAlign='center'>Status</Table.ColumnHeader>
+            <Table.ColumnHeader textAlign='end'>Status</Table.ColumnHeader>
             {/* <Table.ColumnHeader textAlign='end'>Trigger Dag Run</Table.ColumnHeader> */}
           </Table.Row>
         </Table.Header>

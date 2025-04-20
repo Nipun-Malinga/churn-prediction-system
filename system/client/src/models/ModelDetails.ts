@@ -21,4 +21,15 @@ interface AdvancedModelInfo {
   updated_date: string;
 }
 
-export type { AdvancedModelInfo, BasicModelInfo };
+interface TrainedModel {
+  accuracy: number;
+  f1_score: number;
+  is_production_model: false;
+  model_name: string;
+  precision: number;
+  recall: number;
+  trained_date: string;
+  version_name: string;
+}
+
+export type { AdvancedModelInfo, BasicModelInfo, TrainedModel };

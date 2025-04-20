@@ -166,3 +166,24 @@ def get_model_performance_drift():
         return error_response_template(
             "Failed to fetch drift history"
         ), 500
+
+
+        
+@model.route("/production", methods=["GET"])
+@limiter.limit("5 per minute")
+@jwt_required()        
+def get_new_trained_models():
+    try:
+        return response_template(
+            "success",
+            "New Trained Models Fetched Successfully",
+            service.new_trained_models()
+        ), 200
+    except SQLAlchemyError as ex:
+        return error_response_template(
+            f"Database error: {str(ex)}"
+        ), 500
+    except Exception as ex:
+        return error_response_template(
+            "Failed to fetch new trained models"
+        ), 500
