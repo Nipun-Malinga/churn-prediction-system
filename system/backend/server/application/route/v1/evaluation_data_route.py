@@ -1,12 +1,8 @@
-import json
-
-import magic
-import pandas as pd
 from application import limiter
 from application.response import error_response_template, response_template
 from application.schema import Evaluation_Data_Schema
 from application.service import Evaluation_Data_Service
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
@@ -23,6 +19,8 @@ service = Evaluation_Data_Service()
 def get_data():
     return [], 200
 
+
+
 @data.route("/", methods=["POST"])
 @limiter.limit("5 per minute")
 @jwt_required()
@@ -38,7 +36,15 @@ def add_data():
         ), 201
 
     except ValidationError as err:
-        return error_response_template(err.messages), 400
+        return error_response_template(
+            err.messages
+        ), 400
+    except SQLAlchemyError as ex:
+        return error_response_template(
+            f"Database Error: {str(ex)}"
+        ), 500
+
+
     
 @data.route("/list", methods=["POST"])
 @limiter.limit("5 per minute")
@@ -57,7 +63,15 @@ def add_data_list():
         ), 201
 
     except ValidationError as err:
-        return error_response_template(err.messages), 400   
+        return error_response_template(
+            err.messages
+        ), 400  
+    except SQLAlchemyError as ex:
+        return error_response_template(
+            f"Database Error: {str(ex)}"
+        ), 500 
+
+
 
 @data.route("/csv", methods=["POST"])
 @limiter.limit("5 per minute")
@@ -76,9 +90,9 @@ def read_csv_data():
         
         try:
             return response_template(
-            "success",
-            "CSV Data Source Read Successfully",
-            service.preprocess_csv_data(data_source)
+                "success",
+                "CSV Data Source Read Successfully",
+                service.preprocess_csv_data(data_source)
             ), 200
         except ValueError as ex:
             return error_response_template(
@@ -90,6 +104,8 @@ def read_csv_data():
         return error_response_template(
             f"Invalid File type detected: {file_content_type}"
         )
+
+
         
 @data.route("/info", methods=["GET"])
 @limiter.limit("5 per minute")
@@ -102,6 +118,10 @@ def get_dataset_basic_info():
             service.basic_dataset_information()
         )
     except SQLAlchemyError as ex:
-        return error_response_template(f"Database Error: {ex}"), 500
+        return error_response_template(
+            f"Database Error: {str(ex)}"
+        ), 500
     except Exception as ex:
-        return error_response_template(f"Server Error: {ex}"), 500
+        return error_response_template(
+            f"Server Error: {ex}"
+        ), 500

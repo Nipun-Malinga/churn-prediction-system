@@ -35,14 +35,14 @@ class Airflow_Service:
             response = requests.get(f"{AIRFLOW_URL}/api/v1/dags", headers=header)
             response.raise_for_status()
             return response.json()
-        except HTTPError as exp:
-            raise HTTPError(exp.response.text) from exp
-        except RequestException as exp:
-            raise RequestException(f"Request error occurred: {str(exp)}") from exp
+        except HTTPError as ex:
+            raise HTTPError(ex.response.text) from ex
+        except RequestException as ex:
+            raise RequestException(f"Request error occurred: {str(ex)}") from ex
     
     @classmethod
     def update_dag(cls, dag_id, data):
-        """Fetch all DAGs from Airflow."""
+        """Update a DAG's properties (e.g., is_paused)."""
         try:
             header = cls.connect_to_airflow()
             
@@ -53,10 +53,10 @@ class Airflow_Service:
             )
             response.raise_for_status()
             return response.json()
-        except HTTPError as exp:
-            raise HTTPError(exp.response.text) from exp
-        except RequestException as exp:
-            raise RequestException(f"Request error occurred: {str(exp)}") from exp
+        except HTTPError as ex:
+            raise HTTPError(ex.response.text) from ex
+        except RequestException as ex:
+            raise RequestException(f"Request error occurred: {str(ex)}") from ex
     
     @classmethod    
     def run_dag(cls, dag_id):
@@ -70,7 +70,7 @@ class Airflow_Service:
             )
             response.raise_for_status()
             return response.json()
-        except HTTPError as exp:
-            raise HTTPError(exp.response.text) from exp
-        except RequestException as exp:
-            raise RequestException(f"Request error occurred: {str(exp)}") from exp
+        except HTTPError as ex:
+            raise HTTPError(ex.response.text) from ex
+        except RequestException as ex:
+            raise RequestException(f"Request error occurred: {str(ex)}") from ex

@@ -1,11 +1,11 @@
-from enum import Enum, auto
+from enum import Enum
 
 from application import limiter
 from application.response import error_response_template, response_template
 from application.service import Model_Info_Service
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 
 model = Blueprint("model_bp", __name__)
 
@@ -19,7 +19,8 @@ class Type(Enum):
     PRECISION = "precision"
     RECALL = "recall"
     F1_SCORE = "f1_score"
- 
+
+
 @model.route("/info", methods=["GET"])    
 @limiter.limit("5 per minute")
 @jwt_required()
@@ -30,8 +31,17 @@ def get_basic_model():
             "Model Information Fetched Successfully",
             service.get_basic_model_info()
         ), 200
+        
+    except SQLAlchemyError as ex:
+        return error_response_template(
+            f"Database Error: {str(ex)}"
+        ), 500
     except Exception as ex:
-        return error_response_template("Failed to fetch Model Information"), 500
+        return error_response_template(
+            "Failed to fetch Model Information"
+        ), 500
+
+
     
 @model.route("/info/advanced", methods=["GET"])   
 @limiter.limit("5 per minute")
@@ -45,10 +55,21 @@ def get_advanced_model_info_by_id():
             "Model Information Fetched Successfully",
             service.get_advanced_model_info(model_id)
         ), 200
+        
     except NoResultFound as ex:
-        return error_response_template(f"No model info found for model_id: {model_id}"), 404
+        return error_response_template(
+            f"No model info found for model_id: {model_id}"
+        ), 404
+    except SQLAlchemyError as ex: 
+        return error_response_template(
+            f"Database error: {str(ex)}"
+        ), 500
     except Exception as ex:
-        return error_response_template("Failed to fetch Model Information"), 500
+        return error_response_template(
+            "Failed to fetch Model Information"
+        ), 500
+
+
     
 @model.route("/base", methods=["GET"])
 @limiter.limit("5 per minute")
@@ -60,8 +81,17 @@ def get_base_model_performance():
             "Base Model Data Successfully", 
             service.get_base_model_performance()
         ), 200
+    
+    except SQLAlchemyError as ex: 
+        return error_response_template(
+            f"Database error: {str(ex)}"
+        ), 500    
     except Exception as ex:
-        return error_response_template("Failed to fetch model information"), 500
+        return error_response_template(
+            "Failed to fetch model information"
+        ), 500
+
+
 
 @model.route("/charts", methods=["GET"])
 @limiter.limit("5 per minute")
@@ -81,15 +111,21 @@ def model_history_chart_data():
             f"{filter_by.capitalize()} Data Fetched Successfully",
             service.model_performance_history(model_id, filter_by)
         )
-        
+    
     except ValueError as ex:
         return error_response_template(
             f"Invalid Filtering Value",
         ), 400
-        
+    except SQLAlchemyError as ex: 
+        return error_response_template(
+            f"Database error: {str(ex)}"
+        ), 500    
     except Exception as ex:
-        return error_response_template("Failed to fetch chart history"), 500
+        return error_response_template(
+            "Failed to fetch chart history"
+        ), 500
     
+
     
 @model.route("/drift", methods=["GET"])
 @limiter.limit("5 per minute")
@@ -101,5 +137,11 @@ def get_model_performance_drift():
             "Drift History Fetched Successfully", 
             service.model_drift_history()
         ), 200
+    except SQLAlchemyError as ex: 
+        return error_response_template(
+            f"Database error: {str(ex)}"
+        ), 500
     except Exception as ex:
-        return error_response_template("Failed to fetch drift history"), 500
+        return error_response_template(
+            "Failed to fetch drift history"
+        ), 500
