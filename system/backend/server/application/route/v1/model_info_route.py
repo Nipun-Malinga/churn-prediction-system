@@ -19,6 +19,27 @@ class Type(Enum):
     PRECISION = "precision"
     RECALL = "recall"
     F1_SCORE = "f1_score"
+    
+
+@model.route("", methods=["GET"])    
+@limiter.limit("5 per minute")
+@jwt_required()
+def get_models():
+    try:
+        return response_template(
+            "success",
+            "Models Fetched Successfully",
+            service.get_all_models()
+        ), 200
+        
+    except SQLAlchemyError as ex:
+        return error_response_template(
+            f"Database Error: {str(ex)}"
+        ), 500
+    except Exception as ex:
+        return error_response_template(
+            "Server Error: Failed to Fetch Models"
+        ), 500
 
 
 @model.route("/info", methods=["GET"])    
