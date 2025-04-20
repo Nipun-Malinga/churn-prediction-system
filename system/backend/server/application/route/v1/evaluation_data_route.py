@@ -9,6 +9,8 @@ from application.service import Evaluation_Data_Service
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
+
 
 data = Blueprint("data_bp", __name__)
 
@@ -88,3 +90,18 @@ def read_csv_data():
         return error_response_template(
             f"Invalid File type detected: {file_content_type}"
         )
+        
+@data.route("/info", methods=["GET"])
+@limiter.limit("5 per minute")
+@jwt_required()
+def get_dataset_basic_info():
+    try: 
+        return response_template(
+            "success", 
+            "hello", 
+            service.basic_dataset_information()
+        )
+    except SQLAlchemyError as ex:
+        return error_response_template(f"Database Error: {ex}"), 500
+    except Exception as ex:
+        return error_response_template(f"Server Error: {ex}"), 500
