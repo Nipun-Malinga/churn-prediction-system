@@ -1,10 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Layout from './Layout';
 import Configuration from './pages/Configuration';
+import DatasetInfo from './pages/DatasetInfo';
 import Home from './pages/Home';
 import Model from './pages/Model';
-import SignIn from './pages/SignIn';
 import NotFound from './pages/NotFound';
+import SignIn from './pages/SignIn';
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,7 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: '/signin', element: <SignIn /> },
       { path: '/model/:model/:id', element: <Model /> },
+      { path: '/dataset', element: <DatasetInfo /> },
       { path: '/config', element: <Configuration /> },
     ],
   },

@@ -1,7 +1,7 @@
 interface BasicModelInfo {
   id: number;
-  base_model: number;
-  name: number;
+  base_model: boolean;
+  name: string;
   accuracy: number;
   updated_date: string;
 }
