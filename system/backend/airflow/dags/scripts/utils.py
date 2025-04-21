@@ -218,7 +218,7 @@ def update_model_info(model_info_list: list, data_transformer_list: list) -> Non
                         """
                         INSERT INTO model_info 
                         (
-                            model_id, updated_date, accuracy, 
+                            model_id, batch_id, updated_date, accuracy, 
                             "TP", "TN", "FP", "FN", precision, 
                             recall, f1_score, is_automated_tunning,
                             is_production_model, is_downloaded, 
@@ -226,7 +226,7 @@ def update_model_info(model_info_list: list, data_transformer_list: list) -> Non
                         )
                         VALUES 
                         (
-                            :model_id, :updated_date, :accuracy, 
+                            :model_id, :batch_id, :updated_date, :accuracy, 
                             :TP, :TN, :FP, :FN, :precision, :recall, 
                             :f1_score, :is_automated_tunning, 
                             :is_production_model, :is_downloaded, 
@@ -237,6 +237,7 @@ def update_model_info(model_info_list: list, data_transformer_list: list) -> Non
                     ), 
                     {
                         "model_id": model_id,
+                        "batch_id": model_info["batch_id"],
                         "updated_date": datetime.now(),
                         "accuracy": float(model_info["accuracy"]), 
                         "TP": int(model_info["tp"]),

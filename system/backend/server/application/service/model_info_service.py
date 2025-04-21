@@ -2,7 +2,7 @@ from application import db
 from application.model import Accuracy_Drift, Model, Model_Info
 from sqlalchemy import desc
 from sqlalchemy.exc import NoResultFound, SQLAlchemyError
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, Session
 from sqlalchemy.sql import desc, func
 
 #TODO: Build DTO class for necessary endpoints
@@ -28,7 +28,8 @@ class Model_Info_Service:
         results = db.session.query(
             Model_Info
         ).filter(
-            Model_Info.model_id == model_id
+            Model_Info.model_id == model_id,
+            Model_Info.is_production_model == True
         ).all()
     
         return [r.to_dict() for r in results] if results else []
@@ -41,6 +42,8 @@ class Model_Info_Service:
                 func.max(Model_Info.updated_date).label("latest_date")
             ).group_by(
                 Model_Info.model_id
+            ).filter(
+                Model_Info.is_production_model == True
             ).subquery()
 
             LatestModelInfo = aliased(Model_Info)
@@ -81,7 +84,8 @@ class Model_Info_Service:
             result = db.session.query(
                 Model_Info
             ).filter(
-                Model_Info.model_id == model_id
+                Model_Info.model_id == model_id,
+                Model_Info.is_production_model == True
             ).order_by(
                 desc(
                     Model_Info.updated_date
@@ -105,6 +109,7 @@ class Model_Info_Service:
                 Model, Model.id == Model_Info.model_id
             ).filter(
               Model.base_model == True, 
+              Model_Info.is_production_model == True
             ).order_by(
                 desc(Model_Info.updated_date)
             ).limit(1).one()     
@@ -139,7 +144,8 @@ class Model_Info_Service:
             results = db.session.query(
                 filter_by, Model_Info.updated_date
             ).filter(
-                Model_Info.model_id == model_id
+                Model_Info.model_id == model_id,
+                Model_Info.is_production_model == True               
             ).all()
 
             return [
@@ -159,6 +165,10 @@ class Model_Info_Service:
         try:
             results = db.session.query(
                 Accuracy_Drift
+            ).join(
+                Model_Info, Model_Info.id == Accuracy_Drift.model_info_id,
+            ).filter(
+                Model_Info.is_production_model == True
             ).all()
 
             return [r.to_dict() for r in results] if results else []
@@ -181,11 +191,15 @@ class Model_Info_Service:
                 Model_Info.is_production_model == False,
             ).order_by(
                 desc(Model_Info.updated_date)
-            ).limit(1).one()
+            ).limit(1).one_or_none()
+            
+            if not results: 
+                return None
              
             model, info = results
                 
             return {
+                "batch_id": info.batch_id,
                 "model_name": model.name,
                 "version_name": info.version_name,
                 "accuracy": info.accuracy,
@@ -194,9 +208,43 @@ class Model_Info_Service:
                 "f1_score": info.f1_score,
                 "is_production_model": info.is_production_model,
                 "trained_date": info.updated_date
-            }
-                    
+            }   
         except SQLAlchemyError as ex:
             raise SQLAlchemyError(
                 "An error occurred while retrieving new trained models."
             )
+            
+    @classmethod
+    def production_model(cls, batch_id):
+        session = db.session()
+        try:
+            selected_models = session.query(
+                Model_Info
+            ).filter(
+                Model_Info.batch_id == batch_id
+            ).all()
+            
+            if not selected_models:
+                raise NoResultFound(
+                    f"No results found for batch id: {batch_id}"
+                )
+                
+            response = []
+            for model in selected_models:
+                model.is_production_model = True
+                response.append(model.to_dict())
+            
+            session.commit()
+            return response
+            
+        except NoResultFound as ex:
+            session.rollback()
+            raise ex 
+        except SQLAlchemyError as ex:
+            session.rollback()
+            raise SQLAlchemyError(
+                "An error occurred while setting production models."
+            )
+        finally:
+            session.close()
+        

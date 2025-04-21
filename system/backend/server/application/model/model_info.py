@@ -11,8 +11,8 @@ class Model_Info(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     model_id: Mapped[int] = mapped_column(ForeignKey('model.id'))
+    batch_id: Mapped[str] = mapped_column(String, nullable=False)
     updated_date: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.now)
-    accuracy: Mapped[float] = mapped_column(Float, nullable=False, default=0)
 
     # Confusion matrix data
     TP: Mapped[float] = mapped_column(Float, nullable= False, default=0)
@@ -20,6 +20,7 @@ class Model_Info(db.Model):
     FP: Mapped[float] = mapped_column(Float, nullable= False, default=0)
     FN: Mapped[float] = mapped_column(Float, nullable= False, default=0)
 
+    accuracy: Mapped[float] = mapped_column(Float, nullable=False, default=0)
     precision: Mapped[float] = mapped_column(Float, nullable= False, default=0)
     recall: Mapped[float] = mapped_column(Float, nullable= False, default=0)
     f1_score: Mapped[float] = mapped_column(Float, nullable= False, default=0)

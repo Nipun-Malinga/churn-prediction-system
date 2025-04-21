@@ -187,3 +187,44 @@ def get_new_trained_models():
         return error_response_template(
             "Failed to fetch new trained models"
         ), 500
+        
+@model.route("/production", methods=["POST"])
+@limiter.limit("5 per minute")
+@jwt_required()        
+def set_production_model():
+    
+    # batch_id = request.args.get("batch_id")
+        
+    # if not batch_id:
+    #     return error_response_template(
+    #         "Missing required parameters"
+    #     ), 400
+        
+    # return response_template(
+    #         "success",
+    #         "Production Models Set Successfully",
+    #         service.production_model(batch_id)
+    #     )   
+    
+    try:
+        batch_id = request.args.get("batch_id")
+        
+        if not batch_id:
+            return error_response_template(
+                "Missing required parameters"
+            ), 400
+        
+        return response_template(
+            "success",
+            "Production Models Set Successfully",
+            service.production_model(batch_id)
+        )    
+        
+    except NoResultFound as ex:
+        return error_response_template(
+            f"{str(ex)}"
+        ), 404
+    except Exception as ex:
+        return error_response_template(
+            "Failed to set production model"
+        ), 500

@@ -24,6 +24,9 @@ ML_MODEL_PATHS = {
 }
 
 def train_model(X_train, y_train):
+    
+    # Use to identify model batch
+    batch_id = str(uuid.uuid4())[:8]
 
     def perform_random_search(model, params, n_tier=20, cv=5):
         random_search = RandomizedSearchCV(model, param_distributions=params, n_iter=n_tier, cv=cv, scoring='accuracy', n_jobs=-1, random_state=42)
@@ -118,28 +121,32 @@ def train_model(X_train, y_train):
             "name":"XGBOOST", 
             "version": XGM_version, 
             "base_model": False,
-            "best_params": XGM_best_params
+            "best_params": XGM_best_params,
+            "batch_id": batch_id
         }, 
         {
             "model":LGBM_random_searched,
             "name":"LIGHTGBM",
             "version": LGBM_version, 
             "base_model": False,
-            "best_params": LGBM_best_params
+            "best_params": LGBM_best_params,
+            "batch_id": batch_id
         }, 
         {
             "model":RF_random_searched, 
             "name":"RANDOM FOREST",
             "version": RF_version, 
             "base_model": False,
-            "best_params": RF_best_params
+            "best_params": RF_best_params,
+            "batch_id": batch_id
         }, 
         {
             "model":voting_classifier, 
             "name":"VOTING CLASSIFIER",
             "version": voting_classifier_version, 
             "base_model": True,
-            "best_params": {}
+            "best_params": {},
+            "batch_id": batch_id
         }
         ]
 
