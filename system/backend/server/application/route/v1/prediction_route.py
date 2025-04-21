@@ -2,9 +2,10 @@ from application import limiter
 from application.response import error_response_template, response_template
 from application.schema import Prediction_Request_Schema
 from application.service import Prediction_Service
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 
 predict_result = Blueprint("predict_bp", __name__)
 
@@ -31,13 +32,21 @@ def predict():
         
     except ValidationError as ex:
         return error_response_template(
-            ex.messages
+            str(ex)
         ), 400
     except FileNotFoundError as ex:
         return error_response_template(
-            "Sorry there ara no trained models currently available."
+            str(ex)
         ), 503
     except ValueError as ex:
         return error_response_template (
-            "Sorry the system cannot make predictions for untrained values."
+            str(ex)
         ), 400
+    except SQLAlchemyError as ex:
+        return error_response_template (
+            str(ex)
+        ), 500
+    except Exception as ex:
+        return error_response_template(
+            "Failed to make prediction."
+        ), 500

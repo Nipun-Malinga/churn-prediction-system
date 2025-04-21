@@ -7,6 +7,7 @@ from application.model.model import Model
 from application.model.model_info import Model_Info
 from application.util.cloud_storage_utils import download_blob
 from sqlalchemy import desc
+from sqlalchemy.exc import SQLAlchemyError
 
 ABS_DIR = dirname(abspath(__file__))
 BASE_DIR = join(ABS_DIR, "trained_models/")
@@ -44,6 +45,11 @@ def fetch_preprocessing_models():
                 db.session.rollback()
                 continue
         db.session.commit() 
+    except SQLAlchemyError as ex:
+        db.session.rollback()
+        raise SQLAlchemyError(
+            "An error occurred while retrieving data transformer information."
+        )
     except Exception as ex:
         db.session.rollback()
     finally:
@@ -79,7 +85,11 @@ def fetch_ml_models():
             db.session.commit()
         except Exception as ex:
             db.session.rollback()
-            
+    except SQLAlchemyError as ex:
+        db.session.rollback()
+        raise SQLAlchemyError(
+            "An error occurred while retrieving data ML model information."
+        )    
     except Exception as ex:
         db.session.rollback()
     finally:

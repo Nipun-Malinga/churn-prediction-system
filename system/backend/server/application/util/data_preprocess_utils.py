@@ -1,4 +1,4 @@
-from os.path import abspath, dirname, join, realpath
+from os.path import abspath, dirname, exists, join
 
 import joblib
 import pandas as pd
@@ -9,72 +9,95 @@ ABS_DIR = dirname(abspath(__file__))
 BASE_DIR = join(ABS_DIR, "trained_models/")
 DATA_TRANSFORMER_PATH = join(BASE_DIR, "data_transformers/")
 
+def load_encoder(file_name):
+    path = join(DATA_TRANSFORMER_PATH, f"{file_name}.pkl")
+    if not exists(path):
+        raise FileNotFoundError(f"File {file_name} not found at {path}")
+    return joblib.load(path)
+
 def json_data_preprocessor(json_data):
     dataframe = pd.json_normalize(json_data)
     
-    result = db.session.query(
-        Data_Transformer.name
+    results = db.session.query(
+        Data_Transformer
     ).all()
+    
+    if not results:
+        raise FileNotFoundError(
+            "Currently there are no trained encoders available."
+        )
+        
+    transformers = {
+        row.name: load_encoder(row.name) for row in results
+    }
     
     def encode_data(data):
         
-        if not result:
-            raise FileNotFoundError("Currently there are no trained encoders available.")
-        
         # Onehot encoding
-        oneHotEncoder = joblib.load(join(DATA_TRANSFORMER_PATH, f"{result[0][0]}.pkl"))
-        encoded = oneHotEncoder.transform(data[["geography", "education", "card_type"]])
-        encoded_df = pd.DataFrame(encoded,
-                                    columns=oneHotEncoder.get_feature_names_out(
-                                        ["geography", "education", "card_type"]
-                                    ))
+        oneHotEncoder = transformers["One_Hot_Encoder"]
+        
+        encoded = oneHotEncoder.transform(
+            data[["geography", "education", "card_type"]]
+        )
+        
+        encoded_df = pd.DataFrame(
+            encoded,
+            columns = oneHotEncoder.get_feature_names_out(
+                ["geography", "education", "card_type"]
+            )
+        )
 
         # Reset index before concatenation
-        data= data.reset_index(drop=True)
+        data = data.reset_index(drop=True)
         encoded_df = encoded_df.reset_index(drop=True)
 
         # Concatenate DataFrames
         data = pd.concat([data, encoded_df], axis=1)
 
         # Drop original categorical columns
-        data = data.drop(columns=["geography", "education", "card_type"])
+        data = data.drop(
+            columns=["geography", "education", "card_type"]
+        )
 
         # Label encoding
-        genderEncoder = joblib.load(join(DATA_TRANSFORMER_PATH, f"{result[1][0]}.pkl"))
-        housingEncoder = joblib.load(join(DATA_TRANSFORMER_PATH, f"{result[2][0]}.pkl"))
-        loanEncoder = joblib.load(join(DATA_TRANSFORMER_PATH, f"{result[3][0]}.pkl"))
-
-        data["gender"] = genderEncoder.transform(data["gender"])
-        data["housing"] = housingEncoder.transform(data["housing"])
-        data["loan"] = loanEncoder.transform(data["loan"])
-
+        data["gender"] = transformers["gender_Encoder"].transform(data["gender"])
+        data["housing"] = transformers["housing_Encoder"].transform(data["housing"])
+        data["loan"] = transformers["loan_Encoder"].transform(data["loan"])
+        
         data.columns = data.columns.str.strip()
         return data
 
     def scale_data(data):
         # Min-Max scaling
-        minmaxScaler = joblib.load(join(DATA_TRANSFORMER_PATH, f"{result[4][0]}.pkl"))
-        return minmaxScaler.transform(data)
-
-    encoded_data = encode_data(dataframe)
-    scaled_data = scale_data(encoded_data)
-    return scaled_data
+        return transformers["Min Max Scaler"].transform(data)
+    
+    
+    try:
+        
+        encoded_data = encode_data(dataframe)
+        scaled_data = scale_data(encoded_data)
+        return scaled_data
+    except ValueError as ex:
+        raise ValueError()
+        
 
 def csv_data_preprocessor(csv_data):
     dataframe = pd.read_csv(csv_data)
     
-    dataframe['Card Type '] = dataframe['Card Type '].where(dataframe['HasCrCard'] == 1, 'None')
+    dataframe['Card Type '] = dataframe['Card Type '].where(
+        dataframe['HasCrCard'] == 1, 'None'
+    )
 
     expected_features = [
-            "CustomerId", "Surname",
-            "Education", "CreditScore",
-            "Geography", "Gender",
-            "Age", "Tenure", "Balance", 
-            "NumOfProducts", "HasCrCard", 
-            "Card Type ", "IsActiveMember",
-            "EstimatedSalary", "Housing",
-            "Loan", "Exited"
-        ]
+        "CustomerId", "Surname",
+        "Education", "CreditScore",
+        "Geography", "Gender",
+        "Age", "Tenure", "Balance", 
+        "NumOfProducts", "HasCrCard", 
+        "Card Type ", "IsActiveMember",
+        "EstimatedSalary", "Housing",
+        "Loan", "Exited"
+    ]
     
     actual_features = list(dataframe.columns)
      
