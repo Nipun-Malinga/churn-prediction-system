@@ -33,17 +33,17 @@ const PerformanceDifferenceChart = ({
     {
       subject: 'Precision',
       base: baseModelData.precision,
-      current: currentModelData.accuracy,
+      current: currentModelData.precision,
     },
     {
       subject: 'Recall',
       base: baseModelData.recall,
-      current: currentModelData.accuracy,
+      current: currentModelData.recall,
     },
     {
       subject: 'F1 Score',
       base: baseModelData.f1_score,
-      current: currentModelData.accuracy,
+      current: currentModelData.f1_score,
     },
   ];
 

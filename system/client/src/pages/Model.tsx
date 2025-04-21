@@ -19,7 +19,7 @@ const Model = () => {
 
   const { data } = useAdvancedModelInfo(modelId);
   const { data: baseModelInfo } = useBaseModelInfo();
-  const { data: performanceHistoryData } = usePerformanceHistory(4, selectedMode);
+  const { data: performanceHistoryData } = usePerformanceHistory(modelId, selectedMode);
 
   return (
     <>
