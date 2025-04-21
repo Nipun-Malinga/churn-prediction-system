@@ -5,7 +5,7 @@ interface Props {
   notification: string;
 }
 
-const NotificationButton = ({ type, notification }: Props) => {
+const NotificationBar = ({ type, notification }: Props) => {
   return (
     <Alert.Root
       status={type}
@@ -23,4 +23,4 @@ const NotificationButton = ({ type, notification }: Props) => {
   );
 };
 
-export default NotificationButton;
+export default NotificationBar;

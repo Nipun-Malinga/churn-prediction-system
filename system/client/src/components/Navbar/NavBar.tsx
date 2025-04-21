@@ -4,7 +4,8 @@ import { Button, HStack, Popover, Portal } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { FaRegBell } from 'react-icons/fa6';
 import { IoMdMenu } from 'react-icons/io';
-import NotificationButton from '../NotificationButton';
+import NotificationBar from '../NotificationButton';
+
 
 const NavBar = () => {
   const { data } = useTrainedModels();
@@ -37,7 +38,7 @@ const NavBar = () => {
               <Popover.Body>
                 <Popover.Title fontWeight='medium'>Notifications</Popover.Title>
                 {data?.data && (
-                  <NotificationButton type='warning' notification='New Trained Model Available' />
+                  <NotificationBar type='warning' notification='New Trained Model Available' />
                 )}
               </Popover.Body>
             </Popover.Content>

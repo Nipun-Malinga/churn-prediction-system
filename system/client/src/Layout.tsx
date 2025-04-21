@@ -24,7 +24,7 @@ const Layout = () => {
           </GridItem>
         </Show>
         <GridItem area={'main'} background='#F5F6FA'>
-          <NavBar />
+          {/* <NavBar /> */}
           <VStack alignItems='flex-start' padding={5} rowGap={5}>
             <Outlet />
           </VStack>

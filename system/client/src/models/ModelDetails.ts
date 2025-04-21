@@ -30,6 +30,7 @@ interface TrainedModel {
   recall: number;
   trained_date: string;
   version_name: string;
+  batch_id: string;
 }
 
 export type { AdvancedModelInfo, BasicModelInfo, TrainedModel };
