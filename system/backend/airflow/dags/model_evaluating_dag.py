@@ -13,12 +13,19 @@ from scripts.model_evaluator import (compare_model_performance, evaluate_model,
 from scripts.utils import fetch_evaluation_data, fetch_trained_model_data
 
 default_args = {
-    'owner': 'churn-pred_server',
-    'retries': 5,
-    'retry_delay': timedelta(minutes=10)
+    "owner": "churn-prediction-server",
+    "retries": 5,
+    "retry_delay": timedelta(minutes=10)
 }
 
-@dag(dag_id='Model_Evaluating_DAG', default_args=default_args, start_date=days_ago(1), schedule_interval="@weekly")
+@dag(
+    dag_display_name="Model Evaluating Dag",
+    dag_id="model_evaluating_dag", 
+    default_args=default_args, 
+    start_date=days_ago(1), 
+    schedule_interval="@weekly", 
+    description="Evaluate the current model performance with untrained data"
+)
 def model_evaluator():
     
     @task(multiple_outputs=True)
@@ -123,12 +130,12 @@ def model_evaluator():
     
     trigger_retraining_dag_01 = TriggerDagRunOperator(
         task_id="trigger_retraining_dag_01",
-        trigger_dag_id="Model_Training_DAG",
+        trigger_dag_id="model_training_dag",
     )
     
     trigger_retraining_dag_02 = TriggerDagRunOperator(
         task_id="trigger_retraining_dag_02",
-        trigger_dag_id="Model_Training_DAG",
+        trigger_dag_id="model_training_dag",
     )
     
     branch_task_01 = BranchPythonOperator(

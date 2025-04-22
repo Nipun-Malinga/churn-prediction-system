@@ -29,7 +29,15 @@ def train_model(X_train, y_train):
     batch_id = str(uuid.uuid4())[:8]
 
     def perform_random_search(model, params, n_tier=20, cv=5):
-        random_search = RandomizedSearchCV(model, param_distributions=params, n_iter=n_tier, cv=cv, scoring='accuracy', n_jobs=-1, random_state=42)
+        random_search = RandomizedSearchCV(
+            model, 
+            param_distributions=params, 
+            n_iter=n_tier, 
+            cv=cv, 
+            scoring='f1', 
+            n_jobs=-1, 
+            random_state=42
+        )
         return random_search.fit(X_train, y_train)
     
     def save_model_file(model_name, model):
@@ -62,7 +70,7 @@ def train_model(X_train, y_train):
         'n_estimators': randint(100, 600),
     }
 
-    XGM_random_searched = perform_random_search(XGM, params_XG, 30)
+    XGM_random_searched = perform_random_search(XGM, params_XG, 40)
     XGM_best_params = XGM_random_searched.best_params_
 
     XGM_version = save_model_file("XGBOOST", XGM_random_searched)
@@ -97,7 +105,7 @@ def train_model(X_train, y_train):
         'n_estimators': randint(100, 600),
     }
 
-    RF_random_searched = perform_random_search(RF, params_RF, 30, 10)
+    RF_random_searched = perform_random_search(RF, params_RF, 40, 10)
     RF_best_params = RF_random_searched.best_params_
     
     RF_version = save_model_file("RF", RF_random_searched)
@@ -148,7 +156,7 @@ def train_model(X_train, y_train):
             "best_params": {},
             "batch_id": batch_id
         }
-        ]
+    ]
 
 def deploy_models(model_list: list):
     
@@ -178,4 +186,8 @@ def deploy_models(model_list: list):
 
     for model in model_list:
         model_version = model["version"]
-        upload_to_gcs("churn_prediction_model_storage", join(ML_MODEL_PATHS["versioned"], model_version), f"ml_models/{model_version}")
+        upload_to_gcs(
+            "churn_prediction_model_storage", 
+            join(ML_MODEL_PATHS["versioned"], model_version), 
+            f"ml_models/{model_version}"
+        )

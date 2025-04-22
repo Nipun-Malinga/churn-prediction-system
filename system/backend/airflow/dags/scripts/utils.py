@@ -10,6 +10,7 @@ from scripts import database_engine
 from sqlalchemy import exc, text
 
 
+
 def fetch_training_data() -> pd.DataFrame:
     
     with database_engine().connect() as conn:
@@ -70,7 +71,8 @@ def fetch_trained_model_data() -> list:
                         precision,
                         recall, 
                         f1_score, 
-                        version_name 
+                        version_name,
+                        batch_id
                     FROM model_info 
                     INNER JOIN model ON model_info.model_id = model.id
                     WHERE base_model IS TRUE
@@ -92,7 +94,8 @@ def fetch_trained_model_data() -> list:
                     "f1_score": data[5],
                     "version": data[6],
                     "base_model": None,
-                    "best_params": None
+                    "best_params": None,
+                    "batch_id": data[7]
             })
     
     return model_data

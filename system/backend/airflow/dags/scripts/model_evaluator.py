@@ -69,7 +69,6 @@ def compare_model_performance(base_performance, evaluated_performance):
 
 def update_accuracy_drift(model_info, performance_drift):
 
-    print(type(performance_drift["precision"]))
     with database_engine().connect() as connection:
         connection.execute(
             text(

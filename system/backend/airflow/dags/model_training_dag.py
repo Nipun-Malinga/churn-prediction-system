@@ -13,12 +13,19 @@ from scripts.model_trainer import deploy_models, train_model
 from scripts.utils import fetch_training_data, update_model_info
 
 default_args = {
-    'owner': 'churn-pred-server',
-    'retries': 5,
-    'retry_delay': timedelta(minutes=10)
+    "owner": "churn-prediction-server",
+    "retries": 5,
+    "retry_delay": timedelta(minutes=10)
 }
 
-@dag(dag_id='Model_Training_DAG', default_args=default_args, start_date=days_ago(1), schedule_interval="@once")
+@dag(
+    dag_display_name="Model Training DAG",
+    dag_id="model_training_dag", 
+    default_args=default_args,
+    start_date=days_ago(1), 
+    schedule_interval="@once",
+    description="Train machine learning models"
+)
 def model_trainer():
     @task(multiple_outputs=True)
     def fetching_training_data() -> Dict[str, pd.DataFrame]:
@@ -99,9 +106,7 @@ def model_trainer():
     """ Dependencies """
 
     training_data >> short_circuit >> preprocessed_data
-    
-    preprocessed_data >> deploying_processing_models(preprocessed_data["data_transformer_list"])
-    
+       
     preprocessed_data >> trained_models
     
     trained_models >> evaluation_data
@@ -110,6 +115,8 @@ def model_trainer():
         evaluation_data["model_evaluation_list"], 
         preprocessed_data["data_transformer_list"]
     )
+    
+    trained_models >> deploying_processing_models(preprocessed_data["data_transformer_list"])
     
     trained_models >> deploying_ml_models(trained_models["model_list"])
 
