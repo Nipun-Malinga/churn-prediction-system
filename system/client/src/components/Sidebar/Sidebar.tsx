@@ -4,7 +4,7 @@ import NavButton from '../NavButton';
 
 const Sidebar = () => {
   return (
-    <VStack background='white' height='100vh' padding={5}>
+    <VStack background='white' height='100%' padding={5} position={'fixed'}>
       {navLinks
         .filter((link) => link.isMain)
         .map((link, id) => (

@@ -76,26 +76,28 @@ const Model = () => {
           </MainContainer>
         </GridItem>
         <GridItem colSpan={2}>
-          {data && (
-            <SimpleGrid columns={{ base: 1, md: 2 }} gap={'1rem'}>
-              <PerformanceCard
-                value={Number((data.data.accuracy * 100).toFixed(2))}
-                title='Accuracy'
-              ></PerformanceCard>
-              <PerformanceCard
-                value={Number((data.data?.precision * 100).toFixed(2))}
-                title='Precision'
-              ></PerformanceCard>
-              <PerformanceCard
-                value={Number((data.data?.recall * 100).toFixed(2))}
-                title='Recall'
-              ></PerformanceCard>
-              <PerformanceCard
-                value={Number((data.data?.f1_score * 100).toFixed(2))}
-                title='F1 Score'
-              ></PerformanceCard>
-            </SimpleGrid>
-          )}
+          <MainContainer title='Current Model Performance' modeSelectorVisible={false}>
+            {data && (
+              <SimpleGrid width={'100%'} columns={{ base: 1, md: 2 }} gap={'1rem'}>
+                <PerformanceCard
+                  value={Number((data.data.accuracy * 100).toFixed(2))}
+                  title='Accuracy'
+                ></PerformanceCard>
+                <PerformanceCard
+                  value={Number((data.data?.precision * 100).toFixed(2))}
+                  title='Precision'
+                ></PerformanceCard>
+                <PerformanceCard
+                  value={Number((data.data?.recall * 100).toFixed(2))}
+                  title='Recall'
+                ></PerformanceCard>
+                <PerformanceCard
+                  value={Number((data.data?.f1_score * 100).toFixed(2))}
+                  title='F1 Score'
+                ></PerformanceCard>
+              </SimpleGrid>
+            )}
+          </MainContainer>
         </GridItem>
       </SimpleGrid>
     </>

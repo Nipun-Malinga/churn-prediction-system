@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import ChartContainer from '../ChartContainer';
 
 interface Props {
   performanceHistory: PerformanceDataPoint[];
@@ -17,7 +18,7 @@ interface Props {
 
 const PerformanceChart = ({ performanceHistory }: Props) => {
   return (
-    <ResponsiveContainer width='100%' height={400}>
+    <ChartContainer>
       <ComposedChart data={performanceHistory}>
         <CartesianGrid strokeDasharray='3 3' />
         <XAxis
@@ -43,7 +44,7 @@ const PerformanceChart = ({ performanceHistory }: Props) => {
           activeDot={{ r: 6 }}
         />
       </ComposedChart>
-    </ResponsiveContainer>
+    </ChartContainer>
   );
 };
 

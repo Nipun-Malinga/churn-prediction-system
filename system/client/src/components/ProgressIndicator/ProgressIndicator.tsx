@@ -38,7 +38,7 @@ const ProgressIndicator = ({ value }: Props) => {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          fontSize: '24px',
+          fontSize: '1.25rem',
           fontWeight: 'bold',
           color: '#004D40',
         }}

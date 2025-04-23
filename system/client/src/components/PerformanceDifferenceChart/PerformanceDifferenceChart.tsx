@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
+import ChartContainer from '../ChartContainer';
 
 /* Build a separate API endpoint 
    for performance difference chart
@@ -48,7 +49,7 @@ const PerformanceDifferenceChart = ({
   ];
 
   return (
-    <ResponsiveContainer width='100%' height={400}>
+    <ChartContainer>
       <RadarChart cx='50%' cy='50%' outerRadius='80%' data={data}>
         <PolarGrid />
         <PolarAngleAxis dataKey='subject' />
@@ -63,7 +64,7 @@ const PerformanceDifferenceChart = ({
           fillOpacity={0.5}
         />
       </RadarChart>
-    </ResponsiveContainer>
+    </ChartContainer>
   );
 };
 
