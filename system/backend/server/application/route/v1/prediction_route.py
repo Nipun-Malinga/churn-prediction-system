@@ -16,6 +16,7 @@ service = Prediction_Service()
 @jwt_required()
 def predict():
     schema = Prediction_Request_Schema()
+     
     try:
         request_data = schema.load(request.json)
          

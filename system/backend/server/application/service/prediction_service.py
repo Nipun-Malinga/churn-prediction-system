@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 from application.util import (fetch_ml_models, fetch_preprocessing_models,
                               json_data_preprocessor, make_prediction)
 
@@ -14,7 +14,7 @@ class Prediction_Service:
             return  make_prediction(preprocessed_data)   
         except SQLAlchemyError as ex:
             raise             
-        except FileNotFoundError as ex:
+        except NoResultFound as ex:
             raise
         except ValueError as ex:
             raise ValueError(
