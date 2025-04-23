@@ -1,5 +1,5 @@
 import DataImbalanceChart from '@/components/DataImbalanceChart';
-import InfoCard from '@/components/InfoCard/InfoCard';
+import InfoCard from '@/components/InfoCard';
 import MainContainer from '@/components/MainContainer';
 import useBasicDatasetInfo from '@/hooks/useBasicDatasetInfo';
 import { GridItem, SimpleGrid, Text } from '@chakra-ui/react';

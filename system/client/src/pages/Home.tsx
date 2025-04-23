@@ -1,5 +1,5 @@
 import CardContainer from '@/components/CardContainer';
-import InfoCard from '@/components/InfoCard/InfoCard';
+import InfoCard from '@/components/InfoCard';
 import MainContainer from '@/components/MainContainer';
 import PerformanceChart from '@/components/PerformanceChart';
 import PerformanceDriftChart from '@/components/PerformanceDriftChart';
