@@ -17,6 +17,7 @@ const Layout = () => {
           base: '1fr',
           lg: '250px 1fr',
         }}
+        height={'100vh'}
       >
         <Show when={isDesktop}>
           <GridItem area={'aside'}>
