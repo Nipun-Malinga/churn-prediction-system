@@ -31,15 +31,44 @@ const Model = () => {
       >
         {modelName}
       </Text>
+      <MainContainer title='Current Model Performance' modeSelectorVisible={false}>
+        {data && (
+          <SimpleGrid width={'100%'} columns={{ base: 1, md: 4 }} gap={'1rem'}>
+            <PerformanceCard
+              value={Number((data.data.accuracy * 100).toFixed(2))}
+              title='Accuracy'
+            ></PerformanceCard>
+            <PerformanceCard
+              value={Number((data.data?.precision * 100).toFixed(2))}
+              title='Precision'
+            ></PerformanceCard>
+            <PerformanceCard
+              value={Number((data.data?.recall * 100).toFixed(2))}
+              title='Recall'
+            ></PerformanceCard>
+            <PerformanceCard
+              value={Number((data.data?.f1_score * 100).toFixed(2))}
+              title='F1 Score'
+            ></PerformanceCard>
+          </SimpleGrid>
+        )}
+      </MainContainer>
       <SimpleGrid
         width={'100%'}
         columns={{
           base: 1,
-          md: 3,
+          md: 4,
         }}
         gap={'1rem'}
       >
-        <GridItem width={'100%'}>
+        <GridItem colSpan={{ md: 4 }}>
+          <MainContainer modeSelectorVisible={true}>
+            {performanceHistoryData?.data && (
+              <PerformanceChart performanceHistory={performanceHistoryData?.data} />
+            )}
+          </MainContainer>
+        </GridItem>
+        <GridItem width={'100%'} colSpan={{ md: 2 }}>
           <ConfusionMatrix
             tp={data?.data.TP ? data?.data.TP : 0}
             tn={data?.data.TN ? data?.data.TN : 0}
@@ -48,23 +77,6 @@ const Model = () => {
           />
         </GridItem>
         <GridItem colSpan={{ md: 2 }} width={'100%'}>
-          <MainContainer modeSelectorVisible={true}>
-            {performanceHistoryData?.data && (
-              <PerformanceChart performanceHistory={performanceHistoryData?.data} />
-            )}
-          </MainContainer>
-        </GridItem>
-      </SimpleGrid>
-
-      <SimpleGrid
-        width={'100%'}
-        columns={{
-          base: 1,
-          md: 3,
-        }}
-        gap={{ md: '1rem' }}
-      >
-        <GridItem>
           <MainContainer title='Performance Difference' modeSelectorVisible={false}>
             {baseModelInfo?.data && data?.data && (
               <PerformanceDifferenceChart
@@ -72,30 +84,6 @@ const Model = () => {
                 currentModelData={data?.data}
                 baseModelData={baseModelInfo?.data}
               />
-            )}
-          </MainContainer>
-        </GridItem>
-        <GridItem colSpan={2}>
-          <MainContainer title='Current Model Performance' modeSelectorVisible={false}>
-            {data && (
-              <SimpleGrid width={'100%'} columns={{ base: 1, md: 2 }} gap={'1rem'}>
-                <PerformanceCard
-                  value={Number((data.data.accuracy * 100).toFixed(2))}
-                  title='Accuracy'
-                ></PerformanceCard>
-                <PerformanceCard
-                  value={Number((data.data?.precision * 100).toFixed(2))}
-                  title='Precision'
-                ></PerformanceCard>
-                <PerformanceCard
-                  value={Number((data.data?.recall * 100).toFixed(2))}
-                  title='Recall'
-                ></PerformanceCard>
-                <PerformanceCard
-                  value={Number((data.data?.f1_score * 100).toFixed(2))}
-                  title='F1 Score'
-                ></PerformanceCard>
-              </SimpleGrid>
             )}
           </MainContainer>
         </GridItem>
