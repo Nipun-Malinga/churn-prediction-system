@@ -4,8 +4,7 @@ import { Button, HStack, Popover, Portal } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { FaRegBell } from 'react-icons/fa6';
 import { IoMdMenu } from 'react-icons/io';
-import NotificationBar from '../NotificationButton';
-
+import NotificationBar from '../NotificationBar';
 
 const NavBar = () => {
   const { data } = useTrainedModels();

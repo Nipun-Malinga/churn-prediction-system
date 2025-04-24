@@ -1,15 +1,17 @@
 import CardContainer from '@/components/CardContainer';
 import InfoCard from '@/components/InfoCard';
 import MainContainer from '@/components/MainContainer';
+import NotificationBar from '@/components/NotificationBar';
 import PerformanceChart from '@/components/PerformanceChart';
 import PerformanceDriftChart from '@/components/PerformanceDriftChart';
 import SystemOption from '@/components/SystemOption';
 import SystemOptionContainer from '@/components/SystemOptionContainer';
+import useDagRun from '@/hooks/useDagRun';
 import { useBasicModelInfo } from '@/hooks/useModelInfo';
 import usePerformanceDriftHistory from '@/hooks/usePerformanceDriftHistory';
 import usePerformanceHistory from '@/hooks/usePerformanceHistory';
 import useSelectedModeStore from '@/store/useSelectedModeStore';
-import { Box, SimpleGrid, Text } from '@chakra-ui/react';
+import { Box, SimpleGrid, Text, VisuallyHidden } from '@chakra-ui/react';
 import { IoDownloadOutline } from 'react-icons/io5';
 import { LuBrainCircuit } from 'react-icons/lu';
 import { TbRefresh } from 'react-icons/tb';
@@ -22,8 +24,19 @@ const Home = () => {
   const { data: performanceHistoryData } = usePerformanceHistory(4, selectedMode);
   const { data: performanceDriftHistoryData } = usePerformanceDriftHistory();
 
+  const { mutate, isSuccess } = useDagRun();
+
+  const handleModelRetrainRun = () => {
+    mutate({
+      dag_id: 'model_evaluating_dag',
+    });
+  };
+
   return (
     <>
+      <Box width={'100%'} hidden={!isSuccess}>
+        <NotificationBar notification='Model Training In Progress' type='info' />
+      </Box>
       <Text
         fontSize={{
           base: '1rem',
@@ -59,7 +72,7 @@ const Home = () => {
           <SystemOption
             icon={TbRefresh}
             description='System Retrain'
-            onClick={() => console.log('Hello')}
+            onClick={() => handleModelRetrainRun()}
           ></SystemOption>
           <SystemOption
             icon={IoDownloadOutline}
