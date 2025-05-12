@@ -2,8 +2,9 @@ import { FetchListResponse, FetchResponse } from '@/models/FetchResponse';
 import axios, { AxiosRequestConfig } from 'axios';
 
 /* Store the JWT token in local storage */
+/* Add type safety for the incoming response separately */
 const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0NDM5NjU3MywianRpIjoiMzdjMWRhM2ItMDkxYy00MjkxLWJjNTktNGExN2ZiNWYwNzg2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IntcInVzZXJfaWQ6XCI6IDF9IiwibmJmIjoxNzQ0Mzk2NTczLCJjc3JmIjoiZWE5Y2Q2NDMtMjNlMS00MmE1LWJiODEtODE2NjQ4YzY0MDAzIiwiZXhwIjoxNzQ2OTg4NTczLCJlbWFpbCI6Im5pcHVubWFsaW5nYUBnbWFpbC5jb20ifQ.STbFZ21cRlSun8QrpHOT_B4vYX5mMm4fixclDVCkKHI';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0Njk5MDk4NiwianRpIjoiYTk2YTBjMGEtYWY3MS00NjgwLTg4NzAtZWVjMTIzYjI2NGJmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IntcInVzZXJfaWQ6XCI6IDF9IiwibmJmIjoxNzQ2OTkwOTg2LCJjc3JmIjoiNjAxY2I3ZWMtYTVmMi00ZTE1LWFkOWMtZTBiMmZiNmZjMmFiIiwiZXhwIjoxNzQ5NTgyOTg2LCJlbWFpbCI6Im5pcHVubWFsaW5nYUBnbWFpbC5jb20ifQ.dgnwd5RQ2Vunw08gDR8q8PQk3YihiueNSlzeiRGA6DA';
 
 const axiosInstance = axios.create({
   baseURL: 'http://127.0.0.1:5000/api',
@@ -11,7 +12,7 @@ const axiosInstance = axios.create({
     Authorization: `Bearer ${token}`,
   },
 });
-class APIClient<T> {
+class APIClient<T, R = T> {
   private endpoint;
 
   constructor(endpoint: string) {
@@ -29,7 +30,7 @@ class APIClient<T> {
   };
 
   post = async (requestConfig?: AxiosRequestConfig, data?: T) => {
-    const resp = await axiosInstance.post<FetchResponse<T>>(this.endpoint, data, requestConfig);
+    const resp = await axiosInstance.post<FetchResponse<R>>(this.endpoint, data, requestConfig);
     return resp.data;
   };
 
