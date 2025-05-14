@@ -34,7 +34,7 @@ def train_model(X_train, y_train):
             param_distributions=params, 
             n_iter=n_tier, 
             cv=cv, 
-            scoring='f1', 
+            scoring='accuracy', 
             n_jobs=-1, 
             random_state=42
         )
@@ -70,7 +70,7 @@ def train_model(X_train, y_train):
         'n_estimators': randint(100, 600),
     }
 
-    XGM_random_searched = perform_random_search(XGM, params_XG, 40)
+    XGM_random_searched = perform_random_search(XGM, params_XG, 30)
     XGM_best_params = XGM_random_searched.best_params_
 
     XGM_version = save_model_file("XGBOOST", XGM_random_searched)
@@ -105,7 +105,7 @@ def train_model(X_train, y_train):
         'n_estimators': randint(100, 600),
     }
 
-    RF_random_searched = perform_random_search(RF, params_RF, 40, 10)
+    RF_random_searched = perform_random_search(RF, params_RF, 20, 10)
     RF_best_params = RF_random_searched.best_params_
     
     RF_version = save_model_file("RF", RF_random_searched)
@@ -114,16 +114,30 @@ def train_model(X_train, y_train):
     """
     VOTING CLASSIFIER
     """
+    XGM_best_model = XGM_random_searched.best_estimator_
+    LGBM_best_model = LGBM_random_searched.best_estimator_
+    RF_best_model = RF_random_searched.best_estimator_
     voting_classifier = VotingClassifier(
-        estimators=[
-            ('xg', XGM_random_searched), 
-            ('lgb', LGBM_random_searched), 
-            ('rf', RF_random_searched)], voting='soft').fit(X_train, y_train)
+    estimators=[
+        ('xg', XGM_best_model), 
+        ('lgb', LGBM_best_model), 
+        ('rf', RF_best_model)
+    ],
+    voting='soft'
+    ).fit(X_train, y_train)
     
     voting_classifier_version = save_model_file("VOTING_Classifier", voting_classifier)
     
     #TODO: Create a output template
     return [
+        {
+            "model":voting_classifier, 
+            "name":"VOTING CLASSIFIER",
+            "version": voting_classifier_version, 
+            "base_model": True,
+            "best_params": {},
+            "batch_id": batch_id
+        },
         {
             "model":XGM_random_searched, 
             "name":"XGBOOST", 
@@ -146,14 +160,6 @@ def train_model(X_train, y_train):
             "version": RF_version, 
             "base_model": False,
             "best_params": RF_best_params,
-            "batch_id": batch_id
-        }, 
-        {
-            "model":voting_classifier, 
-            "name":"VOTING CLASSIFIER",
-            "version": voting_classifier_version, 
-            "base_model": True,
-            "best_params": {},
             "batch_id": batch_id
         }
     ]
