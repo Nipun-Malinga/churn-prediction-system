@@ -21,7 +21,7 @@ const Home = () => {
   const { selectedMode } = useSelectedModeStore();
 
   const { data: basicModelData } = useBasicModelInfo();
-  const { data: performanceHistoryData } = usePerformanceHistory(4, selectedMode);
+  const { data: performanceHistoryData } = usePerformanceHistory(1, selectedMode);
   const { data: performanceDriftHistoryData } = usePerformanceDriftHistory();
 
   const { mutate, isSuccess } = useDagRun();

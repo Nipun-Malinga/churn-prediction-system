@@ -36,12 +36,14 @@ def model_trainer():
 
     @task(multiple_outputs=True)
     def preprocessing_data(dataset: pd.DataFrame) -> Dict[str, Union[np.array, list]]:
-        X_train, X_test, y_train, y_test, data_transformer_list = preprocess_dataset(dataset)
+        X_train, X_test, X_cal, y_train, y_test, y_cal, data_transformer_list = preprocess_dataset(dataset)
         return {
             "X_train": X_train, 
-            "X_test": X_test, 
+            "X_test": X_test,
+            "X_cal": X_cal,
             "y_train": y_train, 
             "y_test": y_test,
+            "y_cal": y_cal,
             "data_transformer_list": data_transformer_list
         }
     
@@ -50,8 +52,8 @@ def model_trainer():
         deploy_preprocessing_models(data_transformer_list)
     
     @task(multiple_outputs=True)
-    def training_ml_model(X_train: np.array, y_train: np.array) -> Dict[str, list]:
-        model_list = train_model(X_train, y_train)
+    def training_ml_model(X_train: np.array, X_cal:np.array, y_train: np.array, y_cal:np.array) -> Dict[str, list]:
+        model_list = train_model(X_train, X_cal, y_train, y_cal)
         return {
             "model_list": model_list
         }
@@ -79,7 +81,9 @@ def model_trainer():
     
     trained_models = training_ml_model(
         preprocessed_data["X_train"], 
-        preprocessed_data["y_train"]
+        preprocessed_data["X_cal"], 
+        preprocessed_data["y_train"],
+        preprocessed_data["y_cal"]
     )
     
     evaluation_data = evaluating_model_performance(

@@ -9,7 +9,7 @@ from pandas.api.types import is_numeric_dtype, is_object_dtype
 from scripts import database_engine
 from scripts.utils import remove_models, upload_to_gcs
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OneHotEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 from sqlalchemy import text
 
 ABS_DIR = dirname(abspath(__file__))
@@ -19,6 +19,8 @@ DATA_TRANSFORMER_PATHS = {
     "non_versioned": join(BASE_DIR, "data_transformers/non_versioned/"),
     "versioned": join(BASE_DIR, "data_transformers/versioned/"),
 }
+
+random_state = 42
 
 def preprocess_dataset(dataset):
     # Store the data transformers
@@ -157,25 +159,26 @@ def preprocess_dataset(dataset):
 
         return overSampled_X, overSampled_y  
 
-    def scale_features(X_train, X_test):
-        scaler = MinMaxScaler()
+    def scale_features(X_train, X_test, X_cal):
+        scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train)
         X_test_scaled = scaler.transform(X_test)
+        X_cal_scaled = scaler.transform(X_cal)
 
         # Export scaler
         joblib.dump(scaler, join(DATA_TRANSFORMER_PATHS["non_versioned"], "minMax_scaler.pkl"))
 
         # Versioning the scaler
-        minmax_scaler_version = f"minMax_scaler_V{str(uuid.uuid4())[:8]}.pkl"
+        minmax_scaler_version = f"standard_scaler_V{str(uuid.uuid4())[:8]}.pkl"
 
         # Exporting versioned scaler
         joblib.dump(scaler, join(DATA_TRANSFORMER_PATHS["versioned"], minmax_scaler_version))
         
         data_transformer_list.append(
-            {"transformer_name": "Min Max Scaler", "version": minmax_scaler_version}
+            {"transformer_name": "Standard Scaler", "version": minmax_scaler_version}
         )
 
-        return X_train_scaled, X_test_scaled
+        return X_train_scaled, X_test_scaled, X_cal_scaled
 
     dataset = dataset.drop(columns=["id", "added_date"])
 
@@ -203,16 +206,19 @@ def preprocess_dataset(dataset):
     # Splitting the dataset into X and y
     X, y = split_dataset_to_X_y(dataset)
 
-    # Generating synthetic data using SMOTE
-    X, y = handle_class_imbalance(X, y)
-
     # Splitting the dataset into training and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
+    X_temp, X_test, y_temp, y_test = train_test_split(X, y, test_size=0.20, random_state=random_state)
+    
+    # Splitting the dataset into training and test sets
+    X_train, X_cal, y_train, y_cal = train_test_split(X_temp, y_temp, test_size=0.20, random_state=random_state)
+    
+    # Generating synthetic data using SMOTE
+    X_train, y_train  = handle_class_imbalance(X_train, y_train)
 
     # Feature scaling using min max scaler
-    X_train, X_test = scale_features(X_train, X_test)
+    X_train, X_test, X_cal = scale_features(X_train, X_test, X_cal)
 
-    return X_train, X_test, y_train, y_test, data_transformer_list
+    return X_train, X_test, X_cal, y_train, y_test, y_cal, data_transformer_list
 
 # FIXME: Fix the preprocessing failure due to untrained data
 def preprocess_evaluation_data(dataset):
@@ -307,4 +313,8 @@ def deploy_preprocessing_models(data_transformer_list):
     
     for data_transformer in data_transformer_list:
         encoder_version = data_transformer["version"]
-        upload_to_gcs("churn_prediction_model_storage", join(DATA_TRANSFORMER_PATHS["versioned"], encoder_version), f"data_transformers/{encoder_version}")
+        upload_to_gcs(
+            "churn_prediction_model_storage", 
+            join(DATA_TRANSFORMER_PATHS["versioned"], encoder_version), 
+            f"data_transformers/{encoder_version}"
+        )

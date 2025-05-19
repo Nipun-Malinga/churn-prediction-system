@@ -3,6 +3,7 @@ import warnings
 from os.path import abspath, dirname, join
 
 import joblib
+from sklearn.calibration import CalibratedClassifierCV
 from imblearn.over_sampling import SMOTENC
 from lightgbm import LGBMClassifier
 from scipy.stats import randint, uniform
@@ -23,20 +24,21 @@ ML_MODEL_PATHS = {
     "versioned": join(BASE_DIR, "ml_models/versioned/"),
 }
 
-def train_model(X_train, y_train):
+random_state:int = 42
+
+def train_model(X_train, X_cal, y_train, y_cal):
     
     # Use to identify model batch
     batch_id = str(uuid.uuid4())[:8]
 
-    def perform_random_search(model, params, n_tier=20, cv=5):
+    def perform_random_search(model, params, n_tier, cv, X_train, y_train):
         random_search = RandomizedSearchCV(
             model, 
             param_distributions=params, 
             n_iter=n_tier, 
             cv=cv, 
-            scoring='accuracy', 
-            n_jobs=-1, 
-            random_state=42
+            scoring='roc_auc', 
+            n_jobs=-1
         )
         return random_search.fit(X_train, y_train)
     
@@ -64,34 +66,35 @@ def train_model(X_train, y_train):
     )
 
     params_XG = {
-        'max_depth': randint(2, 8),
-        'reg_alpha': uniform(0.01, 1),
-        'reg_lambda': uniform(0.01, 10),
-        'n_estimators': randint(100, 600),
+    'max_depth': randint(3, 20),
+    'learning_rate': uniform(0.01, 0.3),
+    'subsample': uniform(0.6, 0.4),
+    'colsample_bytree': uniform(0.6, 0.4),
+    'reg_alpha': uniform(0.01, 1),
+    'reg_lambda': uniform(0.01, 10),
+    'n_estimators': randint(100, 800)
     }
 
-    XGM_random_searched = perform_random_search(XGM, params_XG, 30)
+    XGM_random_searched = perform_random_search(XGM, params_XG, 40, 5, X_train, y_train)
     XGM_best_params = XGM_random_searched.best_params_
-
-    XGM_version = save_model_file("XGBOOST", XGM_random_searched)
 
 
     """
     LIGHTGBM
     """
-    LGB = LGBMClassifier()
+    LGB = LGBMClassifier(objective='binary', random_state=random_state)
 
     params_LGB = {
         'learning_rate': uniform(0.01, 1),
         'max_depth': randint(2, 20),
-        'num_leaves': randint(20, 60),
-        'n_estimators': randint(100, 600),
+        'num_leaves': randint(10,20),
+        'n_estimators': randint(100, 1000),
+        'reg_alpha': uniform(0.01, 1),
+        'reg_lambda': uniform(0.01, 10),
     }
-
-    LGBM_random_searched = perform_random_search(LGB, params_LGB, 40, 10)
-    LGBM_best_params = LGBM_random_searched.best_params_
     
-    LGBM_version = save_model_file("LIGHTGBM", LGBM_random_searched)
+    LGBM_random_searched = perform_random_search(LGB, params_LGB, 40, 5, X_train, y_train)
+    LGBM_best_params = LGBM_random_searched.best_params_
     
     
     """
@@ -102,31 +105,53 @@ def train_model(X_train, y_train):
     params_RF = {
         'max_depth': randint(3, 20),
         'min_samples_split': randint(2, 20),
-        'n_estimators': randint(100, 600),
-    }
+        'n_estimators': randint(100, 1000),
+    } 
 
-    RF_random_searched = perform_random_search(RF, params_RF, 20, 10)
+    RF_random_searched = perform_random_search(RF, params_RF, 40, 5, X_train, y_train)
     RF_best_params = RF_random_searched.best_params_
+
     
-    RF_version = save_model_file("RF", RF_random_searched)
+    """
+    Calibrating Models
+    """
+    XGM_best_estimator = XGM_random_searched.best_estimator_
+    calibrated_xgb = CalibratedClassifierCV(XGM_best_estimator, method='sigmoid')
+    calibrated_xgb.fit(X_cal, y_cal)
+    
+    
+    LGBM_best_estimator  = LGBM_random_searched.best_estimator_
+    calibrated_LGB = CalibratedClassifierCV(LGBM_best_estimator, method='sigmoid')
+    calibrated_LGB.fit(X_cal, y_cal)
+    
+    
+    RF_best_estimator = RF_random_searched.best_estimator_
+    calibrated_RF = CalibratedClassifierCV(RF_best_estimator, method='sigmoid')
+    calibrated_RF.fit(X_cal, y_cal)
+    
+    """
+    Saving Models
+    """
+    LGBM_version = save_model_file("LIGHTGBM", calibrated_LGB)
+    RF_version = save_model_file("RF", calibrated_RF)
+    XGM_version = save_model_file("XGBOOST", calibrated_xgb)
     
     
     """
     VOTING CLASSIFIER
     """
-    XGM_best_model = XGM_random_searched.best_estimator_
-    LGBM_best_model = LGBM_random_searched.best_estimator_
-    RF_best_model = RF_random_searched.best_estimator_
+    
     voting_classifier = VotingClassifier(
     estimators=[
-        ('xg', XGM_best_model), 
-        ('lgb', LGBM_best_model), 
-        ('rf', RF_best_model)
-    ],
-    voting='soft'
+        ('xg', calibrated_xgb), 
+        ('lgb', calibrated_LGB), 
+        ('rf', calibrated_RF)
+        ], 
+    voting='soft', 
+    weights=[3, 1, 2]
     ).fit(X_train, y_train)
     
-    voting_classifier_version = save_model_file("VOTING_Classifier", voting_classifier)
+    voting_classifier_version = save_model_file("Voting_Classifier", voting_classifier)
     
     #TODO: Create a output template
     return [

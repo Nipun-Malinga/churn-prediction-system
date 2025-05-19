@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any, Dict, List
 
 from scripts import database_engine
 from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
@@ -6,11 +7,18 @@ from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
 from sqlalchemy import text
 
 
-def evaluate_model(model_list: list, X_test, y_test):
+def evaluate_model(model_list: List[Dict[str, Any]], X_test, y_test, threshold: float = 0.3):
     model_evaluation_list = []
-     
+    
     for model in model_list:
-        y_pred = model["model"].predict(X_test)
+        if model.get("base_model", False):
+            y_pred_proba = model["model"].predict_proba(X_test)[:, 1]
+            y_pred = (y_pred_proba >= threshold).astype(int)
+            threshold_used = threshold
+        else:
+            y_pred = model["model"].predict(X_test)
+            threshold_used = 0.5
+
         tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
 
         model_evaluation_list.append({
@@ -26,10 +34,12 @@ def evaluate_model(model_list: list, X_test, y_test):
             "version_name": model["version"],
             "base_model": model["base_model"],
             "best_params": model["best_params"],
-            "batch_id": model["batch_id"]
+            "batch_id": model["batch_id"],
+            "threshold_used": threshold_used
         })
 
     return model_evaluation_list
+
 
 def fetch_drift_thresholds_from_db():
     """
