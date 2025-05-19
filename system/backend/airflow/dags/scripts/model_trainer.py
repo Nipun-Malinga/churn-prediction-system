@@ -156,7 +156,6 @@ def train_model(X_train, X_cal, y_train, y_cal):
     #TODO: Create a output template
     return [
         {
-            "model":voting_classifier, 
             "name":"VOTING CLASSIFIER",
             "version": voting_classifier_version, 
             "base_model": True,
@@ -164,7 +163,6 @@ def train_model(X_train, X_cal, y_train, y_cal):
             "batch_id": batch_id
         },
         {
-            "model":XGM_random_searched, 
             "name":"XGBOOST", 
             "version": XGM_version, 
             "base_model": False,
@@ -172,7 +170,6 @@ def train_model(X_train, X_cal, y_train, y_cal):
             "batch_id": batch_id
         }, 
         {
-            "model":LGBM_random_searched,
             "name":"LIGHTGBM",
             "version": LGBM_version, 
             "base_model": False,
@@ -180,7 +177,6 @@ def train_model(X_train, X_cal, y_train, y_cal):
             "batch_id": batch_id
         }, 
         {
-            "model":RF_random_searched, 
             "name":"RANDOM FOREST",
             "version": RF_version, 
             "base_model": False,

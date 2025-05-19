@@ -1,22 +1,39 @@
 from datetime import datetime
+import os
+from os.path import abspath, dirname, join
 from typing import Any, Dict, List
 
+import joblib
 from scripts import database_engine
 from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
                              precision_score, recall_score)
 from sqlalchemy import text
+
+ABS_DIR = dirname(abspath(__file__))
+BASE_DIR = join(ABS_DIR, "trained_models/") 
+
+ML_MODEL_PATHS = {
+    "versioned": join(BASE_DIR, "ml_models/versioned/"),
+}
 
 
 def evaluate_model(model_list: List[Dict[str, Any]], X_test, y_test, threshold: float = 0.3):
     model_evaluation_list = []
     
     for model in model_list:
-        if model.get("base_model", False):
-            y_pred_proba = model["model"].predict_proba(X_test)[:, 1]
+        
+        model_path = join(ML_MODEL_PATHS["versioned"], model["version"])
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model not found at path: {model_path}")
+        
+        ml_model = joblib.load(model_path)
+
+        if model["base_model"]:
+            y_pred_proba = ml_model.predict_proba(X_test)[:, 1]
             y_pred = (y_pred_proba >= threshold).astype(int)
             threshold_used = threshold
         else:
-            y_pred = model["model"].predict(X_test)
+            y_pred = ml_model.predict(X_test)
             threshold_used = 0.5
 
         tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
