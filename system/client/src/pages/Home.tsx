@@ -44,7 +44,7 @@ const Home = () => {
               subtitle={model.name}
               icon={LuBrainCircuit}
               date={model.updated_date}
-              link={`/model/${model.name}/${model.id}`}
+              link={`/dashboard/model/${model.name}/${model.id}`}
               linkIcon={TbRefresh}
               color={model.base_model ? '#FEC53D' : '#5893FF'}
             />
@@ -55,8 +55,7 @@ const Home = () => {
           base: 'center',
           md: 'flex-end',
         }}
-      >
-      </Box>
+      ></Box>
 
       <SimpleGrid
         columns={{

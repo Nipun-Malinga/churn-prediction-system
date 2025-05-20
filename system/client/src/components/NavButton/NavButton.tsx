@@ -14,7 +14,10 @@ const NavButton = ({ children }: Props) => {
     navigate(endpoint);
   };
 
-  const isLocation = location.pathname == children.navigateTo;
+  const isLocation =
+    location.pathname === children.navigateTo ||
+    location.pathname.startsWith(`${children.navigateTo}/`);
+
   const buttonColors: ButtonProps = {
     background: isLocation ? '#4880FF' : '#fff',
     color: isLocation ? '#fff' : '#000',

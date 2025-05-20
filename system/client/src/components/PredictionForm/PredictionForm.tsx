@@ -50,7 +50,7 @@ const PredictionForm = () => {
               <SimpleGrid columns={2} gap={'1rem'} width={'100%'} justifyContent={'space-between'}>
                 {formInputs.map((input, key) => (
                   <Field.Root key={key}>
-                    <Field.Label color={'#9fafb8'}>{input.title}</Field.Label>
+                    <Field.Label color={'#494f52'}>{input.title}</Field.Label>
                     <Input {...register(input.name as keyof FormData)} name={input.name} />
                     {errors[input.name as keyof FormData] && (
                       <Box color='red' fontSize='sm'>
@@ -64,13 +64,13 @@ const PredictionForm = () => {
               <HStack wrap='wrap' justifyContent='center'>
                 {selectionData.map((data, key) => (
                   <Field.Root key={key} width={{ base: '100%', sm: '48%', md: '23%' }}>
-                    <Field.Label color='#9fafb8'>{data.title}</Field.Label>
+                    <Field.Label color='#494f52'>{data.title}</Field.Label>
 
                     <NativeSelect.Root>
                       <NativeSelect.Field
                         {...register(data.name as keyof FormData)}
                         name={data.name}
-                        color='#cfcfcf'
+                        color='#838c91'
                         defaultValue=''
                       >
                         <option value='' disabled>{`Select ${data.title}`}</option>

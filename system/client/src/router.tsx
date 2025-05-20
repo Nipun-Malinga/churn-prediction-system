@@ -14,6 +14,11 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <Home /> },
+      { path: '/dashboard', element: <Home /> },
+      {
+        path: 'dashboard/model/:model/:id',
+        element: <Model />,
+      },
       { path: '/signin', element: <SignIn /> },
       { path: '/model/:model/:id', element: <Model /> },
       { path: '/predict', element: <Prediction /> },

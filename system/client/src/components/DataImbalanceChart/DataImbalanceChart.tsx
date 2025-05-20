@@ -42,8 +42,8 @@ const DataImbalanceChart = ({ classImbalance }: Props) => {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Bar dataKey='churned' fill='#8884d8' />
-        <Bar dataKey='notChurned' fill='#82ca9d' />
+        <Bar name='Churned' dataKey='churned' fill='#8884d8' />
+        <Bar name='Not Churned' dataKey='notChurned' fill='#82ca9d' />
       </BarChart>
     </ResponsiveContainer>
   );
