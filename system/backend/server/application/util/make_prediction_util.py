@@ -27,10 +27,11 @@ def make_prediction(preprocessed_data):
                
         voting_classifier = joblib.load(join(ML_MODEL_PATH, f"{result[0]}.pkl"))
 
-        prediction = voting_classifier.predict(preprocessed_data).tolist()
-        probability = voting_classifier.predict_proba(preprocessed_data).tolist()
+        y_pred_proba = voting_classifier.predict_proba(preprocessed_data)
+        positive_class_proba = y_pred_proba[:, 1]
+        prediction = (positive_class_proba >= 0.3).astype(int)
 
-        return prediction, probability  
+        return prediction.tolist(), positive_class_proba.tolist()
       
     except NoResultFound as ex:
         raise NoResultFound("Currently there are no trained models available.")          
