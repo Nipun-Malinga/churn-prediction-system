@@ -25,12 +25,7 @@ const Configuration = () => {
   return (
     <>
       <SimpleGrid columns={2} width={'100%'} gap={'1rem'}>
-        <GridItem colSpan={2} borderRadius={'1rem'} overflow={'hidden'}>
-          <MainContainer title='Dag Information' modeSelectorVisible={false}>
-            <DagInfoTable />
-          </MainContainer>
-        </GridItem>
-        <GridItem colSpan={{ base: 2, md: 1 }}>
+        <GridItem colSpan={{ base: 2, md: 2 }}>
           {data?.data && (
             <MainContainer title='New Trained Model' modeSelectorVisible={false}>
               <TrainedModelCard
@@ -39,6 +34,11 @@ const Configuration = () => {
               />
             </MainContainer>
           )}
+        </GridItem>
+        <GridItem colSpan={2} borderRadius={'1rem'} overflow={'hidden'}>
+          <MainContainer title='Dag Information' modeSelectorVisible={false}>
+            <DagInfoTable />
+          </MainContainer>
         </GridItem>
       </SimpleGrid>
     </>
