@@ -93,7 +93,7 @@ const selectionData = [
     name: 'loan',
     data: [
       { key: 'Yes', value: 'yes' },
-      { key: 'No', value: 'no ' },
+      { key: 'No', value: 'no' },
     ],
   },
 ];

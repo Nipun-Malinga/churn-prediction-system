@@ -166,7 +166,7 @@ def preprocess_dataset(dataset):
         X_cal_scaled = scaler.transform(X_cal)
 
         # Export scaler
-        joblib.dump(scaler, join(DATA_TRANSFORMER_PATHS["non_versioned"], "minMax_scaler.pkl"))
+        joblib.dump(scaler, join(DATA_TRANSFORMER_PATHS["non_versioned"], "standard_scaler.pkl"))
 
         # Versioning the scaler
         minmax_scaler_version = f"standard_scaler_V{str(uuid.uuid4())[:8]}.pkl"
@@ -272,12 +272,12 @@ def preprocess_evaluation_data(dataset):
     def scale_data(data):
         # Loading Scaler
         try:
-            minmaxScaler = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "minMax_scaler.pkl"))
+            standard_scaler = joblib.load(join(DATA_TRANSFORMER_PATHS["non_versioned"], "standard_scaler.pkl"))
         except RuntimeError as exp:
             print(f"Failed to load encoders: {exp}")
             
         try:
-            scaled_data = minmaxScaler.transform(data)
+            scaled_data = standard_scaler.transform(data)
         except ValueError as exp:
             raise ValueError(f"Invalid Value Detected during encoding: {exp}") from exp
         

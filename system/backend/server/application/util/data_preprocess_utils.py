@@ -69,7 +69,7 @@ def json_data_preprocessor(json_data):
 
     def scale_data(data):
         # Min-Max scaling
-        return transformers["Min Max Scaler"].transform(data)
+        return transformers["Standard Scaler"].transform(data)
     
     
     try:
