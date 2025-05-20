@@ -1,9 +1,14 @@
 import DagInfoTable from '@/components/DagInfoTable';
 import MainContainer from '@/components/MainContainer';
+import NotificationBar from '@/components/NotificationBar';
+import SystemOption from '@/components/SystemOption';
+import SystemOptionContainer from '@/components/SystemOptionContainer';
 import TrainedModelCard from '@/components/TrainedModelCard';
+import useDagRun from '@/hooks/useDagRun';
 import useSetProductionModel from '@/hooks/useSetProductionModel';
 import useTrainedModels from '@/hooks/useTrainedModels';
-import { GridItem, SimpleGrid } from '@chakra-ui/react';
+import { Box, GridItem, SimpleGrid } from '@chakra-ui/react';
+import { TbRefresh } from 'react-icons/tb';
 
 const Configuration = () => {
   const { data, refetch } = useTrainedModels();
@@ -22,8 +27,27 @@ const Configuration = () => {
     );
   };
 
+  const { mutate: triggerDagRun, isSuccess } = useDagRun();
+
+  const handleModelRetrainRun = () => {
+    triggerDagRun({
+      dag_id: 'model_evaluating_dag',
+    });
+  };
+
   return (
     <>
+      <Box width={'100%'} hidden={!isSuccess}>
+        <NotificationBar notification='Model Training In Progress' type='info' />
+      </Box>
+      <SystemOptionContainer>
+        {/* Implement button operations */}
+        <SystemOption
+          icon={TbRefresh}
+          description='System Retrain'
+          onClick={() => handleModelRetrainRun()}
+        ></SystemOption>
+      </SystemOptionContainer>
       <SimpleGrid columns={2} width={'100%'} gap={'1rem'}>
         <GridItem colSpan={{ base: 2, md: 2 }}>
           {data?.data && (

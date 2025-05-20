@@ -24,19 +24,8 @@ const Home = () => {
   const { data: performanceHistoryData } = usePerformanceHistory(1, selectedMode);
   const { data: performanceDriftHistoryData } = usePerformanceDriftHistory();
 
-  const { mutate, isSuccess } = useDagRun();
-
-  const handleModelRetrainRun = () => {
-    mutate({
-      dag_id: 'model_evaluating_dag',
-    });
-  };
-
   return (
     <>
-      <Box width={'100%'} hidden={!isSuccess}>
-        <NotificationBar notification='Model Training In Progress' type='info' />
-      </Box>
       <Text
         fontSize={{
           base: '1rem',
@@ -67,19 +56,6 @@ const Home = () => {
           md: 'flex-end',
         }}
       >
-        <SystemOptionContainer>
-          {/* Implement button operations */}
-          <SystemOption
-            icon={TbRefresh}
-            description='System Retrain'
-            onClick={() => handleModelRetrainRun()}
-          ></SystemOption>
-          <SystemOption
-            icon={IoDownloadOutline}
-            description='Download Model'
-            onClick={() => console.log('Hello')}
-          ></SystemOption>
-        </SystemOptionContainer>
       </Box>
 
       <SimpleGrid

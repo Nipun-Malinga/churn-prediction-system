@@ -17,7 +17,7 @@ interface Prediction {
 
 interface PredictionResponse {
   Prediction: number;
-  Probability: [[number]];
+  Probability: [number];
 }
 
 export type { Prediction, PredictionResponse };
