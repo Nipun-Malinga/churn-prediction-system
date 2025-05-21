@@ -5,27 +5,66 @@ import DatasetInfo from './pages/DatasetInfo';
 import Home from './pages/Home';
 import Model from './pages/Model';
 import NotFound from './pages/NotFound';
-import SignIn from './pages/SignIn';
 import Prediction from './pages/Prediction';
+import SignIn from './pages/SignIn';
+import ProtectedRoute from './ProtectedRoute';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
     children: [
-      { index: true, element: <Home /> },
-      { path: '/dashboard', element: <Home /> },
+      {
+        index: true,
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/dashboard',
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: 'dashboard/model/:model/:id',
-        element: <Model />,
+        element: (
+          <ProtectedRoute>
+            <Model />
+          </ProtectedRoute>
+        ),
       },
-      { path: '/signin', element: <SignIn /> },
-      { path: '/model/:model/:id', element: <Model /> },
-      { path: '/predict', element: <Prediction /> },
-      { path: '/dataset', element: <DatasetInfo /> },
-      { path: '/config', element: <Configuration /> },
+      {
+        path: '/predict',
+        element: (
+          <ProtectedRoute>
+            <Prediction />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/dataset',
+        element: (
+          <ProtectedRoute>
+            <DatasetInfo />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/config',
+        element: (
+          <ProtectedRoute>
+            <Configuration />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
+  { path: '/signin', element: <SignIn /> },
   {
     path: '*',
     element: <NotFound />,

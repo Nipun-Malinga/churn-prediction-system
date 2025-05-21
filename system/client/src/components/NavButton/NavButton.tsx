@@ -4,9 +4,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 interface Props {
   children: NavLink;
+  onClick?: () => void;
 }
 
-const NavButton = ({ children }: Props) => {
+const NavButton = ({ children, onClick }: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -44,6 +45,7 @@ const NavButton = ({ children }: Props) => {
         }}
         onClick={() => {
           goTo(children.navigateTo);
+          onClick && onClick();
         }}
       >
         <children.icon />

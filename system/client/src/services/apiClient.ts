@@ -3,8 +3,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 /* Store the JWT token in local storage */
 /* Add type safety for the incoming response separately */
-const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0Njk5MDk4NiwianRpIjoiYTk2YTBjMGEtYWY3MS00NjgwLTg4NzAtZWVjMTIzYjI2NGJmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IntcInVzZXJfaWQ6XCI6IDF9IiwibmJmIjoxNzQ2OTkwOTg2LCJjc3JmIjoiNjAxY2I3ZWMtYTVmMi00ZTE1LWFkOWMtZTBiMmZiNmZjMmFiIiwiZXhwIjoxNzQ5NTgyOTg2LCJlbWFpbCI6Im5pcHVubWFsaW5nYUBnbWFpbC5jb20ifQ.dgnwd5RQ2Vunw08gDR8q8PQk3YihiueNSlzeiRGA6DA';
+const token = localStorage.getItem('auth_token');
 
 const axiosInstance = axios.create({
   baseURL: 'http://127.0.0.1:5000/api',
