@@ -1,4 +1,5 @@
 import DagInfoTable from '@/components/DagInfoTable';
+import DriftThresholdContainer from '@/components/DriftThresholdContainer';
 import MainContainer from '@/components/MainContainer';
 import NotificationBar from '@/components/NotificationBar';
 import SystemOption from '@/components/SystemOption';
@@ -65,6 +66,9 @@ const Configuration = () => {
           </MainContainer>
         </GridItem>
       </SimpleGrid>
+      <MainContainer title='Drift Detector Thresholds' modeSelectorVisible={false}>
+        <DriftThresholdContainer />
+      </MainContainer>
     </>
   );
 };

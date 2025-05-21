@@ -4,6 +4,7 @@ from sqlalchemy import desc
 from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 from sqlalchemy.orm import aliased, Session
 from sqlalchemy.sql import desc, func
+from application.model import Evaluation_Threshold
 
 #TODO: Build DTO class for necessary endpoints
 class Model_Info_Service:
@@ -245,6 +246,48 @@ class Model_Info_Service:
             raise SQLAlchemyError(
                 "An error occurred while setting production models."
             )
+        finally:
+            session.close()
+            
+    @classmethod
+    def set_threshold(cls, thresholds):
+        session = db.session()
+        try:
+            existing = session.query(Evaluation_Threshold).first()
+            if existing:
+                existing.accuracy = thresholds["accuracy"]
+                existing.precision = thresholds["precision"]
+                existing.recall = thresholds["recall"]
+                existing.f1_score = thresholds["f1_score"]
+                session.commit()
+                return existing.to_dict()
+            else:
+                new_data_entry = Evaluation_Threshold(**thresholds)
+                session.add(new_data_entry)
+                session.commit()
+                return new_data_entry.to_dict()
+        except SQLAlchemyError as ex:
+            session.rollback()
+            raise RuntimeError("An error occurred while setting evaluation thresholds.") from ex
+        finally:
+            session.close()
+
+    @classmethod
+    def get_threshold(cls):
+        session = db.session()
+        try:
+            existing = session.query(Evaluation_Threshold).first()
+            if existing:
+                return existing.to_dict()
+            default_thresholds = {
+                "accuracy": -15,
+                "precision": -10,
+                "recall": -10,
+                "f1_score": -10
+            }
+            return default_thresholds
+        except SQLAlchemyError as ex:
+            raise RuntimeError("An error occurred while fetching evaluation thresholds.") from ex
         finally:
             session.close()
         

@@ -6,3 +6,4 @@ from .model import Model
 from .model_hyperparameters import Model_Hyperparameters
 from .model_info import Model_Info
 from .user import User
+from .evaluation_threshold import Evaluation_Threshold

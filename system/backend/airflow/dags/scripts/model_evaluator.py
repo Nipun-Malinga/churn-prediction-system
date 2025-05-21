@@ -58,16 +58,44 @@ def evaluate_model(model_list: List[Dict[str, Any]], X_test, y_test, threshold: 
     return model_evaluation_list
 
 
+from sqlalchemy import text
+from datetime import datetime
+
 def fetch_drift_thresholds_from_db():
     """
-    Placeholder function to simulate fetching thresholds from the database.
+    Fetch drift thresholds from the database.
+    If no thresholds are set, use default values and insert them into the DB.
     """
-    return {
+    default_thresholds = {
         "accuracy": -15,
         "precision": -10,
         "recall": -10,
-        "f1_score": -10,
+        "f1_score": -10
     }
+
+    with database_engine().connect() as connection:
+        result = connection.execute(
+            text("SELECT accuracy, precision, recall, f1_score FROM evaluation_threshold LIMIT 1")
+        ).fetchone()
+
+        if result:
+            return {
+                "accuracy": int(result.accuracy),
+                "precision": int(result.precision),
+                "recall": result.recall,
+                "f1_score": result.f1_score
+            }
+            
+        connection.execute(
+            text("""
+                INSERT INTO evaluation_threshold (accuracy, precision, recall, f1_score)
+                VALUES (:accuracy, :precision, :recall, :f1_score)
+            """),
+            default_thresholds
+        )
+
+        return default_thresholds
+
 
 def compare_model_performance(base_performance, evaluated_performance):
     """

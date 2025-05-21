@@ -9,7 +9,7 @@ const CardContainer = ({ children }: Props) => {
   return (
     <SimpleGrid
       columns={{
-        base: 1,
+        base: 2,
         md: 2,
         xl: 4,
       }}

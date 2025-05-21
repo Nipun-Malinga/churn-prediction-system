@@ -1,11 +1,14 @@
 from enum import Enum
 
+from marshmallow import ValidationError
+
 from application import limiter
 from application.response import error_response_template, response_template
 from application.service import Model_Info_Service
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from sqlalchemy.exc import NoResultFound, SQLAlchemyError
+from application.schema import Evaluation_Threshold_Schema
 
 model = Blueprint("model_bp", __name__)
 
@@ -228,3 +231,50 @@ def set_production_model():
         return error_response_template(
             "Failed to set production model"
         ), 500
+        
+@model.route("/evaluation-threshold", methods=["POST"])
+@limiter.limit("10 per minute")
+@jwt_required()        
+def set_evaluation_threshold():
+    schema = Evaluation_Threshold_Schema()
+    try:
+        request_data = schema.load(request.json)
+        return response_template(
+            "success", 
+            "Evaluation thresholds set successfully", 
+            schema.dump(service.set_threshold(request_data))
+        ), 201
+        
+    except ValidationError as err:
+        return error_response_template(
+            err.messages
+        ), 400
+    except SQLAlchemyError as ex:
+        return error_response_template(
+            f"Database Error: {str(ex)}"
+        ), 500
+    except Exception as ex:
+        return error_response_template(
+            "Failed to set evaluation threshold"
+        ), 500
+        
+@model.route("/evaluation-threshold", methods=["GET"])
+@limiter.limit("10 per minute")
+@jwt_required()        
+def get_evaluation_threshold():
+    try:
+        return response_template(
+            "success", 
+            "Evaluation thresholds fetched successfully", 
+            service.get_threshold()
+        ), 201
+
+    except SQLAlchemyError as ex:
+        return error_response_template(
+            f"Database Error: {str(ex)}"
+        ), 500
+    except Exception as ex:
+        return error_response_template(
+            "Failed to set evaluation threshold"
+        ), 500
+    

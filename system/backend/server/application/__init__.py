@@ -39,7 +39,7 @@ def create_app():
     from application.model import (Accuracy_Drift, Data_Transformer,
                                    Data_Transformer_Info, Evaluation_Data,
                                    Model, Model_Hyperparameters, Model_Info,
-                                   User)
+                                   User, Evaluation_Threshold)
 
     with app.app_context():
         db.create_all()
