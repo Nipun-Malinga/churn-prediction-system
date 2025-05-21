@@ -1,4 +1,4 @@
-import { Box, Button, HoverCard, Link, Portal, Span, Strong, VStack } from '@chakra-ui/react';
+import { Box, Button, HoverCard, Portal, Span, VStack } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { IconType } from 'react-icons';
 
@@ -6,7 +6,7 @@ interface Props {
   icon?: IconType;
   description: string;
   disable?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 const SystemOption = ({ icon, description, disable, onClick }: Props) => {
@@ -26,7 +26,7 @@ const SystemOption = ({ icon, description, disable, onClick }: Props) => {
           background={'#ffffff'}
           color={'#000'}
           marginX={1}
-          onClick={() => onClick()}
+          onClick={() => onClick && onClick()}
           _hover={{
             background: '#4880FF',
             color: '#fff',

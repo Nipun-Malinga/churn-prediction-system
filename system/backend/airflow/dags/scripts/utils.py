@@ -86,7 +86,6 @@ def fetch_trained_model_data() -> list:
         for data in model_data_result:
             model_data.append({
                     "id": data[0],
-                    "model": joblib.load(join(ML_MODEL_PATHS["versioned"], data[6])),
                     "name": data[1],
                     "accuracy": data[2],
                     "precision": data[3],
@@ -106,7 +105,7 @@ def upload_to_gcs(bucket_name, source_file_path, destination) -> None:
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination)
 
-    blob.upload_from_filename(source_file_path, timeout=10000)
+    blob.upload_from_filename(source_file_path, timeout=1000000)
 
     print(f"File {source_file_path} uploaded to {destination} in {bucket_name}.")
 

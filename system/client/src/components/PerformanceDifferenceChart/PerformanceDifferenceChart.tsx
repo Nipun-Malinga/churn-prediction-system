@@ -55,7 +55,7 @@ const PerformanceDifferenceChart = ({
         <PolarAngleAxis dataKey='subject' />
         <PolarRadiusAxis />
         <Legend />
-        <Radar name='Base Model' dataKey='base' stroke='#2ca02c' fill='#2ca02c' fillOpacity={0.6} />
+        <Radar name='Base Model' dataKey='base' stroke='#3ee63e' fill='#3ee63e' fillOpacity={0.6} />
         <Radar
           name={currentModelName}
           dataKey='current'

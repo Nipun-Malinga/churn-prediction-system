@@ -8,7 +8,17 @@ import TrainedModelCard from '@/components/TrainedModelCard';
 import useDagRun from '@/hooks/useDagRun';
 import useSetProductionModel from '@/hooks/useSetProductionModel';
 import useTrainedModels from '@/hooks/useTrainedModels';
-import { Box, GridItem, SimpleGrid } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  CloseButton,
+  Dialog,
+  GridItem,
+  Portal,
+  SimpleGrid,
+  Text,
+} from '@chakra-ui/react';
+import { FaRegCircleCheck } from 'react-icons/fa6';
 import { TbRefresh } from 'react-icons/tb';
 
 const Configuration = () => {
@@ -42,12 +52,36 @@ const Configuration = () => {
         <NotificationBar notification='Model Training In Progress' type='info' />
       </Box>
       <SystemOptionContainer>
-        {/* Implement button operations */}
-        <SystemOption
-          icon={TbRefresh}
-          description='System Retrain'
-          onClick={() => handleModelRetrainRun()}
-        ></SystemOption>
+        <Dialog.Root>
+          <Dialog.Trigger width='5rem' asChild>
+            <Button variant={'ghost'}>
+              <SystemOption icon={TbRefresh} description='System Retrain'></SystemOption>
+            </Button>
+          </Dialog.Trigger>
+          <Portal>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Header>
+                  <Dialog.Title>System Retrain</Dialog.Title>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <Text>This action will cause system retrain. Do you want to proceed?</Text>
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Dialog.ActionTrigger asChild>
+                    <Button width='100%' onClick={() => handleModelRetrainRun()}>
+                      <FaRegCircleCheck />
+                    </Button>
+                  </Dialog.ActionTrigger>
+                </Dialog.Footer>
+                <Dialog.CloseTrigger asChild>
+                  <CloseButton size='sm' />
+                </Dialog.CloseTrigger>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
+        </Dialog.Root>
       </SystemOptionContainer>
       <SimpleGrid columns={2} width={'100%'} gap={'1rem'}>
         <GridItem colSpan={{ base: 2, md: 2 }}>

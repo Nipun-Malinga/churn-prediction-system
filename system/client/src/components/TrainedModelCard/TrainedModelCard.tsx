@@ -29,7 +29,7 @@ const DriftText = ({ value }: { value: number }) => {
     <HStack gap={1}>
       {isPositive ? <FaArrowUp color='green' /> : <FaArrowDown color='red' />}
       <Text fontSize='1rem' color={isPositive ? 'green.400' : 'red.400'}>
-        {value.toFixed(2)}% performance
+        {value ? value.toFixed(2) : 0}% performance
       </Text>
     </HStack>
   );

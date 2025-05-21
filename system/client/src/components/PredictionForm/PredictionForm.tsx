@@ -30,9 +30,9 @@ const PredictionForm = () => {
     formState: { errors },
   } = useForm({ resolver: zodResolver(predictionSchema) });
 
-  const { mutate, isPending, isError } = usePredictResults();
+  const { mutate, isPending } = usePredictResults();
 
-  const [predictionResponse, setPredictionResponse] = useState<PredictionResponse>();
+  const [predictionResponse, setPredictionResponse] = useState<PredictionResponse | null>();
   const [error, setError] = useState<AxiosError | null>(null);
 
   const onSubmit = (data: FormData) => {
@@ -45,6 +45,7 @@ const PredictionForm = () => {
       onError: (error) => {
         if (axios.isAxiosError(error)) {
           setError(error);
+          setPredictionResponse(null); 
         } else {
           setError(new AxiosError('Unknown error', '500'));
         }
@@ -115,12 +116,14 @@ const PredictionForm = () => {
           >
             Submit
           </Button>
-          {isError && <NotificationBar type={'error'} notification='Failed to make prediction.' />}
           {error && error.status == 400 && (
             <NotificationBar
               type={'warning'}
               notification='Failed to make prediction: Untrained Value Detected'
             />
+          )}
+          {error && error.status == 500 && (
+            <NotificationBar type={'error'} notification='Failed to make prediction.' />
           )}
         </VStack>
       </form>

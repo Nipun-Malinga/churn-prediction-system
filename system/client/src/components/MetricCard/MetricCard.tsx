@@ -12,7 +12,7 @@ const MetricCard = ({ label, value }: { label: string; value: number }) => (
   >
     <VStack gap={1}>
       <Text fontSize='2xl' fontWeight='bold' color='blue.600'>
-        {value}
+        {value}%
       </Text>
       <Text fontSize='sm' color='gray.600'>
         {label}

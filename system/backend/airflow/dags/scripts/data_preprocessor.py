@@ -154,7 +154,7 @@ def preprocess_dataset(dataset):
 
         cat_indices = [X.columns.get_loc(col) for col in categorical_features]
         
-        smote = SMOTENC(categorical_features=cat_indices, k_neighbors=9, random_state=42)
+        smote = SMOTENC(categorical_features=cat_indices, k_neighbors=3, sampling_strategy=0.75, random_state=random_state)
         overSampled_X, overSampled_y = smote.fit_resample(X, y)
 
         return overSampled_X, overSampled_y  

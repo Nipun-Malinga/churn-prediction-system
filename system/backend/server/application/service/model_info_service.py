@@ -109,15 +109,18 @@ class Model_Info_Service:
             ).join(
                 Model, Model.id == Model_Info.model_id
             ).filter(
-              Model.base_model == True, 
-              Model_Info.is_production_model == True
+                Model.base_model == True,
+                Model_Info.is_production_model == True
             ).order_by(
                 desc(Model_Info.updated_date)
-            ).limit(1).one()     
+            ).limit(1).one_or_none()
 
-            return result.to_dict() if result else {}
-        except NoResultFound as ex:
-            raise NoResultFound from ex
+            if result:
+                return result.to_dict()
+            else:
+                # Graceful fallback instead of raising an exception
+                return {"message": "No base model performance found."}
+    
         except SQLAlchemyError as ex:
             raise SQLAlchemyError(
                 "An error occurred while retrieving base model performance."
