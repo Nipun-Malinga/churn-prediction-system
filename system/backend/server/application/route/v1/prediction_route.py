@@ -12,7 +12,7 @@ predict_result = Blueprint("predict_bp", __name__)
 service = Prediction_Service()
 
 @predict_result.route("/predict", methods=["POST"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()
 def predict():
     schema = Prediction_Request_Schema()

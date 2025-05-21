@@ -10,7 +10,8 @@ const useTrainedModels = () => {
   return useQuery({
     queryKey: ['trainedModels'],
     queryFn: fetchData,
-    staleTime: ms('5 minutes'),
+    staleTime: ms('1 Minutes'),
+    refetchInterval: ms('1 Minutes'),
   });
 };
 

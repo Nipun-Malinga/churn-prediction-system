@@ -22,7 +22,7 @@ class Type(Enum):
     
 
 @model.route("", methods=["GET"])    
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()
 def get_models():
     try:
@@ -43,7 +43,7 @@ def get_models():
 
 
 @model.route("/info", methods=["GET"])    
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()
 def get_basic_model():
     try:
@@ -65,7 +65,7 @@ def get_basic_model():
 
     
 @model.route("/info/advanced", methods=["GET"])   
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required() 
 def get_advanced_model_info_by_id():
     
@@ -93,7 +93,7 @@ def get_advanced_model_info_by_id():
 
     
 @model.route("/base", methods=["GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required() 
 def get_base_model_performance(): 
     try:
@@ -115,7 +115,7 @@ def get_base_model_performance():
 
 
 @model.route("/charts", methods=["GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required() 
 def model_history_chart_data():
     try:
@@ -149,7 +149,7 @@ def model_history_chart_data():
 
     
 @model.route("/drift", methods=["GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required() 
 def get_model_performance_drift(): 
     try:
@@ -170,7 +170,7 @@ def get_model_performance_drift():
 
         
 @model.route("/production", methods=["GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()        
 def get_new_trained_models():
     try:
@@ -189,7 +189,7 @@ def get_new_trained_models():
         ), 500
         
 @model.route("/production", methods=["POST"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()        
 def set_production_model():
     

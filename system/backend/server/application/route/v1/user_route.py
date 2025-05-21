@@ -11,7 +11,7 @@ user = Blueprint("user_bp", __name__)
 service = User_Service()
 
 @user.route("/register", methods=["POST"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 def register():
     schema = User_Register_Schema()
     
@@ -35,7 +35,7 @@ def register():
         ), 409
     
 @user.route("/login", methods=["POST"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 def login():
     schema = User_Login_Schema()
     

@@ -13,7 +13,8 @@ const usePerformanceHistory = (model_id: number, filter_type: string) => {
   return useQuery({
     queryKey: ['performanceHistory', model_id, filter_type],
     queryFn: fetchData,
-    staleTime: ms('5 Minutes'),
+    staleTime: ms('1 Minutes'),
+    refetchInterval: ms('1 Minutes'),
   });
 };
 

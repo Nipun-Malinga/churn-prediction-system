@@ -10,7 +10,8 @@ const useDagInfo = () => {
   return useQuery({
     queryKey: ['dagDetails'],
     queryFn: fetchData,
-    staleTime: ms('5 Minutes'),
+    staleTime: ms('1 Minutes'),
+    refetchInterval: ms('1 Minutes'),
   });
 };
 

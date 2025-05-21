@@ -13,7 +13,7 @@ data = Blueprint("data_bp", __name__)
 service = Evaluation_Data_Service()
 
 @data.route("/", methods=["GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()
 # TODO: Complete
 def get_data():
@@ -22,7 +22,7 @@ def get_data():
 
 
 @data.route("/", methods=["POST"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()
 def add_data():
     schema = Evaluation_Data_Schema()
@@ -47,7 +47,7 @@ def add_data():
 
     
 @data.route("/list", methods=["POST"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()
 def add_data_list():
     schema = Evaluation_Data_Schema(many=True)
@@ -74,7 +74,7 @@ def add_data_list():
 
 
 @data.route("/csv", methods=["POST"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()
 def read_csv_data():
     data_source = request.files.get("data_source")
@@ -108,7 +108,7 @@ def read_csv_data():
 
         
 @data.route("/info", methods=["GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()
 def get_dataset_basic_info():
     try: 

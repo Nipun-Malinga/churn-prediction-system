@@ -5,13 +5,13 @@ import ms from 'ms';
 
 const usePerformanceDriftHistory = () => {
   const apiClient = new APIClient<PerformanceDriftHistory>('/v1/models/drift');
-  const fetchData = () =>
-    apiClient.getAll();
+  const fetchData = () => apiClient.getAll();
 
   return useQuery({
     queryKey: ['performanceDriftHistory'],
     queryFn: fetchData,
-    staleTime: ms('5 Minutes'),
+    staleTime: ms('1 Minutes'),
+    refetchInterval: ms('1 Minutes'),
   });
 };
 

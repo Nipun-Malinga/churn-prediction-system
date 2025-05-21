@@ -10,7 +10,8 @@ const useBasicModelInfo = () => {
   return useQuery({
     queryKey: ['basicModelInfo'],
     queryFn: fetchData,
-    staleTime: ms('5 Minutes'),
+    staleTime: ms('1 Minutes'),
+    refetchInterval: ms('1 Minutes'),
   });
 };
 
@@ -24,7 +25,8 @@ const useAdvancedModelInfo = (model_id: number) => {
   return useQuery({
     queryKey: ['advancedModelInfo', model_id],
     queryFn: fetchData,
-    staleTime: ms('5 Minutes'),
+    staleTime: ms('1 Minutes'),
+    refetchInterval: ms('1 Minutes'),
   });
 };
 

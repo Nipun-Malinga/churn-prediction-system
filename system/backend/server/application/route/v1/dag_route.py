@@ -12,7 +12,7 @@ dag = Blueprint("dag_bp", __name__)
 service = Airflow_Service()
 
 @dag.route("/dags", methods=["GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()
 def fetch_all():
     try:
@@ -32,7 +32,7 @@ def fetch_all():
 
 
 @dag.route("/dags", methods=["PATCH"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()
 def pause_dag():
     schema = Update_Dag_Schema()
@@ -58,7 +58,7 @@ def pause_dag():
 
 
 @dag.route("/dags", methods=["POST"])    
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 @jwt_required()
 def run_dag():
     try:

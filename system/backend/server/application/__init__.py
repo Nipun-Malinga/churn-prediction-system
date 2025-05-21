@@ -18,7 +18,7 @@ db = SQLAlchemy()
 marshmallow = Marshmallow()
 limiter = Limiter(
     key_func=get_remote_address,
-    default_limits=["1200 per day", "50 per hour"]
+    default_limits=["14400 per day", "600 per hour"]
 )
 
 def create_app():
