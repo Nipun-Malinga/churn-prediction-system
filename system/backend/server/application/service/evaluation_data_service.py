@@ -26,7 +26,10 @@ class Evaluation_Data_Service:
     @classmethod
     def preprocess_csv_data(cls, csv_data):
         try:
-            return csv_data_preprocessor(csv_data)
+            records = csv_data_preprocessor(csv_data)
+            for entry in records:
+                cls.save_evaluation_data(entry)
+            return records
         except ValueError as ex:
             raise ValueError(ex) from ex
         

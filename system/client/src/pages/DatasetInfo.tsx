@@ -1,3 +1,5 @@
+import CardContainer from '@/components/CardContainer';
+import CSVUpload from '@/components/CSVUpload';
 import DataImbalanceChart from '@/components/DataImbalanceChart';
 import InfoCard from '@/components/InfoCard';
 import MainContainer from '@/components/MainContainer';
@@ -29,12 +31,16 @@ const DatasetInfo = () => {
             />
           </SimpleGrid>
         </GridItem>
-
         <GridItem>
           <MainContainer title='Class Imbalance' modeSelectorVisible={false}>
             {data?.data.class_imbalance && (
               <DataImbalanceChart classImbalance={data?.data.class_imbalance} />
             )}
+          </MainContainer>
+        </GridItem>
+        <GridItem>
+          <MainContainer title='Upload Dataset CSV File' modeSelectorVisible={false}>
+            <CSVUpload />
           </MainContainer>
         </GridItem>
       </SimpleGrid>
