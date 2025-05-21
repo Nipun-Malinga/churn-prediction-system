@@ -18,6 +18,8 @@ import usePredictResults from '@/hooks/usePredictResults';
 import PredictionResult from '../PredictionResult';
 import { useState } from 'react';
 import { PredictionResponse } from '@/models/Prediction';
+import NotificationBar from '../NotificationBar';
+import axios, { AxiosError } from 'axios';
 
 type FormData = z.infer<typeof predictionSchema>;
 
@@ -28,15 +30,24 @@ const PredictionForm = () => {
     formState: { errors },
   } = useForm({ resolver: zodResolver(predictionSchema) });
 
-  const { mutate, isPending } = usePredictResults();
+  const { mutate, isPending, isError } = usePredictResults();
 
   const [predictionResponse, setPredictionResponse] = useState<PredictionResponse>();
+  const [error, setError] = useState<AxiosError | null>(null);
 
   const onSubmit = (data: FormData) => {
     mutate(data, {
       onSuccess: (data) => {
         console.log(data);
+        setError(null);
         setPredictionResponse(data.data);
+      },
+      onError: (error) => {
+        if (axios.isAxiosError(error)) {
+          setError(error);
+        } else {
+          setError(new AxiosError('Unknown error', '500'));
+        }
       },
     });
   };
@@ -104,6 +115,13 @@ const PredictionForm = () => {
           >
             Submit
           </Button>
+          {isError && <NotificationBar type={'error'} notification='Failed to make prediction.' />}
+          {error && error.status == 400 && (
+            <NotificationBar
+              type={'warning'}
+              notification='Failed to make prediction: Untrained Value Detected'
+            />
+          )}
         </VStack>
       </form>
       {predictionResponse && <PredictionResult predictionResponse={predictionResponse} />}

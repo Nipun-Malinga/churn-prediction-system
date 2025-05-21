@@ -9,7 +9,6 @@ const NotificationBar = ({ type, notification }: Props) => {
   return (
     <Alert.Root
       status={type}
-      my='4'
       onClick={() => console.log('')}
       cursor={'pointer'}
       _hover={{
