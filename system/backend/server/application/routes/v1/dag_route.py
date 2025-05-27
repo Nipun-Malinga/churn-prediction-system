@@ -30,7 +30,7 @@ def fetch_all():
     except RequestException as ex:
         current_app.logger.error("Request Error: %s", ex, exc_info=True)
         return error_response_template("Error: Failed to Connect to Airflow Server"), 500 
-    except Exception as exp:
+    except Exception as ex:
         current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
         return error_response_template("Error: Server Error Occurred"), 500
 

@@ -179,7 +179,7 @@ cython_debug/
 *.pkl
 
 # Secrets
-ServiceKey_GoogleCloud.json
+GCS-Storage-Credentials.json
 
 # Apache Airflow Metadata
 logs

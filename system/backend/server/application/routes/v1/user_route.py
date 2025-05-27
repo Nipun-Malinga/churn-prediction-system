@@ -17,7 +17,7 @@ def register():
     
     try:
         auth_token = service.save_user(schema.load(request.json))
-        current_app.logger.info("User Email: %s Registered Successfully", schema.email)
+        current_app.logger.info("User Email Registered Successfully")
            
         return response_template(
             "success",
@@ -32,7 +32,7 @@ def register():
         return error_response_template(ex.messages), 400 
     except ValueError as ex:
         current_app.logger.error("Value Error: %s", ex, exc_info=True)
-        return error_response_template("Error: Invalid Prediction Value Detected"), 400 
+        return error_response_template("Error: User Already Exists In the System"), 409
     except SQLAlchemyError as ex:
         current_app.logger.error("Database Error: %s", ex, exc_info=True)
         return error_response_template("Error: Database Error Occurred"), 500
@@ -47,7 +47,7 @@ def login():
     
     try:
         auth_token = service.validate_user(schema.load(request.json))
-        current_app.logger.info("User Email: %s Validated Successfully", schema.email)
+        current_app.logger.info("User Email Validated Successfully")
         
         if auth_token: 
             return response_template(
@@ -66,7 +66,7 @@ def login():
         return error_response_template(ex.messages), 400 
     except ValueError as ex:
         current_app.logger.error("Value Error: %s", ex, exc_info=True)
-        return error_response_template("Error: Invalid Prediction Value Detected"), 400 
+        return error_response_template("Error: Invalid User"), 400 
     except SQLAlchemyError as ex:
         current_app.logger.error("Database Error: %s", ex, exc_info=True)
         return error_response_template("Error: Database Error Occurred"), 500

@@ -106,7 +106,7 @@ def read_csv_data():
             ), 200
         except ValueError as ex:
             current_app.logger.error("Value Error: %s", ex, exc_info=True)
-            return error_response_template("Error: Invalid Prediction Value Detected"), 400 
+            return error_response_template("Error: Invalid Data Value Detected"), 400 
         except SQLAlchemyError as ex:
             current_app.logger.error("Database Error: %s", ex, exc_info=True)
             return error_response_template("Error: Database Error Occurred"), 500
