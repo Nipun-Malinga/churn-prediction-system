@@ -1,10 +1,10 @@
 from application import db
-from application.model import Accuracy_Drift, Model, Model_Info
+from application.models import Accuracy_Drift, Model, Model_Info
 from sqlalchemy import desc
 from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 from sqlalchemy.orm import aliased, Session
 from sqlalchemy.sql import desc, func
-from application.model import Evaluation_Threshold
+from application.models import Evaluation_Threshold
 
 #TODO: Build DTO class for necessary endpoints
 class Model_Info_Service:

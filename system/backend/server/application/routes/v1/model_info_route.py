@@ -3,12 +3,12 @@ from enum import Enum
 from marshmallow import ValidationError
 
 from application import limiter
-from application.response import error_response_template, response_template
-from application.service import Model_Info_Service
+from application.responses import error_response_template, response_template
+from application.services import Model_Info_Service
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from sqlalchemy.exc import NoResultFound, SQLAlchemyError
-from application.schema import Evaluation_Threshold_Schema
+from application.schemas import Evaluation_Threshold_Schema
 
 model = Blueprint("model_bp", __name__)
 

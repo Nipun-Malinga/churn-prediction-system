@@ -1,6 +1,6 @@
 from application import db
-from application.model import Evaluation_Data
-from application.util import csv_data_preprocessor
+from application.models import Evaluation_Data
+from application.utils import csv_data_preprocessor
 from sqlalchemy import func, case, inspect
 from sqlalchemy.exc import SQLAlchemyError
 

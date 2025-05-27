@@ -1,7 +1,7 @@
 from application import limiter
-from application.response import error_response_template, response_template
-from application.schema import User_Login_Schema, User_Register_Schema
-from application.service import User_Service
+from application.responses import error_response_template, response_template
+from application.schemas import User_Login_Schema, User_Register_Schema
+from application.services import User_Service
 from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError

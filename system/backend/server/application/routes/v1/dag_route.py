@@ -1,7 +1,7 @@
 from application import limiter
-from application.response import error_response_template, response_template
-from application.schema import Update_Dag_Schema
-from application.service import Airflow_Service
+from application.responses import error_response_template, response_template
+from application.schemas import Update_Dag_Schema
+from application.services import Airflow_Service
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from marshmallow.exceptions import ValidationError

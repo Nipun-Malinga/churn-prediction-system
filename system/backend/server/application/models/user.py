@@ -1,5 +1,5 @@
 from application import db
-from application.util import encrypt_password
+from application.utils import encrypt_password
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 

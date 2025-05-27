@@ -1,7 +1,7 @@
 import os
 
 import requests
-from application.util import get_csrf_token, login
+from application.utils import get_csrf_token, login
 from requests.exceptions import ConnectionError, HTTPError, RequestException
 
 AIRFLOW_URL = os.getenv("AIRFLOW_URL")

@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound
-from application.util import (fetch_ml_models, fetch_preprocessing_models,
+from application.utils import (fetch_ml_models, fetch_preprocessing_models,
                               json_data_preprocessor, make_prediction)
 
 

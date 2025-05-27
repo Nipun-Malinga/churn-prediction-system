@@ -1,9 +1,9 @@
 import json
 
 from application import db
-from application.model import User
-from application.schema import User_Login_Schema
-from application.util import validate_password
+from application.models import User
+from application.schemas import User_Login_Schema
+from application.utils import validate_password
 from flask_jwt_extended import create_access_token
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 

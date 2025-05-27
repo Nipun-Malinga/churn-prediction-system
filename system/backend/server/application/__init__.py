@@ -36,7 +36,7 @@ def create_app():
     marshmallow.init_app(app)
     limiter.init_app(app)
 
-    from application.model import (Accuracy_Drift, Data_Transformer,
+    from application.models import (Accuracy_Drift, Data_Transformer,
                                    Data_Transformer_Info, Evaluation_Data,
                                    Model, Model_Hyperparameters, Model_Info,
                                    User, Evaluation_Threshold)
@@ -44,8 +44,8 @@ def create_app():
     with app.app_context():
         db.create_all()
 
-    from application.error import register_error_handler
-    from application.route import create_routes
+    from application.errors import register_error_handler
+    from application.routes import create_routes
 
     create_routes(app)
     register_error_handler(app)

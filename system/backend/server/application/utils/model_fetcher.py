@@ -1,11 +1,11 @@
 from os.path import abspath, dirname, join
 
 from application import db
-from application.model.data_transformer import Data_Transformer
-from application.model.data_transformer_info import Data_Transformer_Info
-from application.model.model import Model
-from application.model.model_info import Model_Info
-from application.util.cloud_storage_utils import download_blob
+from application.models.data_transformer import Data_Transformer
+from application.models.data_transformer_info import Data_Transformer_Info
+from application.models.model import Model
+from application.models.model_info import Model_Info
+from application.utils.cloud_storage_utils import download_blob
 from sqlalchemy import desc
 from sqlalchemy.exc import SQLAlchemyError
 

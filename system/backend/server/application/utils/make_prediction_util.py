@@ -2,7 +2,7 @@ from os.path import abspath, dirname, join
 
 import joblib
 from application import db
-from application.model import Model, Model_Info
+from application.models import Model, Model_Info
 from sqlalchemy import desc
 from sqlalchemy.exc import NoResultFound
 

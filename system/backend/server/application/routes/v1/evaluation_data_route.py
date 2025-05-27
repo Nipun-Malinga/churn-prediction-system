@@ -1,7 +1,7 @@
 from application import limiter
-from application.response import error_response_template, response_template
-from application.schema import Evaluation_Data_Schema
-from application.service import Evaluation_Data_Service
+from application.responses import error_response_template, response_template
+from application.schemas import Evaluation_Data_Schema
+from application.services import Evaluation_Data_Service
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError

@@ -3,7 +3,7 @@ from os.path import abspath, dirname, exists, join
 import joblib
 import pandas as pd
 from application import db
-from application.model import Data_Transformer
+from application.models import Data_Transformer
 
 ABS_DIR = dirname(abspath(__file__))
 BASE_DIR = join(ABS_DIR, "trained_models/")
