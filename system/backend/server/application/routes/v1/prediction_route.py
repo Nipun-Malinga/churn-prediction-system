@@ -2,7 +2,7 @@ from application import limiter
 from application.responses import error_response_template, response_template
 from application.schemas import Prediction_Request_Schema
 from application.services import Prediction_Service
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
@@ -19,8 +19,9 @@ def predict():
      
     try:
         request_data = schema.load(request.json)
-         
         prediction, probability = service.predict_results(request_data)
+        
+        current_app.logger.info("Churn Predicted Successfully")
 
         return response_template(
             "success", 
@@ -32,22 +33,17 @@ def predict():
         ), 200
         
     except ValidationError as ex:
-        return error_response_template(
-            str(ex)
-        ), 400
+        current_app.logger.error("Validation Error: %s", ex, exc_info=True)
+        return error_response_template(ex.messages), 400 
     except FileNotFoundError as ex:
-        return error_response_template(
-            str(ex)
-        ), 503
+        current_app.logger.error("Service Unavailable Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Service Unavailable"), 503 
     except ValueError as ex:
-        return error_response_template (
-            str(ex)
-        ), 400
+        current_app.logger.error("Value Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Invalid Prediction Value Detected"), 400 
     except SQLAlchemyError as ex:
-        return error_response_template (
-            str(ex)
-        ), 500
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500
     except Exception as ex:
-        return error_response_template(
-            "Failed to make prediction."
-        ), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500

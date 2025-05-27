@@ -2,7 +2,7 @@ from application import limiter
 from application.responses import error_response_template, response_template
 from application.schemas import Update_Dag_Schema
 from application.services import Airflow_Service
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required
 from marshmallow.exceptions import ValidationError
 from requests import HTTPError, RequestException
@@ -17,17 +17,22 @@ service = Airflow_Service()
 def fetch_all():
     try:
         dags = service.fetch_all_dags()
+        current_app.logger.info("Dag Info Fetched Successfully")
+        
         return response_template(
             "success", 
             "DAG data fetched successfully", 
             dags
         ), 200
     except HTTPError as ex:
-            error_response_template(str(ex)), 500
+        current_app.logger.error("HTTP Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Failed to Connect to Airflow Server"), 500
     except RequestException as ex:
-            error_response_template(str(ex)), 500  
-    except Exception as ex:
-        return error_response_template(str(ex)), 500
+        current_app.logger.error("Request Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Failed to Connect to Airflow Server"), 500 
+    except Exception as exp:
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
 
 
 
@@ -45,15 +50,21 @@ def pause_dag():
             dag_id,
             schema.load(request.json)
         )
+        current_app.logger.info("Dag Updated Successfully")
+        
         return response_template("success", "DAG data fetched successfully", dag_data), 200
-    except ValidationError as exp:
-        return error_response_template(str(exp)), 400
+    except ValidationError as ex:
+        current_app.logger.error("Validation Error: %s", ex, exc_info=True)
+        return error_response_template(ex.messages), 400 
     except HTTPError as ex:
-            error_response_template(str(ex)), 500
+        current_app.logger.error("HTTP Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Failed to Connect to Airflow Server"), 500
     except RequestException as ex:
-            error_response_template(str(ex)), 500  
+        current_app.logger.error("Request Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Failed to Connect to Airflow Server"), 500 
     except Exception as exp:
-        return error_response_template(str(exp)), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
 
 
 
@@ -69,12 +80,18 @@ def run_dag():
         dag = service.run_dag(
             request.args.get("dag_id"),
         )
+        current_app.logger.info("Dag Ran Successfully")
+        
         return response_template("success", "DAG data fetched successfully", dag), 200
-    except ValidationError as exp:
-        return error_response_template(str(exp)), 400
+    except ValidationError as ex:
+        current_app.logger.error("Validation Error: %s", ex, exc_info=True)
+        return error_response_template(ex.messages), 400 
     except HTTPError as ex:
-            error_response_template(str(ex)), 500
+        current_app.logger.error("HTTP Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Failed to Connect to Airflow Server"), 500
     except RequestException as ex:
-            error_response_template(str(ex)), 500  
+        current_app.logger.error("Request Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Failed to Connect to Airflow Server"), 500 
     except Exception as exp:
-        return error_response_template(str(exp)), 500    
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500   

@@ -1,14 +1,13 @@
 from enum import Enum
 
-from marshmallow import ValidationError
-
-from application import limiter
+from application import create_app, limiter
 from application.responses import error_response_template, response_template
-from application.services import Model_Info_Service
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
-from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 from application.schemas import Evaluation_Threshold_Schema
+from application.services import Model_Info_Service
+from flask import Blueprint, current_app, request
+from flask_jwt_extended import jwt_required
+from marshmallow import ValidationError
+from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 
 model = Blueprint("model_bp", __name__)
 
@@ -29,20 +28,22 @@ class Type(Enum):
 @jwt_required()
 def get_models():
     try:
+        models = service.get_all_models()
+        current_app.logger.info("Models Fetched Successfully")
+
         return response_template(
-            "success",
-            "Models Fetched Successfully",
-            service.get_all_models()
+            "success", 
+            "Models Fetched Successfully", 
+            models
         ), 200
-        
+
     except SQLAlchemyError as ex:
-        return error_response_template(
-            f"Database Error: {str(ex)}"
-        ), 500
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500
+
     except Exception as ex:
-        return error_response_template(
-            "Server Error: Failed to Fetch Models"
-        ), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
 
 
 @model.route("/info", methods=["GET"])    
@@ -50,48 +51,47 @@ def get_models():
 @jwt_required()
 def get_basic_model():
     try:
+        basic_model_info = service.get_basic_model_info()
+        current_app.logger.info("Model Info Fetched Successfully")
+        
         return response_template(
             "success",
             "Model Information Fetched Successfully",
-            service.get_basic_model_info()
+            basic_model_info
         ), 200
         
     except SQLAlchemyError as ex:
-        return error_response_template(
-            f"Database Error: {str(ex)}"
-        ), 500
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500
     except Exception as ex:
-        return error_response_template(
-            "Failed to fetch Model Information"
-        ), 500
-
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
 
     
 @model.route("/info/advanced", methods=["GET"])   
 @limiter.limit("10 per minute")
 @jwt_required() 
 def get_advanced_model_info_by_id():
-    
-    model_id = request.args.get("model_id")
     try:
+        model_id = request.args.get("model_id")
+        advanced_model_info = service.get_advanced_model_info(model_id)
+        current_app.logger.info("Advanced Model Info Fetched Successfully")
+        
         return response_template(
             "success",
             "Model Information Fetched Successfully",
-            service.get_advanced_model_info(model_id)
+            advanced_model_info
         ), 200
         
     except NoResultFound as ex:
-        return error_response_template(
-            f"No model info found for model_id: {model_id}"
-        ), 404
-    except SQLAlchemyError as ex: 
-        return error_response_template(
-            f"Database error: {str(ex)}"
-        ), 500
+        current_app.logger.error("NotFound error: %s", ex, exc_info=True)
+        return error_response_template(f"Error: No Model Info Found for model_id: {model_id}"), 404
+    except SQLAlchemyError as ex:
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500
     except Exception as ex:
-        return error_response_template(
-            "Failed to fetch Model Information"
-        ), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
 
 
     
@@ -100,20 +100,21 @@ def get_advanced_model_info_by_id():
 @jwt_required() 
 def get_base_model_performance(): 
     try:
+        base_model_performance = service.get_base_model_performance()
+        current_app.logger.info("Base Model Performance Fetched Successfully")
+        
         return response_template(
             "success", 
             "Base Model Data Successfully", 
-            service.get_base_model_performance()
+            base_model_performance
         ), 200
     
-    except SQLAlchemyError as ex: 
-        return error_response_template(
-            f"Database error: {str(ex)}"
-        ), 500    
+    except SQLAlchemyError as ex:
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500   
     except Exception as ex:
-        return error_response_template(
-            "Failed to fetch model information"
-        ), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
 
 
 
@@ -130,24 +131,24 @@ def model_history_chart_data():
 
         Type(filter_by)
         
+        chart_data = service.model_performance_history(model_id, filter_by)
+        current_app.logger.info("Chart Data Fetched Successfully for Model ID %s with filter %s", model_id, filter_by)
+        
         return response_template(
             "success",
-            f"{filter_by.capitalize()} Data Fetched Successfully",
-            service.model_performance_history(model_id, filter_by)
+            f"Model Id: {model_id}, Filter: {filter_by.capitalize()} Data Fetched Successfully",
+            chart_data
         )
     
     except ValueError as ex:
-        return error_response_template(
-            f"Invalid Filtering Value",
-        ), 400
-    except SQLAlchemyError as ex: 
-        return error_response_template(
-            f"Database error: {str(ex)}"
-        ), 500    
+        current_app.logger.error("Value Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Invalid Filtering Value"), 400 
+    except SQLAlchemyError as ex:
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500   
     except Exception as ex:
-        return error_response_template(
-            "Failed to fetch chart history"
-        ), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
     
 
     
@@ -156,19 +157,20 @@ def model_history_chart_data():
 @jwt_required() 
 def get_model_performance_drift(): 
     try:
+        drift_history = service.model_drift_history()
+        current_app.logger.info("Model Performance Drift History Chart Data Fetched Successfully")
+        
         return response_template(
             "success", 
             "Drift History Fetched Successfully", 
-            service.model_drift_history()
+            drift_history
         ), 200
-    except SQLAlchemyError as ex: 
-        return error_response_template(
-            f"Database error: {str(ex)}"
-        ), 500
+    except SQLAlchemyError as ex:
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500   
     except Exception as ex:
-        return error_response_template(
-            "Failed to fetch drift history"
-        ), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
 
 
         
@@ -177,38 +179,25 @@ def get_model_performance_drift():
 @jwt_required()        
 def get_new_trained_models():
     try:
+        new_trained_models = service.new_trained_models()
+        current_app.logger.info("New Trained Models Fetched Successfully")
+        
         return response_template(
             "success",
             "New Trained Models Fetched Successfully",
-            service.new_trained_models()
+            new_trained_models
         ), 200
     except SQLAlchemyError as ex:
-        return error_response_template(
-            f"Database error: {str(ex)}"
-        ), 500
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500   
     except Exception as ex:
-        return error_response_template(
-            "Failed to fetch new trained models"
-        ), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
         
 @model.route("/production", methods=["POST"])
 @limiter.limit("10 per minute")
 @jwt_required()        
-def set_production_model():
-    
-    # batch_id = request.args.get("batch_id")
-        
-    # if not batch_id:
-    #     return error_response_template(
-    #         "Missing required parameters"
-    #     ), 400
-        
-    # return response_template(
-    #         "success",
-    #         "Production Models Set Successfully",
-    #         service.production_model(batch_id)
-    #     )   
-    
+def set_production_model(): 
     try:
         batch_id = request.args.get("batch_id")
         
@@ -216,21 +205,25 @@ def set_production_model():
             return error_response_template(
                 "Missing required parameters"
             ), 400
+            
+        production_model = service.production_model(batch_id)
+        current_app.logger.info("New Production Model Set Successfully. Batch Id: %s", batch_id)
         
         return response_template(
             "success",
             "Production Models Set Successfully",
-            service.production_model(batch_id)
+            production_model
         )    
         
     except NoResultFound as ex:
-        return error_response_template(
-            f"{str(ex)}"
-        ), 404
+        current_app.logger.error("NotFound error: %s", ex, exc_info=True)
+        return error_response_template(f"Error: No Batch Found for batch_id: {batch_id}"), 404
+    except SQLAlchemyError as ex:
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500   
     except Exception as ex:
-        return error_response_template(
-            "Failed to set production model"
-        ), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
         
 @model.route("/evaluation-threshold", methods=["POST"])
 @limiter.limit("10 per minute")
@@ -239,42 +232,44 @@ def set_evaluation_threshold():
     schema = Evaluation_Threshold_Schema()
     try:
         request_data = schema.load(request.json)
+        
+        set_threshold = service.set_threshold(request_data)
+        current_app.logger.info("New Drift Evaluation Threshold Set Successfully. Threshold: %s", set_threshold)
+        
         return response_template(
             "success", 
             "Evaluation thresholds set successfully", 
-            schema.dump(service.set_threshold(request_data))
+            schema.dump(set_threshold)
         ), 201
         
-    except ValidationError as err:
-        return error_response_template(
-            err.messages
-        ), 400
+    except ValidationError as ex:
+        current_app.logger.error("Validation Error: %s", ex, exc_info=True)
+        return error_response_template(ex.messages), 500   
     except SQLAlchemyError as ex:
-        return error_response_template(
-            f"Database Error: {str(ex)}"
-        ), 500
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500   
     except Exception as ex:
-        return error_response_template(
-            "Failed to set evaluation threshold"
-        ), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
         
 @model.route("/evaluation-threshold", methods=["GET"])
 @limiter.limit("10 per minute")
 @jwt_required()        
 def get_evaluation_threshold():
     try:
+        threshold = service.get_threshold()
+        current_app.logger.info("Threshold Fetched Successfully")
+        
         return response_template(
             "success", 
             "Evaluation thresholds fetched successfully", 
-            service.get_threshold()
+            threshold
         ), 201
 
     except SQLAlchemyError as ex:
-        return error_response_template(
-            f"Database Error: {str(ex)}"
-        ), 500
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500   
     except Exception as ex:
-        return error_response_template(
-            "Failed to set evaluation threshold"
-        ), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
     

@@ -9,6 +9,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
+from logging.config import dictConfig
 
 load_dotenv()
 
@@ -24,9 +25,9 @@ limiter = Limiter(
 def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
-    app.config['JWT_TOKEN_LOCATION'] = ['headers']
+    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=30)
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
 
     CORS(app)
@@ -35,6 +36,30 @@ def create_app():
     db.init_app(app)
     marshmallow.init_app(app)
     limiter.init_app(app)
+    
+    dictConfig({
+        "version": 1.0,
+        "formatters": {
+            "default": {
+                "format": "[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
+            }
+        },
+        "handlers": {
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": "app.log",
+            "formatter": "default"
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "default"
+        }
+        },
+        "root": {
+            "level": "INFO",
+            "handlers": ["file", "console"]
+        }
+    })
 
     from application.models import (Accuracy_Drift, Data_Transformer,
                                    Data_Transformer_Info, Evaluation_Data,

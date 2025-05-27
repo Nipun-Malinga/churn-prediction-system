@@ -2,7 +2,7 @@ from application import limiter
 from application.responses import error_response_template, response_template
 from application.schemas import Evaluation_Data_Schema
 from application.services import Evaluation_Data_Service
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
@@ -29,20 +29,24 @@ def add_data():
 
     try:
         request_data = schema.load(request.json)
+        saved_data = service.save_evaluation_data(request_data)
+        current_app.logger.info("Evaluation Data Added Successfully")
+        
         return response_template(
             "success", 
             "New data added to the server successfully", 
-            schema.dump(service.save_evaluation_data(request_data))
+            schema.dump(saved_data)
         ), 201
 
-    except ValidationError as err:
-        return error_response_template(
-            err.messages
-        ), 400
+    except ValidationError as ex:
+        current_app.logger.error("Validation Error: %s", ex, exc_info=True)
+        return error_response_template(ex.messages), 400 
     except SQLAlchemyError as ex:
-        return error_response_template(
-            f"Database Error: {str(ex)}"
-        ), 500
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500
+    except Exception as ex:
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
 
 
     
@@ -55,6 +59,7 @@ def add_data_list():
     try:
         request_data = schema.load(request.json) 
         saved_entries = [service.save_evaluation_data(entry) for entry in request_data]
+        current_app.logger.info("Evaluation Data Added Successfully")
         
         return response_template(
             "success", 
@@ -62,14 +67,16 @@ def add_data_list():
             schema.dump(saved_entries)
         ), 201
 
-    except ValidationError as err:
+    except ValidationError as ex:
         return error_response_template(
-            err.messages
+            ex.messages
         ), 400  
     except SQLAlchemyError as ex:
-        return error_response_template(
-            f"Database Error: {str(ex)}"
-        ), 500 
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500
+    except Exception as ex:
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500
 
 
 
@@ -89,21 +96,28 @@ def read_csv_data():
     if file_content_type in ["text/csv"]:
         
         try:
+            saved_entities = service.save_csv_evaluation_data(data_source)
+            current_app.logger.info("Evaluation Data CSV Added Successfully")
+            
             return response_template(
                 "success",
                 "CSV Data Source Read Successfully",
-                service.preprocess_csv_data(data_source)
+                saved_entities
             ), 200
         except ValueError as ex:
-            return error_response_template(
-                f"{ex}"
-            ), 400
-            
-        
+            current_app.logger.error("Value Error: %s", ex, exc_info=True)
+            return error_response_template("Error: Invalid Prediction Value Detected"), 400 
+        except SQLAlchemyError as ex:
+            current_app.logger.error("Database Error: %s", ex, exc_info=True)
+            return error_response_template("Error: Database Error Occurred"), 500
+        except Exception as ex:
+            current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+            return error_response_template("Error: Server Error Occurred"), 500
+               
     else:
         return error_response_template(
             f"Invalid File type detected: {file_content_type}"
-        )
+        ), 400
 
 
         
@@ -112,16 +126,16 @@ def read_csv_data():
 @jwt_required()
 def get_dataset_basic_info():
     try: 
+        current_app.logger.info("Basic Dataset Info Fetched Successfully")
+        
         return response_template(
             "success", 
             "hello", 
             service.basic_dataset_information()
         )
     except SQLAlchemyError as ex:
-        return error_response_template(
-            f"Database Error: {str(ex)}"
-        ), 500
+        current_app.logger.error("Database Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Database Error Occurred"), 500
     except Exception as ex:
-        return error_response_template(
-            f"Server Error: {ex}"
-        ), 500
+        current_app.logger.error("Unexpected Error: %s", ex, exc_info=True)
+        return error_response_template("Error: Server Error Occurred"), 500

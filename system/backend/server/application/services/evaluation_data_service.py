@@ -24,7 +24,7 @@ class Evaluation_Data_Service:
             ) from ex
     
     @classmethod
-    def preprocess_csv_data(cls, csv_data):
+    def save_csv_evaluation_data(cls, csv_data):
         try:
             records = csv_data_preprocessor(csv_data)
             for entry in records:
