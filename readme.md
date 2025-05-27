@@ -1,46 +1,75 @@
-# Bank Customer Churn Prediction System Using Machine Learning
+# Bank Customer Churn Prediction System
 
-**Module:** PUSL3190 Computing Individual Project
-**Programme:** BSc (Hons) Software Engineering
-**Student:** Kodippili T Prabhathiya (10899663)
-**Supervisor:** Mr. Gayan Perera
+A full‑stack, production‑ready machine learning system that predicts at‑risk banking customers using XGBoost, Random Forest, and LightGBM. The system includes automated model evaluation and retraining with Apache Airflow, a secure REST API, and an interactive dashboard.
+
+<p align="center">
+  <strong>Accuracy: 85% · AUC: 78%</strong><br/>
+  XGBoost · LightGBM · Random Forest → Voting Classifier · Apache Airflow · Flask · React + Chakra UI · PostgreSQL · GCS
+</p>
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Key Features](#key-features)
+3. [System Architecture](#system-architecture)
+4. [Tech Stack](#tech-stack)
+5. [Setup and Installation](#setup-and-installation)
+6. [Testing and Evaluation](#testing-and-evaluation)
+7. [Future Enhancements](#future-enhancements)
+
+---
 
 ## Overview
 
-This project presents a full-stack, automated bank customer churn prediction system. It integrates supervised machine learning models (XGBoost, Random Forest, LightGBM) with an ensemble voting classifier for robust predictions. The system aims to address the significant challenge of customer churn in the banking sector, which impacts profitability and customer relationships. Traditional rule-based systems often lack the adaptability to evolving customer behavior, a gap this project seeks to fill by leveraging machine learning and MLOps practices.
+This project addresses the challenge of predicting bank customer churn using a modular machine learning system. It replaces static rule-based systems with adaptive learning models, using real-world workflows for retraining and evaluation.
 
-The system features an autonomous pipeline based on Apache Airflow for model evaluation and retraining, triggered by performance drift. It includes a cloud-based model versioning system with a secure REST API server built with Flask. A React.js-based dashboard provides real-time model insights and configuration options. The ensemble model achieved 85% accuracy and an AUC of 78% after handling class imbalance using SMOTENC. This solution offers a scalable and maintainable approach for banks to proactively retain high-risk customers, thereby reducing churn-related losses and enhancing operational decision-making.
+Key components include:
+- An ensemble voting classifier
+- Apache Airflow pipelines for retraining
+- A Flask-based REST API
+- A React.js + Chakra UI dashboard
+- Google Cloud Storage model versioning
+
+---
 
 ## Key Features
 
-* **Comprehensive Data Preprocessing:**
-    * Engineered a custom dataset by integrating features from multiple public sources.
-    * Handled missing values, detected and capped outliers.
-    * Performed categorical encoding (One-Hot and Label Encoding).
-    * Addressed class imbalance using SMOTENC.
-    * Normalized features using Min-Max Scaling.
-    * Ensured feature consistency, for example, between `has_credit_card` and `card_type`.
-* **Advanced Machine Learning Modeling:**
-    * Utilized supervised machine learning algorithms: XGBoost, Random Forest, and LightGBM.
-    * Implemented an Ensemble Voting Classifier combining individual model predictions for improved reliability and performance.
-    * Optimized hyperparameters using Randomized SearchCV.
-* **Automated Retraining and Evaluation:**
-    * Apache Airflow-based autonomous pipeline for scheduled model evaluation and retraining.
-    * Automated retraining triggered by performance drift detection or new untrained data.
-    * Model performance monitoring using metrics like accuracy, precision, recall, and F1-score.
-* **Robust Backend System:**
-    * RESTful API server built with Flask providing endpoints for predictions, model analytics, dataset insights, new data ingestion, and manual retraining triggers.
-    * Secure API with JWT (JSON Web Tokens) authentication and rate limiting.
-    * User password encryption using bcrypt.
-    * PostgreSQL database for storing model information, insights, churn data, and user data.
-    * SQLAlchemy as ORM for database interactions.
-* **Interactive Frontend Dashboard:**
-    * User-friendly interface developed with React.js, TypeScript, and Chakra UI.
-    * Real-time visualization of churn risk scores, model performance indicators (accuracy, precision, recall, confusion matrix, F1 score), performance history, and dataset insights using Recharts.
-    * Controls for manual retraining, new trained model approval, and Airflow DAG insights.
-* **Cloud Integration & MLOps:**
-    * Cloud-based model versioning and storage using Google Cloud Storage.
-    * Adherence to MLOps practices for a scalable and maintainable solution.
+### 🔢 Data Preprocessing
+- Merged features from multiple public sources
+- Handled missing values and outliers
+- Categorical encoding: One-Hot & Label Encoding
+- Balanced dataset using SMOTENC
+- Normalized features (Min-Max Scaling)
+
+### Machine Learning Models
+- Models: XGBoost, Random Forest, LightGBM
+- Ensemble Voting Classifier for improved performance
+- Hyperparameter tuning with RandomizedSearchCV
+
+### Automated Retraining
+- Apache Airflow DAGs detect model drift or new untrained data
+- Scheduled or manual retraining
+- Evaluation using accuracy, precision, recall, F1, and AUC
+
+### Secure Backend API
+- Flask server with JWT authentication & bcrypt password hashing
+- REST API: predictions, insights, new data, retraining triggers
+- PostgreSQL + SQLAlchemy ORM
+- Rate limiting with Flask-Limiter
+
+### Frontend Dashboard
+- Built with React, Chakra UI, and TypeScript
+- View performance metrics, churn risks, confusion matrix
+- Manual retraining & model approval controls
+- Interactive charts using Recharts
+
+### Cloud & MLOps
+- Model versioning via Google Cloud Storage
+- Modular architecture following MLOps principles
+
+---
 
 ## System Architecture
 
