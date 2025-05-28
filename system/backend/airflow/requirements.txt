@@ -1,4 +1,8 @@
+ #Note Use Apache Airflow V2.10.5
+ 
  google-cloud-storage
+ psycopg2-binary==2.9.10
+ asyncpg==0.30.0
 
 # ML Related libraries
  scikit-learn==1.5.2

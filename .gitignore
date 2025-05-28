@@ -182,6 +182,7 @@ cython_debug/
 GCS-Storage-Credentials.json
 
 # Apache Airflow Metadata
+airflow.cfg
 logs
 *.pid
 

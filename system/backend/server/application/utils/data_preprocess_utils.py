@@ -16,6 +16,7 @@ def load_encoder(file_name):
     return joblib.load(path)
 
 def json_data_preprocessor(json_data):
+    # TODO: Implement A Dynamic Preprocessing System
     dataframe = pd.json_normalize(json_data)
     
     results = db.session.query(
@@ -33,7 +34,7 @@ def json_data_preprocessor(json_data):
     
     def encode_data(data):
         
-        # Onehot encoding
+        # OneHot encoding
         oneHotEncoder = transformers["One_Hot_Encoder"]
         
         encoded = oneHotEncoder.transform(
@@ -68,7 +69,7 @@ def json_data_preprocessor(json_data):
         return data
 
     def scale_data(data):
-        # Min-Max scaling
+        # Standard scaling
         return transformers["Standard Scaler"].transform(data)
     
     
