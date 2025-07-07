@@ -1,26 +1,17 @@
-import CardContainer from '@/components/CardContainer';
 import CSVUpload from '@/components/CSVUpload';
 import DataImbalanceChart from '@/components/DataImbalanceChart';
 import InfoCard from '@/components/InfoCard';
 import MainContainer from '@/components/MainContainer';
+import PageContainer from '@/components/PageContainer';
 import useBasicDatasetInfo from '@/hooks/useBasicDatasetInfo';
-import { GridItem, SimpleGrid, Text } from '@chakra-ui/react';
+import { GridItem, SimpleGrid } from '@chakra-ui/react';
 import { PiShapesBold } from 'react-icons/pi';
 
 const DatasetInfo = () => {
   const { data } = useBasicDatasetInfo();
 
   return (
-    <>
-      <Text
-        fontSize={{
-          base: '1rem',
-          lg: '1.5rem',
-        }}
-        fontWeight={'medium'}
-      >
-        Dataset
-      </Text>
+    <PageContainer title='Dataset Information'>
       <SimpleGrid columns={1} width={'100%'} gap={'1rem'}>
         <GridItem>
           <SimpleGrid gap={'1rem'}>
@@ -39,12 +30,15 @@ const DatasetInfo = () => {
           </MainContainer>
         </GridItem>
         <GridItem>
-          <MainContainer title='Upload Dataset CSV File' modeSelectorVisible={false}>
+          <MainContainer
+            title='Upload Dataset CSV File'
+            modeSelectorVisible={false}
+          >
             <CSVUpload />
           </MainContainer>
         </GridItem>
       </SimpleGrid>
-    </>
+    </PageContainer>
   );
 };
 

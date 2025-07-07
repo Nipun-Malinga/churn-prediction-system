@@ -2,6 +2,7 @@ import DagInfoTable from '@/components/DagInfoTable';
 import DriftThresholdContainer from '@/components/DriftThresholdContainer';
 import MainContainer from '@/components/MainContainer';
 import NotificationBar from '@/components/NotificationBar';
+import PageContainer from '@/components/PageContainer';
 import SystemOption from '@/components/SystemOption';
 import SystemOptionContainer from '@/components/SystemOptionContainer';
 import TrainedModelCard from '@/components/TrainedModelCard';
@@ -47,15 +48,21 @@ const Configuration = () => {
   };
 
   return (
-    <>
+    <PageContainer title='Configuration'>
       <Box width={'100%'} hidden={!isSuccess}>
-        <NotificationBar notification='Model Training In Progress' type='info' />
+        <NotificationBar
+          notification='Model Training In Progress'
+          type='info'
+        />
       </Box>
       <SystemOptionContainer>
         <Dialog.Root>
           <Dialog.Trigger width='5rem' asChild>
             <Button variant={'ghost'}>
-              <SystemOption icon={TbRefresh} description='System Retrain'></SystemOption>
+              <SystemOption
+                icon={TbRefresh}
+                description='System Retrain'
+              ></SystemOption>
             </Button>
           </Dialog.Trigger>
           <Portal>
@@ -66,11 +73,17 @@ const Configuration = () => {
                   <Dialog.Title>System Retrain</Dialog.Title>
                 </Dialog.Header>
                 <Dialog.Body>
-                  <Text>This action will cause system retrain. Do you want to proceed?</Text>
+                  <Text>
+                    This action will cause system retrain. Do you want to
+                    proceed?
+                  </Text>
                 </Dialog.Body>
                 <Dialog.Footer>
                   <Dialog.ActionTrigger asChild>
-                    <Button width='100%' onClick={() => handleModelRetrainRun()}>
+                    <Button
+                      width='100%'
+                      onClick={() => handleModelRetrainRun()}
+                    >
                       <FaRegCircleCheck />
                     </Button>
                   </Dialog.ActionTrigger>
@@ -86,7 +99,10 @@ const Configuration = () => {
       <SimpleGrid columns={2} width={'100%'} gap={'1rem'}>
         <GridItem colSpan={{ base: 2, md: 2 }}>
           {data?.data && (
-            <MainContainer title='New Trained Model' modeSelectorVisible={false}>
+            <MainContainer
+              title='New Trained Model'
+              modeSelectorVisible={false}
+            >
               <TrainedModelCard
                 trainedModel={data?.data}
                 onApprove={(batch_id) => handleSubmit(batch_id)}
@@ -100,10 +116,13 @@ const Configuration = () => {
           </MainContainer>
         </GridItem>
       </SimpleGrid>
-      <MainContainer title='Drift Detector Thresholds' modeSelectorVisible={false}>
+      <MainContainer
+        title='Drift Detector Thresholds'
+        modeSelectorVisible={false}
+      >
         <DriftThresholdContainer />
       </MainContainer>
-    </>
+    </PageContainer>
   );
 };
 

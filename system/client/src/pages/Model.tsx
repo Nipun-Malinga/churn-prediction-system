@@ -1,5 +1,6 @@
 import ConfusionMatrix from '@/components/ConfusionMatrix';
 import MainContainer from '@/components/MainContainer';
+import PageContainer from '@/components/PageContainer';
 import PerformanceCard from '@/components/PerformanceCard';
 import PerformanceChart from '@/components/PerformanceChart';
 import PerformanceDifferenceChart from '@/components/PerformanceDifferenceChart';
@@ -7,7 +8,7 @@ import useBaseModelInfo from '@/hooks/useBaseModelInfo';
 import { useAdvancedModelInfo } from '@/hooks/useModelInfo';
 import usePerformanceHistory from '@/hooks/usePerformanceHistory';
 import useSelectedModeStore from '@/store/useSelectedModeStore';
-import { GridItem, SimpleGrid, Text } from '@chakra-ui/react';
+import { GridItem, SimpleGrid } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 
 const Model = () => {
@@ -19,19 +20,17 @@ const Model = () => {
 
   const { data } = useAdvancedModelInfo(modelId);
   const { data: baseModelInfo } = useBaseModelInfo();
-  const { data: performanceHistoryData } = usePerformanceHistory(modelId, selectedMode);
+  const { data: performanceHistoryData } = usePerformanceHistory(
+    modelId,
+    selectedMode
+  );
 
   return (
-    <>
-      <Text
-        fontWeight={'bold'}
-        fontSize={{
-          lg: '1.5rem',
-        }}
+    <PageContainer title={modelName}>
+      <MainContainer
+        title='Current Model Performance'
+        modeSelectorVisible={false}
       >
-        {modelName}
-      </Text>
-      <MainContainer title='Current Model Performance' modeSelectorVisible={false}>
         {data && (
           <SimpleGrid width={'100%'} columns={{ base: 1, md: 4 }} gap={'1rem'}>
             <PerformanceCard
@@ -64,7 +63,9 @@ const Model = () => {
         <GridItem colSpan={{ md: 4 }}>
           <MainContainer modeSelectorVisible={true}>
             {performanceHistoryData?.data && (
-              <PerformanceChart performanceHistory={performanceHistoryData?.data} />
+              <PerformanceChart
+                performanceHistory={performanceHistoryData?.data}
+              />
             )}
           </MainContainer>
         </GridItem>
@@ -77,7 +78,10 @@ const Model = () => {
           />
         </GridItem>
         <GridItem colSpan={{ md: 2 }} width={'100%'}>
-          <MainContainer title='Performance Difference' modeSelectorVisible={false}>
+          <MainContainer
+            title='Performance Difference'
+            modeSelectorVisible={false}
+          >
             {baseModelInfo?.data && data?.data && (
               <PerformanceDifferenceChart
                 currentModelName={modelName}
@@ -88,7 +92,7 @@ const Model = () => {
           </MainContainer>
         </GridItem>
       </SimpleGrid>
-    </>
+    </PageContainer>
   );
 };
 
