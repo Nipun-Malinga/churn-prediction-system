@@ -1,7 +1,7 @@
 import useDagInfo from '@/hooks/useDagInfo';
 // import useDagRun from '@/hooks/useDagRun';
 import useDagToggle from '@/hooks/useDagToggle';
-import { Button, Table } from '@chakra-ui/react';
+import { Button, Table, TableRow } from '@chakra-ui/react';
 
 const DagInfoTable = () => {
   const { data, refetch } = useDagInfo();

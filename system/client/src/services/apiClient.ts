@@ -1,14 +1,10 @@
 import { FetchListResponse, FetchResponse } from '@/models/FetchResponse';
 import axios, { AxiosRequestConfig } from 'axios';
 
-/* Store the JWT token in local storage */
-/* Add type safety for the incoming response separately */
-const token = localStorage.getItem('auth_token');
-
 const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api',
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
   },
 });
 class APIClient<T, R = T> {

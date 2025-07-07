@@ -2,7 +2,16 @@ import NotificationBar from '@/components/NotificationBar';
 import loginInputs from '@/data/login';
 import useLogin from '@/hooks/useLogin';
 import signInSchema from '@/schemas/signInSchema';
-import { Box, Button, Field, Fieldset, Heading, Input, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Field,
+  Fieldset,
+  Heading,
+  Input,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -34,6 +43,7 @@ const SignIn = () => {
     <VStack bg='#568AFF' height='100vh' align='center' justify='center' p={4}>
       <Box
         as='form'
+        maxW={'40rem'}
         onSubmit={handleSubmit(onSubmit)}
         bg='white'
         borderRadius='2xl'
@@ -69,7 +79,9 @@ const SignIn = () => {
                     />
                     {errors[input.name as keyof FormData] && (
                       <Text color='red.500' fontSize='sm'>
-                        {errors[input.name as keyof FormData]?.message?.toString()}
+                        {errors[
+                          input.name as keyof FormData
+                        ]?.message?.toString()}
                       </Text>
                     )}
                   </Field.Root>
@@ -91,9 +103,17 @@ const SignIn = () => {
           </Button>
         </VStack>
         {isSuccess && (
-          <NotificationBar type='success' notification='User authenticated successfully.' />
+          <NotificationBar
+            type='success'
+            notification='User authenticated successfully.'
+          />
         )}
-        {isError && <NotificationBar type='error' notification='Failed to authenticate user.' />}
+        {isError && (
+          <NotificationBar
+            type='error'
+            notification='Failed to authenticate user.'
+          />
+        )}
       </Box>
     </VStack>
   );
