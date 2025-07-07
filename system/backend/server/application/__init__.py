@@ -19,25 +19,27 @@ db = SQLAlchemy()
 marshmallow = Marshmallow()
 limiter = Limiter(
     key_func=get_remote_address,
-    default_limits=["14400 per day", "600 per hour"]
+    default_limits=["14400 per day", "600 per hour"],
+    storage_uri="memory://",
 )
 
-def create_app():
-    app = Flask(__name__)
-    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
-    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
-    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=30)
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
+app = Flask(__name__)
 
-    CORS(app)
-    JWTManager(app)
-    
-    db.init_app(app)
-    marshmallow.init_app(app)
-    limiter.init_app(app)
-    
-    dictConfig({
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=30)
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
+
+CORS(app)
+JWTManager(app)
+
+db.init_app(app)
+marshmallow.init_app(app)
+limiter.init_app(app)
+
+dictConfig(
+    {
         "version": 1.0,
         "formatters": {
             "default": {
@@ -45,34 +47,34 @@ def create_app():
             }
         },
         "handlers": {
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": "app.log",
-            "formatter": "default"
+            "file": {
+                "class": "logging.FileHandler",
+                "filename": "app.log",
+                "formatter": "default",
+            },
+            "console": {"class": "logging.StreamHandler", "formatter": "default"},
         },
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "default"
-        }
-        },
-        "root": {
-            "level": "INFO",
-            "handlers": ["file", "console"]
-        }
-    })
+        "root": {"level": "INFO", "handlers": ["file", "console"]},
+    }
+)
 
-    from application.models import (Accuracy_Drift, Data_Transformer,
-                                   Data_Transformer_Info, Evaluation_Data,
-                                   Model, Model_Hyperparameters, Model_Info,
-                                   User, Evaluation_Threshold)
+from application.models import (
+    Accuracy_Drift,
+    Data_Transformer,
+    Data_Transformer_Info,
+    Evaluation_Data,
+    Model,
+    Model_Hyperparameters,
+    Model_Info,
+    User,
+    Evaluation_Threshold,
+)
 
-    with app.app_context():
-        db.create_all()
+with app.app_context():
+    db.create_all()
 
-    from application.errors import register_error_handler
-    from application.routes import create_routes
+from application.errors import register_error_handler
+from application.routes import create_routes
 
-    create_routes(app)
-    register_error_handler(app)
-
-    return app
+register_error_handler(app)
+create_routes(app)
