@@ -1,7 +1,6 @@
 import Sidebar from '@/components/Sidebar';
 import { Grid, GridItem, Show, useBreakpointValue, VStack } from '@chakra-ui/react';
 import { Outlet } from 'react-router-dom';
-import NavBar from './components/Navbar';
 
 const Layout = () => {
   const isDesktop = useBreakpointValue({ base: false, lg: true });

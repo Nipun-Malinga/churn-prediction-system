@@ -18,6 +18,7 @@ import {
   Portal,
   SimpleGrid,
   Text,
+  VStack,
 } from '@chakra-ui/react';
 import { FaRegCircleCheck } from 'react-icons/fa6';
 import { TbRefresh } from 'react-icons/tb';
@@ -96,32 +97,36 @@ const Configuration = () => {
           </Portal>
         </Dialog.Root>
       </SystemOptionContainer>
-      <SimpleGrid columns={2} width={'100%'} gap={'1rem'}>
-        <GridItem colSpan={{ base: 2, md: 2 }}>
-          {data?.data && (
-            <MainContainer
-              title='New Trained Model'
-              modeSelectorVisible={false}
-            >
-              <TrainedModelCard
-                trainedModel={data?.data}
-                onApprove={(batch_id) => handleSubmit(batch_id)}
-              />
+
+      <VStack height='100%' gap='1rem'>
+        <SimpleGrid columns={2} width='100%' gap='1rem'>
+          <GridItem colSpan={{ base: 2, md: 2 }}>
+            {data?.data && (
+              <MainContainer
+                title='New Trained Model'
+                modeSelectorVisible={false}
+              >
+                <TrainedModelCard
+                  trainedModel={data?.data}
+                  onApprove={(batch_id) => handleSubmit(batch_id)}
+                />
+              </MainContainer>
+            )}
+          </GridItem>
+          <GridItem colSpan={2} borderRadius='1rem' overflow='hidden'>
+            <MainContainer title='Dag Information' modeSelectorVisible={false}>
+              <DagInfoTable />
             </MainContainer>
-          )}
-        </GridItem>
-        <GridItem colSpan={2} borderRadius={'1rem'} overflow={'hidden'}>
-          <MainContainer title='Dag Information' modeSelectorVisible={false}>
-            <DagInfoTable />
-          </MainContainer>
-        </GridItem>
-      </SimpleGrid>
-      <MainContainer
-        title='Drift Detector Thresholds'
-        modeSelectorVisible={false}
-      >
-        <DriftThresholdContainer />
-      </MainContainer>
+          </GridItem>
+        </SimpleGrid>
+        <MainContainer
+          title='Drift Detector Thresholds'
+          modeSelectorVisible={false}
+        >
+          <DriftThresholdContainer />
+        </MainContainer>
+      </VStack>
+
     </PageContainer>
   );
 };

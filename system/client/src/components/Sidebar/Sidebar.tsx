@@ -1,4 +1,4 @@
-import { navLinks } from '@/data';
+import navLinks from '@/data/navLinks';
 import { Spacer, VStack } from '@chakra-ui/react';
 import NavButton from '../NavButton';
 import { useNavigate } from 'react-router-dom';
