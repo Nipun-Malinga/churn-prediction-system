@@ -3,6 +3,10 @@ import os
 import requests
 from application.utils import get_csrf_token, login
 from requests.exceptions import ConnectionError, HTTPError, RequestException
+from application.exceptions import (
+    AirflowConnectionError,
+    AirflowAPIError,
+)
 
 AIRFLOW_URL = os.getenv("AIRFLOW_URL")
 USERNAME = os.getenv("AIRFLOW_USERNAME")
@@ -24,8 +28,8 @@ class Airflow_Service:
             }
             
             return headers
-        except ConnectionError:
-            raise Exception("Failed to connect to Airflow. Ensure the server is running.")
+        except ConnectionError as ex:
+            raise AirflowConnectionError("Failed to connect to Airflow. Ensure the server is running.") from ex
         
     @classmethod
     def fetch_all_dags(cls):
@@ -36,9 +40,9 @@ class Airflow_Service:
             response.raise_for_status()
             return response.json()
         except HTTPError as ex:
-            raise HTTPError(ex.response.text) from ex
+            raise AirflowAPIError(ex.response.text) from ex
         except RequestException as ex:
-            raise RequestException(f"Request error occurred: {str(ex)}") from ex
+            raise AirflowConnectionError(f"Request error occurred: {str(ex)}") from ex
     
     @classmethod
     def update_dag(cls, dag_id, data):
@@ -54,9 +58,9 @@ class Airflow_Service:
             response.raise_for_status()
             return response.json()
         except HTTPError as ex:
-            raise HTTPError(ex.response.text) from ex
+            raise AirflowAPIError(ex.response.text) from ex
         except RequestException as ex:
-            raise RequestException(f"Request error occurred: {str(ex)}") from ex
+            raise AirflowConnectionError(f"Request error occurred: {str(ex)}") from ex
     
     @classmethod    
     def run_dag(cls, dag_id):
@@ -71,6 +75,6 @@ class Airflow_Service:
             response.raise_for_status()
             return response.json()
         except HTTPError as ex:
-            raise HTTPError(ex.response.text) from ex
+            raise AirflowAPIError(ex.response.text) from ex
         except RequestException as ex:
-            raise RequestException(f"Request error occurred: {str(ex)}") from ex
+            raise AirflowConnectionError(f"Request error occurred: {str(ex)}") from ex

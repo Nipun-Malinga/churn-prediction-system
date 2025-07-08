@@ -42,6 +42,7 @@ def pause_dag():
 @dag.route("/dags", methods=["POST"])
 @limiter.limit("10 per minute")
 @jwt_required()
+@apiWrapper
 def run_dag():
     dag_id = request.args.get("dag_id")
     if not dag_id:
