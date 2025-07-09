@@ -14,7 +14,6 @@ interface Props {
 }
 
 const DataImbalanceChart = ({ classImbalance }: Props) => {
-  console.log(classImbalance.churned);
 
   const data = [
     {

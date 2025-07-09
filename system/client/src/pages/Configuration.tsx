@@ -58,13 +58,8 @@ const Configuration = () => {
       </Box>
       <SystemOptionContainer>
         <Dialog.Root>
-          <Dialog.Trigger width='5rem' asChild>
-            <Button variant={'ghost'}>
-              <SystemOption
-                icon={TbRefresh}
-                description='System Retrain'
-              ></SystemOption>
-            </Button>
+          <Dialog.Trigger width='5rem'>
+            <SystemOption icon={TbRefresh} description='System Retrain'/>
           </Dialog.Trigger>
           <Portal>
             <Dialog.Backdrop />
@@ -126,7 +121,6 @@ const Configuration = () => {
           <DriftThresholdContainer />
         </MainContainer>
       </VStack>
-
     </PageContainer>
   );
 };

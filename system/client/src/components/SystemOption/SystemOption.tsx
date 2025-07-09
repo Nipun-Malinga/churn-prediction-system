@@ -1,4 +1,12 @@
-import { Box, Button, HoverCard, Portal, Span, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  HoverCard,
+  HStack,
+  Icon,
+  Portal,
+  Span,
+} from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { IconType } from 'react-icons';
 
@@ -6,16 +14,15 @@ interface Props {
   icon?: IconType;
   description: string;
   disable?: boolean;
-  onClick?: () => void;
 }
 
-const SystemOption = ({ icon, description, disable, onClick }: Props) => {
+const SystemOption = ({ icon, description, disable }: Props) => {
   const [open, setOpen] = useState(false);
 
   return (
     <HoverCard.Root size='sm' open={open} onOpenChange={(e) => setOpen(e.open)}>
       <HoverCard.Trigger asChild>
-        <Button
+        <HStack
           width={{
             base: '7.5rem',
             md: '5rem',
@@ -23,20 +30,21 @@ const SystemOption = ({ icon, description, disable, onClick }: Props) => {
           height={{
             base: '2.5rem',
           }}
-          background={'#ffffff'}
-          color={'#000'}
-          marginX={1}
-          onClick={() => onClick && onClick()}
+          transition='0.15s all ease-in-out'
           _hover={{
             background: '#4880FF',
             color: '#fff',
           }}
-          disabled={disable}
+          background='#ffffff'
+          color='#000'
+          marginX={1}
+          borderRadius='5px'
+          textAlign='center'
+          justifyContent='center'
+          cursor='pointer'
         >
-          <VStack>
-            <Span padding={2}>{icon && React.createElement(icon)}</Span>
-          </VStack>
-        </Button>
+          <Icon size={'md'}>{icon && React.createElement(icon)}</Icon>
+        </HStack>
       </HoverCard.Trigger>
       <Portal>
         <HoverCard.Positioner>

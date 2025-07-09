@@ -8,7 +8,7 @@ import { useBasicModelInfo } from '@/hooks/useModelInfo';
 import usePerformanceDriftHistory from '@/hooks/usePerformanceDriftHistory';
 import usePerformanceHistory from '@/hooks/usePerformanceHistory';
 import useSelectedModeStore from '@/store/useSelectedModeStore';
-import { SimpleGrid } from '@chakra-ui/react';
+import { GridItem, SimpleGrid } from '@chakra-ui/react';
 import { LuBrainCircuit } from 'react-icons/lu';
 import { TbRefresh } from 'react-icons/tb';
 
@@ -48,23 +48,29 @@ const Home = () => {
         gap={'1rem'}
         width={'100%'}
       >
-        <MainContainer
-          title='Performance Drift History'
-          modeSelectorVisible={false}
-        >
-          {performanceDriftHistoryData?.data && (
-            <PerformanceDriftChart
-              performanceDriftHistory={performanceDriftHistoryData?.data}
-            />
+        {performanceHistoryData?.data &&
+          performanceHistoryData.data.length > 0 && (
+            <GridItem>
+              <MainContainer modeSelectorVisible={true}>
+                <PerformanceChart
+                  performanceHistory={performanceHistoryData?.data}
+                />
+              </MainContainer>
+            </GridItem>
           )}
-        </MainContainer>
-        <MainContainer modeSelectorVisible={true}>
-          {performanceHistoryData?.data && (
-            <PerformanceChart
-              performanceHistory={performanceHistoryData?.data}
-            />
+        {performanceDriftHistoryData?.data &&
+          performanceDriftHistoryData.data.length > 0 && (
+            <GridItem>
+              <MainContainer
+                title='Performance Drift History'
+                modeSelectorVisible={false}
+              >
+                <PerformanceDriftChart
+                  performanceDriftHistory={performanceDriftHistoryData?.data}
+                />
+              </MainContainer>
+            </GridItem>
           )}
-        </MainContainer>
       </SimpleGrid>
     </PageContainer>
   );
