@@ -1,14 +1,14 @@
 import { create } from 'zustand';
 
-interface SelectedMode {
+interface SelectedModeState {
   selectedMode: string;
   setSelectedMode: (mode: string) => void;
 }
 
-const useSelectedModeStore = create<SelectedMode>((set) => ({
+const useSelectedModeStore = create<SelectedModeState>((set) => ({
   selectedMode: 'accuracy',
-  setSelectedMode: (mode: string) => {
-    set({ selectedMode: mode });
+  setSelectedMode: (data) => {
+    set({ selectedMode: data });
   },
 }));
 

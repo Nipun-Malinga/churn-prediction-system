@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 
-type TriggerStore = {
+interface TriggerStoreState {
   trigger: boolean;
   fetchThresholds: () => void;
 };
 
-const useTriggerFetchThresholdsStore = create<TriggerStore>((set) => ({
+const useTriggerFetchThresholdsStore = create<TriggerStoreState>((set) => ({
   trigger: false,
   fetchThresholds: () =>
     set((state) => ({

@@ -1,15 +1,15 @@
 import { TrainedModel } from '@/models/ModelDetails';
 import { create } from 'zustand';
 
-interface NewTrainedModel {
+interface TrainedModelState {
   trainedModel: TrainedModel | null;
   setTrainedModel: (model: TrainedModel) => void;
 }
 
-const useTrainedModelStore = create<NewTrainedModel>((set) => ({
+const useTrainedModelStore = create<TrainedModelState>((set) => ({
   trainedModel: null,
-  setTrainedModel: (model: TrainedModel) => {
-    set({ trainedModel: model });
+  setTrainedModel: (data) => {
+    set({ trainedModel: data });
   },
 }));
 
