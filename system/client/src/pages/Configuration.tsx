@@ -1,7 +1,6 @@
 import DagInfoTable from '@/components/DagInfoTable';
 import DriftThresholdContainer from '@/components/DriftThresholdContainer';
 import MainContainer from '@/components/MainContainer';
-import NotificationBar from '@/components/NotificationBar';
 import PageContainer from '@/components/PageContainer';
 import SystemOption from '@/components/SystemOption';
 import SystemOptionContainer from '@/components/SystemOptionContainer';
@@ -9,8 +8,8 @@ import TrainedModelCard from '@/components/TrainedModelCard';
 import useDagRun from '@/hooks/useDagRun';
 import useSetProductionModel from '@/hooks/useSetProductionModel';
 import useTrainedModels from '@/hooks/useTrainedModels';
+import useNotificationStore from '@/store/useNotificationStore';
 import {
-  Box,
   Button,
   CloseButton,
   Dialog,
@@ -20,12 +19,31 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
+import { useEffect } from 'react';
 import { FaRegCircleCheck } from 'react-icons/fa6';
 import { TbRefresh } from 'react-icons/tb';
 
 const Configuration = () => {
   const { data, refetch } = useTrainedModels();
   const { mutate } = useSetProductionModel();
+  const { mutate: triggerDagRun, isError, isSuccess } = useDagRun();
+  const { setNotification } = useNotificationStore();
+
+  useEffect(() => {
+    isSuccess &&
+      setNotification({ info: 'System Training In Progress', type: 'success' });
+    isError &&
+      setNotification({
+        info: 'Failed to trigger system retrain',
+        type: 'error',
+      });
+  }, [isSuccess, isError]);
+
+  const handleModelRetrainRun = () => {
+    triggerDagRun({
+      dag_id: 'model_evaluating_dag',
+    });
+  };
 
   const handleSubmit = (batch_id: string) => {
     mutate(
@@ -40,26 +58,12 @@ const Configuration = () => {
     );
   };
 
-  const { mutate: triggerDagRun, isSuccess } = useDagRun();
-
-  const handleModelRetrainRun = () => {
-    triggerDagRun({
-      dag_id: 'model_evaluating_dag',
-    });
-  };
-
   return (
     <PageContainer title='Configuration'>
-      <Box width={'100%'} hidden={!isSuccess}>
-        <NotificationBar
-          notification='Model Training In Progress'
-          type='info'
-        />
-      </Box>
       <SystemOptionContainer>
         <Dialog.Root>
           <Dialog.Trigger width='5rem'>
-            <SystemOption icon={TbRefresh} description='System Retrain'/>
+            <SystemOption icon={TbRefresh} description='System Retrain' />
           </Dialog.Trigger>
           <Portal>
             <Dialog.Backdrop />
@@ -92,7 +96,6 @@ const Configuration = () => {
           </Portal>
         </Dialog.Root>
       </SystemOptionContainer>
-
       <VStack height='100%' gap='1rem'>
         <SimpleGrid columns={2} width='100%' gap='1rem'>
           <GridItem colSpan={{ base: 2, md: 2 }}>
