@@ -1,25 +1,21 @@
-import { Alert } from '@chakra-ui/react';
+import useNotificationStore from '@/store/useNotificationStore';
+import { useEffect } from 'react';
+import { Toaster, toaster } from '../ui/toaster';
 
-interface Props {
-  type: 'error' | 'info' | 'neutral' | 'success' | 'warning';
-  notification: string;
-}
+const NotificationBar = () => {
+  const { notification, clearNotification } = useNotificationStore();
 
-const NotificationBar = ({ type, notification }: Props) => {
-  return (
-    <Alert.Root
-      status={type}
-      onClick={() => console.log('')}
-      cursor={'pointer'}
-      _hover={{
-        boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px;',
-        transition: '0.15s ease-in-out',
-      }}
-    >
-      <Alert.Indicator />
-      <Alert.Title>{notification}</Alert.Title>
-    </Alert.Root>
-  );
+  useEffect(() => {
+    notification &&
+      toaster.create({
+        description: notification.info,
+        type: notification.type,
+        closable: true,
+      });
+    clearNotification();
+  }, [notification]);
+
+  return <Toaster />;
 };
 
 export default NotificationBar;

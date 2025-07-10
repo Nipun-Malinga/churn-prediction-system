@@ -1,16 +1,28 @@
-import { useForm, Controller } from 'react-hook-form';
+import useUploadCSV from '@/hooks/useUploadCSV';
+import csvUploadSchema from '@/schemas/csvUploadSchema';
+import useNotificationStore from '@/store/useNotificationStore';
+import { Box, Button, FileUpload, HStack } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FileUpload, Button, HStack } from '@chakra-ui/react';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { HiUpload } from 'react-icons/hi';
 import { z } from 'zod';
-import csvUploadSchema from '@/schemas/csvUploadSchema';
-import useUploadCSV from '@/hooks/useUploadCSV';
-import NotificationBar from '../NotificationBar';
-
-type FormData = z.infer<typeof csvUploadSchema>;
 
 const CSVUpload = () => {
-  const { mutate: uploadCSV, isPending, isSuccess, isError } = useUploadCSV();
+  const { mutate, error, isPending, isError, isSuccess } = useUploadCSV();
+  const { setNotification } = useNotificationStore();
+
+  useEffect(() => {
+    isSuccess &&
+      setNotification({
+        type: 'success',
+        info: 'Dataset File Uploaded Successfully.',
+      });
+    error &&
+      setNotification({ type: 'error', info: 'Failed to upload CSV file.' });
+  }, [isSuccess, isError]);
+
+  type FormData = z.infer<typeof csvUploadSchema>;
 
   const {
     handleSubmit,
@@ -21,16 +33,11 @@ const CSVUpload = () => {
   });
 
   const onSubmit = (data: FormData) => {
-    const file = data.file[0];
-    uploadCSV(file);
+    mutate(data.file[0]);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
-      {isSuccess && (
-        <NotificationBar type={'success'} notification='Dataset File Uploaded Successfully.' />
-      )}
-      {isError && <NotificationBar type={'error'} notification='Failed to upload CSV file.' />}
+    <Box as='form' onSubmit={handleSubmit(onSubmit)} width='100%'>
       <Controller
         name='file'
         control={control}
@@ -49,15 +56,24 @@ const CSVUpload = () => {
                   <HiUpload /> Upload file
                 </Button>
               </FileUpload.Trigger>
-              <Button type='submit' size='sm' width={'7rem'} loading={isPending}>
+              <Button
+                type='submit'
+                size='sm'
+                width={'7rem'}
+                loading={isPending}
+              >
                 Submit
               </Button>
             </HStack>
           </FileUpload.Root>
         )}
       />
-      {errors.file && <p style={{ color: 'red', marginTop: '0.5rem' }}>{errors.file.message}</p>}
-    </form>
+      {errors.file && (
+        <p style={{ color: 'red', marginTop: '0.5rem' }}>
+          {errors.file.message}
+        </p>
+      )}
+    </Box>
   );
 };
 
