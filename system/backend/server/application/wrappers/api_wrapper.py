@@ -8,7 +8,7 @@ from application.exceptions import (
     AirflowCSRFError,
     AirflowAPIError,
 )
-
+from werkzeug.exceptions import NotFound
 
 def apiWrapper(func):
     @wraps(func)
@@ -16,22 +16,33 @@ def apiWrapper(func):
         try:
             return func(*args, **kwargs)
         except ValueError as ex:
-            current_app.logger.error("Value Error: %s", ex, exc_info=False)
+            current_app.logger.error(f"Value Error: {ex}")
             return error_response_template("Error: Invalid Filtering Value"), 400
         except NoResultFound as ex:
-            current_app.logger.error("NotFound error: %s", ex, exc_info=False)
-            return error_response_template("No Information found"), 404
+            current_app.logger.info(f"Resource Not Found: {ex}")
+            return error_response_template("No Information Found"), 404
+        except TypeError as ex:
+            current_app.logger.error(f"Type Error: {ex}")
+            return error_response_template("Error: Type Error"), 500
         except SQLAlchemyError as ex:
-            current_app.logger.error("Database Error: %s", ex, exc_info=False)
+            current_app.logger.error(f"Database Error: {ex}")
             return error_response_template("Error: Database Error Occurred"), 500
-        except (AirflowConnectionError, AirflowLoginError, AirflowCSRFError) as ex:
-            current_app.logger.error("Airflow Auth Error: %s", ex, exc_info=False)
-            return error_response_template(str(ex)), 500
-        except AirflowAPIError as ex:
-            current_app.logger.error("Airflow API Error: %s", ex, exc_info=False)
-            return error_response_template(str(ex)), 500
+        except NotFound as ex:
+            current_app.logger.warning(f"File Not Found: {ex}")
+            return error_response_template("Error: Database Error Occurred"), 404
+        except (
+            AirflowConnectionError,
+            AirflowLoginError,
+            AirflowCSRFError,
+            AirflowAPIError,
+        ) as ex:
+            current_app.logger.error(f"Airflow Service Unavailable Error: {ex}")
+            return error_response_template(f"Error: Airflow Service Not Available"), 503
         except Exception as ex:
-            current_app.logger.error("Unexpected Error: %s", ex, exc_info=False)
-            return error_response_template("Error: Server Error Occurred"), 500
+            current_app.logger.error(f"Unexpected Error: {ex}")
+            return (
+                error_response_template("Error: Unexpected Server Error Occurred"),
+                500,
+            )
 
     return wrapper

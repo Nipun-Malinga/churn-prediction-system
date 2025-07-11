@@ -1,5 +1,7 @@
 import json
 
+from flask import current_app
+
 from application import db
 from application.models import User
 from application.schemas import User_Login_Schema
@@ -17,16 +19,17 @@ class User_Service:
             db.session.add(user)
             db.session.commit()
             return create_access_token(
-                identity=json.dumps({"user_id:": user.id}), 
+                identity=json.dumps({"user_id": user.id}), 
                 additional_claims={"email": user.email}
             )
         except IntegrityError as ex:
             db.session.rollback()  
-            raise ValueError()
+            current_app.logger.warning(f"Integrity Error Occurred While Saving User: {ex}", exc_info=True)
+            raise ValueError("User Already Exists or Violates Unique Constraint.") from ex
         except SQLAlchemyError as ex:
-            raise SQLAlchemyError(
-                "An error occurred while saving user information."
-            ) from ex
+            db.session.rollback()  
+            current_app.logger.error("SQLAlchemy Error Occurred While Saving User", exc_info=True)
+            raise RuntimeError("Database Error Occurred While Saving User") from ex
             
 
     @classmethod
@@ -48,10 +51,8 @@ class User_Service:
             )
             
         except SQLAlchemyError as ex:
-            raise SQLAlchemyError(
-                "An error occurred while retrieving user information."
-            ) from ex
+            current_app.logger.error("SQLAlchemy Error While Retrieving User Information", exc_info=True)
+            raise SQLAlchemyError("An Error While Retrieving User Information") from ex
         except ValueError as ex:
-            raise ValueError(
-                "User validation failed due to password error"
-            ) from ex
+            current_app.logger.error("User Validation Failed Due to Password Error", exc_info=True)
+            raise ValueError("User validation Failed") from ex
