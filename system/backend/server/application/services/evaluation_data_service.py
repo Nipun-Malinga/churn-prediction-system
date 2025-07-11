@@ -33,6 +33,8 @@ class Evaluation_Data_Service:
             return records
         except ValueError:
             raise
+        except KeyError:
+            raise
 
     @classmethod
     def basic_dataset_information(cls):

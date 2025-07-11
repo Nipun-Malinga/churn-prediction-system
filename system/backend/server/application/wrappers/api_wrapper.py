@@ -18,6 +18,9 @@ def apiWrapper(func):
         except ValueError as ex:
             current_app.logger.error(f"Value Error: {ex}")
             return error_response_template("Error: Invalid Filtering Value"), 400
+        except KeyError as ex:
+            current_app.logger.error(f"Value Error: {ex}")
+            return error_response_template("Error: Invalid Filtering Value"), 400
         except NoResultFound as ex:
             current_app.logger.info(f"Resource Not Found: {ex}")
             return error_response_template("No Information Found"), 404
