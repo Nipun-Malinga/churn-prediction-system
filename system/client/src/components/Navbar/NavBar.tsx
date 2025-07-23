@@ -37,7 +37,7 @@ const NavBar = () => {
               <Popover.Body>
                 <Popover.Title fontWeight='medium'>Notifications</Popover.Title>
                 {data?.data && (
-                  <NotificationBar type='warning' notification='New Trained Model Available' />
+                  <NotificationBar />
                 )}
               </Popover.Body>
             </Popover.Content>

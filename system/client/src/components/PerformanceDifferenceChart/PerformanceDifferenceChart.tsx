@@ -5,7 +5,6 @@ import {
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-  ResponsiveContainer,
   Legend,
 } from 'recharts';
 import ChartContainer from '../ChartContainer';

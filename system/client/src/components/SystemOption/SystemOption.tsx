@@ -1,11 +1,9 @@
 import {
   Box,
-  Button,
   HoverCard,
   HStack,
   Icon,
   Portal,
-  Span,
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { IconType } from 'react-icons';
@@ -16,7 +14,7 @@ interface Props {
   disable?: boolean;
 }
 
-const SystemOption = ({ icon, description, disable }: Props) => {
+const SystemOption = ({ icon, description }: Props) => {
   const [open, setOpen] = useState(false);
 
   return (
