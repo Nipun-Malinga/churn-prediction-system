@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  server:
+    build: ./backend/server
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: 434b4679c985b1804a614ae395eddb94c633fec5fb7ccc73dd986f68b05b4154
+      JWT_SECRET_KEY: d2f9c8136e7e4aefae3e5b1c1fc947a3b9a6a2fd78f0dc1a6e1f0a89e4123c7f
+      DATABASE_URI: postgresql://postgres:12345@db:5432/churn_pred_system_database
+      GOOGLE_APPLICATION_CREDENTIALS: /app/creds/GCS-Storage-Credentials.json
+    volumes:
+      - ./backend/GCS-Storage-Credentials.json:/app/creds/GCS-Storage-Credentials.json
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - churn_net
+
+  db:
+    image: postgres
+    ports:
+      - "5431:5432"
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_USER: postgres
+      POSTGRES_DB: churn_pred_system_database 
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "churn_pred_system_database"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 120s
+    networks:
+      - churn_net
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+    networks:
+      - churn_net
+
+volumes:
+  pgdata:
+
+networks:
+  churn_net:
+    driver: bridge

@@ -1,3 +1,3 @@
+#!/bin/sh
 echo "Starting the WSGI Server"
-
-gunicorn run:app
+exec gunicorn --bind 0.0.0.0:8000 run:app
