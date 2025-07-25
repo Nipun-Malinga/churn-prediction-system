@@ -1,1 +1,2 @@
 from .airflow_exceptions import AirflowAPIError, AirflowConnectionError, AirflowCSRFError, AirflowLoginError
+from .user_exceptions import UserNotFoundException, UserAlreadyRegisteredException

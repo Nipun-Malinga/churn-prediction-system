@@ -2,6 +2,7 @@ from application import limiter
 from application.responses import error_response_template, response_template
 from application.schemas import User_Login_Schema, User_Register_Schema
 from application.services import User_Service
+from application.exceptions import UserAlreadyRegisteredException, UserNotFoundException
 from flask import Blueprint, request, current_app
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
@@ -16,30 +17,37 @@ service = User_Service()
 def register():
     schema = User_Register_Schema()
 
-    auth_token = service.save_user(schema.load(request.json))
-    current_app.logger.info("User Email Registered Successfully")
+    try:
+        auth_token = service.save_user(schema.load(request.json))
+        current_app.logger.info("User Email Registered Successfully")
 
-    return (
-        response_template(
-            "success", "User registered successfully", {"auth_token": auth_token}
-        ),
-        201,
-    )
+        return (
+            response_template(
+                "success", "User registered successfully", {"auth_token": auth_token}
+            ),
+            201,
+        )
+    except UserAlreadyRegisteredException as ex:
+        return (error_response_template(message=str(ex)), 409)
 
 
 @user.route("/login", methods=["POST"])
 @limiter.limit("10 per minute")
 def login():
     schema = User_Login_Schema()
-
-    auth_token = service.validate_user(schema.load(request.json))
-    current_app.logger.info("User Email Validated Successfully")
-
-    if auth_token:
-        return (
-            response_template(
-                "success", "User verified successfully", {"auth_token": auth_token}
-            ),
-            200,
-        )
-    return error_response_template("Invalid Credentials"), 401
+    
+    try:
+        auth_token = service.validate_user(schema.load(request.json))
+        if auth_token:
+            current_app.logger.info("User Email Validated Successfully")
+            return (
+                response_template(
+                    "success", "User verified successfully", {"auth_token": auth_token}
+                ),
+                200,
+            )
+        return error_response_template("Invalid Credentials"), 401
+    except UserNotFoundException as ex:
+        return error_response_template(
+            str(ex)
+        ), 404

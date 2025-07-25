@@ -6,7 +6,6 @@ WORKDIR /app
 
 RUN chown -R app:app /app
 
-# Install essential build tools and OpenMP support
 RUN apk add --no-cache \
     build-base \
     cmake \
