@@ -206,9 +206,3 @@ The system underwent comprehensive testing:
 * **Email Alerts:** Notify admins about performance drift automatically.
 * **Old Model Evaluation System:** Allow admins to evaluate previously deployed models.
 * **Dynamic Preprocessing System:** Allow organizations to use their own dataset without modifying the internal code.
-
----
-
-**Author:** Kodippili T Prabhathiya  
-**University:** University of Plymouth / NSBM Green University  
-**Project Type:** Final Year Undergraduate Project  

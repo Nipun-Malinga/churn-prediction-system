@@ -18,7 +18,9 @@ const DriftThresholdCards = () => {
   if (!fetchedData) return null;
 
   return (
-    <HStack width={{ base: '100%', md: 'auto' }}>
+    <HStack 
+      width={{ base: '100%', md: 'auto' }}
+    >
       <CardContainer>
         <MetricCard label='Accuracy' value={fetchedData.accuracy} />
         <MetricCard label='Precision' value={fetchedData.precision} />

@@ -17,7 +17,6 @@ interface Props {
 }
 
 const PerformanceDriftChart = ({ performanceDriftHistory }: Props) => {
-  console.log(performanceDriftHistory);
   return (
     <ChartContainer>
       <BarChart

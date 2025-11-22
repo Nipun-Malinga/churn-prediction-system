@@ -8,14 +8,13 @@ import { useBasicModelInfo } from '@/hooks/useModelInfo';
 import usePerformanceDriftHistory from '@/hooks/usePerformanceDriftHistory';
 import usePerformanceHistory from '@/hooks/usePerformanceHistory';
 import useSelectedModeStore from '@/store/useSelectedModeStore';
-import { GridItem, SimpleGrid } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import { LuBrainCircuit } from 'react-icons/lu';
 import { TbRefresh } from 'react-icons/tb';
 
 // TODO: Build a separate hook to fetch base model information
 const Home = () => {
   const { selectedMode } = useSelectedModeStore();
-
   const { data: basicModelData } = useBasicModelInfo();
   const { data: performanceHistoryData } = usePerformanceHistory(
     1,
@@ -40,38 +39,32 @@ const Home = () => {
             />
           ))}
       </CardContainer>
-      <SimpleGrid
-        columns={{
-          base: 1,
-          md: 2,
+      <Flex
+        width={'full'}
+        marginY={'5'}
+        flexDir={{
+          base: 'column',
         }}
-        gap={'1rem'}
-        width={'100%'}
+        gap={'2'}
       >
-        {performanceHistoryData?.data &&
-          performanceHistoryData.data.length > 0 && (
-            <GridItem>
-              <MainContainer modeSelectorVisible={true}>
-                <PerformanceChart
-                  performanceHistory={performanceHistoryData?.data}
-                />
-              </MainContainer>
-            </GridItem>
-          )}
-        {performanceDriftHistoryData?.data &&
-          performanceDriftHistoryData.data.length > 0 && (
-            <GridItem>
-              <MainContainer
-                title='Performance Drift History'
-                modeSelectorVisible={false}
-              >
-                <PerformanceDriftChart
-                  performanceDriftHistory={performanceDriftHistoryData?.data}
-                />
-              </MainContainer>
-            </GridItem>
-          )}
-      </SimpleGrid>
+        {performanceHistoryData?.data && (
+          <MainContainer modeSelectorVisible={true}>
+            <PerformanceChart
+              performanceHistory={performanceHistoryData?.data}
+            />
+          </MainContainer>
+        )}
+        {performanceDriftHistoryData?.data && (
+          <MainContainer
+            title='Performance Drift History'
+            modeSelectorVisible={false}
+          >
+            <PerformanceDriftChart
+              performanceDriftHistory={performanceDriftHistoryData?.data}
+            />
+          </MainContainer>
+        )}
+      </Flex>
     </PageContainer>
   );
 };

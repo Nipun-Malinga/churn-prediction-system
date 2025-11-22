@@ -51,47 +51,47 @@ const Model = () => {
             ></PerformanceCard>
           </SimpleGrid>
         )}
+        <SimpleGrid
+          width={'100%'}
+          columns={{
+            base: 1,
+            md: 4,
+          }}
+          gap={'1rem'}
+        >
+          <GridItem colSpan={{ md: 4 }}>
+            <MainContainer modeSelectorVisible={true}>
+              {performanceHistoryData?.data && (
+                <PerformanceChart
+                  performanceHistory={performanceHistoryData?.data}
+                />
+              )}
+            </MainContainer>
+          </GridItem>
+          <GridItem width={'100%'} colSpan={{ md: 2 }}>
+            <ConfusionMatrix
+              tp={data?.data.TP ? data?.data.TP : 0}
+              tn={data?.data.TN ? data?.data.TN : 0}
+              fp={data?.data.FP ? data?.data.FP : 0}
+              fn={data?.data.FN ? data?.data.FN : 0}
+            />
+          </GridItem>
+          <GridItem colSpan={{ md: 2 }} width={'100%'}>
+            <MainContainer
+              title='Performance Difference'
+              modeSelectorVisible={false}
+            >
+              {baseModelInfo?.data && data?.data && (
+                <PerformanceDifferenceChart
+                  currentModelName={modelName.toUpperCase()}
+                  currentModelData={data?.data}
+                  baseModelData={baseModelInfo?.data}
+                />
+              )}
+            </MainContainer>
+          </GridItem>
+        </SimpleGrid>
       </MainContainer>
-      <SimpleGrid
-        width={'100%'}
-        columns={{
-          base: 1,
-          md: 4,
-        }}
-        gap={'1rem'}
-      >
-        <GridItem colSpan={{ md: 4 }}>
-          <MainContainer modeSelectorVisible={true}>
-            {performanceHistoryData?.data && (
-              <PerformanceChart
-                performanceHistory={performanceHistoryData?.data}
-              />
-            )}
-          </MainContainer>
-        </GridItem>
-        <GridItem width={'100%'} colSpan={{ md: 2 }}>
-          <ConfusionMatrix
-            tp={data?.data.TP ? data?.data.TP : 0}
-            tn={data?.data.TN ? data?.data.TN : 0}
-            fp={data?.data.FP ? data?.data.FP : 0}
-            fn={data?.data.FN ? data?.data.FN : 0}
-          />
-        </GridItem>
-        <GridItem colSpan={{ md: 2 }} width={'100%'}>
-          <MainContainer
-            title='Performance Difference'
-            modeSelectorVisible={false}
-          >
-            {baseModelInfo?.data && data?.data && (
-              <PerformanceDifferenceChart
-                currentModelName={modelName}
-                currentModelData={data?.data}
-                baseModelData={baseModelInfo?.data}
-              />
-            )}
-          </MainContainer>
-        </GridItem>
-      </SimpleGrid>
     </PageContainer>
   );
 };

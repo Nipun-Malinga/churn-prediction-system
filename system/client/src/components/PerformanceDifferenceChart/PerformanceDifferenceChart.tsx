@@ -6,6 +6,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Legend,
+  ResponsiveContainer,
 } from 'recharts';
 import ChartContainer from '../ChartContainer';
 
@@ -49,20 +50,74 @@ const PerformanceDifferenceChart = ({
 
   return (
     <ChartContainer>
-      <RadarChart cx='50%' cy='50%' outerRadius='80%' data={data}>
-        <PolarGrid />
-        <PolarAngleAxis dataKey='subject' />
-        <PolarRadiusAxis />
-        <Legend />
-        <Radar name='Base Model' dataKey='base' stroke='#3ee63e' fill='#3ee63e' fillOpacity={0.6} />
-        <Radar
-          name={currentModelName}
-          dataKey='current'
-          stroke='#9467bd'
-          fill='#9467bd'
-          fillOpacity={0.5}
-        />
-      </RadarChart>
+      <ResponsiveContainer width='100%' height='100%'>
+        <RadarChart cx='50%' cy='50%' outerRadius='75%' data={data}>
+          <PolarGrid 
+            stroke='#e5e7eb'
+            strokeWidth={1}
+          />
+          <PolarAngleAxis 
+            dataKey='subject'
+            tick={{ 
+              fill: '#374151', 
+              fontSize: 14, 
+              fontWeight: 500 
+            }}
+          />
+          <PolarRadiusAxis 
+            angle={90}
+            tick={{ 
+              fill: '#6b7280', 
+              fontSize: 12 
+            }}
+            stroke='#d1d5db'
+          />
+          <Legend 
+            wrapperStyle={{
+              paddingTop: '1rem',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+            }}
+            iconType='circle'
+          />
+          <Radar 
+            name='Base Model' 
+            dataKey='base' 
+            stroke='#10b981' 
+            fill='#10b981' 
+            fillOpacity={0.25}
+            strokeWidth={2}
+            dot={{ 
+              fill: '#10b981', 
+              r: 4,
+              strokeWidth: 2,
+              stroke: '#fff'
+            }}
+            activeDot={{ 
+              r: 6,
+              strokeWidth: 2
+            }}
+          />
+          <Radar
+            name={currentModelName}
+            dataKey='current'
+            stroke='#8b5cf6'
+            fill='#8b5cf6'
+            fillOpacity={0.25}
+            strokeWidth={2}
+            dot={{ 
+              fill: '#8b5cf6', 
+              r: 4,
+              strokeWidth: 2,
+              stroke: '#fff'
+            }}
+            activeDot={{ 
+              r: 6,
+              strokeWidth: 2
+            }}
+          />
+        </RadarChart>
+      </ResponsiveContainer>
     </ChartContainer>
   );
 };
